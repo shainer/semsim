@@ -1,0 +1,41 @@
+{
+    "created_at": "Fri, 07 Jun 2013 17:01:03 +0000",
+    "from_user": "AshleyYank13",
+    "from_user_id": 369844409,
+    "from_user_id_str": "369844409",
+    "from_user_name": "Ashley Nicole Yank",
+    "geo": null,
+    "id": 343049980904362000,
+    "id_str": "343049980904361984",
+    "iso_language_code": "en",
+    "metadata": {
+        "result_type": "recent"
+    },
+    "profile_image_url": "http://a0.twimg.com/profile_images/3757368444/8d07578d3bf8152e50dc8c98058fa151_normal.jpeg",
+    "profile_image_url_https": "https://si0.twimg.com/profile_images/3757368444/8d07578d3bf8152e50dc8c98058fa151_normal.jpeg",
+    "source": "&lt;a href=&quot;http://twitter.com/download/iphone&quot;&gt;Twitter for iPhone&lt;/a&gt;",
+    "text": "Why the heck is Dora on?? It is 1pm.. Little kids are taking a nap right now...",
+    "normalized_tokens": [ "Why" "the" "heck" "is" "Dora" "on" "??" "It" "is" "1" "pm" ".." "Little" "kids" "are" "taking" "a" "nap" "right" "now" "..."],
+    "pos": [ "P" "D" "N" "V" "^" "P" "," "O" "V" "$" "R" "," "A" "N" "V" "V" "D" "N" "R" "R" "," ],
+    
+    "qpairs": [
+      {
+	"question": "Why is the sky blue?",
+	"answer": "Because of scattering. Blue light scatters more than other colours, because of its high frequency.",
+	"sentiment": {
+	  "class": "Neutral",
+	  "score": 1.0
+	}
+      }
+      
+      {
+	"question": "Why is blue the colour of the sky?",
+	"answer": "Because of scattering. Blue light scatters more than other colours, because of its high frequency.",
+	"sentiment": {
+	  "class": "Neutral",
+	  "score": 1.0
+	}
+      }
+    ]
+
+}
