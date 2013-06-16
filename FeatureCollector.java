@@ -8,8 +8,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import cmu.arktweetnlp.Tagger.TaggedToken;
-import java.util.Iterator;
 import java.util.Map;
+import java.io.File;
+import java.net.URL;
+import java.io.IOException;
+import edu.cmu.lti.ws4j.WS4J;
+import edu.cmu.lti.ws4j.util.*;
+import edu.cmu.lti.ws4j.impl.*;
 
 /**
  * @author shainer
@@ -36,6 +41,7 @@ public class FeatureCollector
         featureMap.put("NumberOverlap3", numberOverlaps[2]);
         featureMap.put("CapitalizedOverlap", capitalizedOverlap());
         featureMap.put("StockOverlap", stockOverlap());
+        featureMap.put("WordNetOverlap", wordnetOverlap());
         
         printMap(featureMap);
         
@@ -50,6 +56,57 @@ public class FeatureCollector
             
             System.out.println(string + ": " + double1);
         }
+    }
+    
+    private double wordnetOverlap()
+    {        
+        return harmonicMean(pwn(sp.s1, sp.s2), pwn(sp.s2, sp.s1));
+    }
+    
+    private double harmonicMean(double d1, double d2)
+    {
+        double mean = 2.0;
+        mean /= ((1.0 / d1) + (1.0 / d2));
+        return mean;
+    }
+    
+    private double pwn(List<TaggedToken> s1, List<TaggedToken> s2)
+    {
+        double res = 0.0;
+        
+        for (TaggedToken tt : s1) {
+            if (tt.tag.equals(",") || tt.tag.equals("$")) {
+                continue;
+            }
+            
+            String token = tt.token;
+            res += wordnetScore(token, s2);
+        }
+        
+        res /= s2.size();
+        return res;
+    }
+    
+    private double wordnetScore(String word1, List<TaggedToken> sentence)
+    {
+        double maxScore = 0.0;
+        
+        for (TaggedToken tt : sentence) {
+            if (tt.token.equals(word1)) {
+                return 1.0;
+            }
+        }
+        
+        for (TaggedToken tt : sentence) {
+            String otherWord = tt.token;
+            double score = WS4J.runPATH(word1, otherWord);
+            
+            if (score > maxScore) {
+                maxScore = score;
+            }
+        }
+        
+        return maxScore;
     }
     
     private double[] ngramOverlaps()
