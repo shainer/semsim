@@ -9,14 +9,8 @@ import java.util.Set;
 import java.util.HashSet;
 import cmu.arktweetnlp.Tagger.TaggedToken;
 import java.util.Map;
-import java.io.File;
-import java.net.URL;
-import java.io.IOException;
 import edu.cmu.lti.ws4j.WS4J;
-import edu.cmu.lti.ws4j.util.*;
-import edu.cmu.lti.ws4j.impl.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.math.BigInteger;
 import java.util.Iterator;
 
 /**
@@ -26,9 +20,11 @@ public class FeatureCollector
 {
     private SentencePair sp;
     HashMap<String, Double> featureMap;
+    FrequencyCounter counter;
     
     public FeatureCollector()
     {
+        counter = new FrequencyCounter();
         featureMap = new HashMap<String, Double>();
     }
     
@@ -51,6 +47,7 @@ public class FeatureCollector
         stockOverlap();
         wordnetOverlap();
         weightedWords();
+        sentenceLength();
         
         printMap(featureMap);
         return featureMap;
@@ -58,6 +55,9 @@ public class FeatureCollector
     
     private void printMap(HashMap<String, Double> map)
     {
+        System.out.println(":: Features for sentences :: ");
+        System.out.println(sp);
+        
         for (Map.Entry<String, Double> entry : map.entrySet()) {
             String string = entry.getKey();
             Double double1 = entry.getValue();
@@ -66,9 +66,69 @@ public class FeatureCollector
         }
     }
     
+    private void sentenceLength()
+    {
+        featureMap.put("LengthDifference", (double)Math.abs(sp.s2.size() - sp.s1.size()));
+    }
+    
     private void weightedWords()
     {
+        BigInteger totalFrequencyCount = new BigInteger("468491999592");
+        double s1TotalContent = 0.0;
+        double s2TotalContent = 0.0;
+        double sharedContent = 0.0;
         
+        for (TaggedToken tt : sp.s1) {
+            double icw = informationContent(tt, totalFrequencyCount);
+            s1TotalContent += icw;
+            
+            if (sentenceContains(sp.s2, tt)) {
+                sharedContent += icw;
+            }
+        }
+        
+        for (TaggedToken tt : sp.s2) {
+            double icw = informationContent(tt, totalFrequencyCount);
+            s2TotalContent += icw;
+            
+            if (sentenceContains(sp.s1, tt)) {
+                sharedContent += icw;
+            }
+        }
+    
+        double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
+        featureMap.put("WordWeightedOverlap", wwo);
+        featureMap.put("AggregatedWordContentDifference", Math.abs(s2TotalContent - s1TotalContent));
+    }
+    
+    private boolean sentenceContains(List<TaggedToken> s, TaggedToken tt)
+    {
+        for (TaggedToken sTT : s) {
+            if (sTT.token.equals(tt.token) && sTT.tag.equals(tt.tag)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private double informationContent(TaggedToken tt, BigInteger totalFrequencyCount)
+    {
+        char[] uselessTags = {'#', '@', '~', 'U', 'E', '$', ',', 'G'};
+        
+        for (int i = 0; i < uselessTags.length; i++) {
+            if (tt.tag.charAt(0) == uselessTags[i]) {
+                return 0.0;
+            }
+        }
+        
+        BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
+        
+        if (frequency.doubleValue() == 0) {
+            return 0;
+        }
+        
+        return Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
     }
     
     private void wordnetOverlap()
@@ -91,9 +151,8 @@ public class FeatureCollector
             if (tt.tag.equals(",") || tt.tag.equals("$")) {
                 continue;
             }
-            
-            String token = tt.token;
-            res += wordnetScore(token, s2);
+
+            res += wordnetScore(tt.token.toLowerCase(), s2);
         }
         
         res /= s2.size();
@@ -103,6 +162,7 @@ public class FeatureCollector
     private double wordnetScore(String word1, List<TaggedToken> sentence)
     {
         double maxScore = 0.0;
+        word1 = word1.toLowerCase();
         
         for (TaggedToken tt : sentence) {
             if (tt.token.equals(word1)) {
@@ -132,33 +192,33 @@ public class FeatureCollector
         Set<String> s2trigrams = new HashSet<String>();
         
         for (int i = 0; i < sp.s1.size(); i++) {
-            String token1 = sp.s1.get(i).token;
+            String token1 = sp.s1.get(i).token.toLowerCase();
             String token2 = "", token3 = "";
             s1unigrams.add(token1);
             
             if (i < sp.s1.size() - 1) {
-                token2 = sp.s1.get(i+1).token;
+                token2 = sp.s1.get(i+1).token.toLowerCase();
                 s1bigrams.add(token1 + " " + token2);
             }
             
             if (i < sp.s1.size() - 2) {
-                token3 = sp.s1.get(i+2).token;
+                token3 = sp.s1.get(i+2).token.toLowerCase();
                 s1trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
         
         for (int i = 0; i < sp.s2.size(); i++) {
-            String token1 = sp.s2.get(i).token;
+            String token1 = sp.s2.get(i).token.toLowerCase();
             String token2 = "", token3 = "";
             s2unigrams.add(token1);
             
             if (i < sp.s2.size() - 1) {
-                token2 = sp.s2.get(i+1).token;
+                token2 = sp.s2.get(i+1).token.toLowerCase();
                 s2bigrams.add(token1 + " " + token2);
             }
             
             if (i < sp.s2.size() - 2) {
-                token3 = sp.s2.get(i+2).token;
+                token3 = sp.s2.get(i+2).token.toLowerCase();
                 s2trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
@@ -175,39 +235,61 @@ public class FeatureCollector
         double[] results = new double[3];
         
         results[0] = Math.log(1 + n1.size() + n2.size());
-        results[1] = (modifiedContainsAll(n1, n2) || modifiedContainsAll(n2, n1)) ? 1.0 : 0.0;
+        results[1] = (modifiedContainsAll(n1, n2)) || (modifiedContainsAll(n2, n1)) ? 1.0 : 0.0;
         results[2] = 1.0;
         results[2] /= (n1.size() + n2.size());
         
-        n1.retainAll(n2);
-        results[2] *= n1.size() * 2;
+        Set<Double> nIntersect = new HashSet<Double>();
+        
+        for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
+            Double d = it.next();
+            
+            if (modifiedContains(n2, d)) {
+                nIntersect.add(d);
+            }
+        }
+        
+        results[2] *= nIntersect.size() * 2;
         
         featureMap.put("NumberOverlap1", results[0]);
         featureMap.put("NumberOverlap2", results[1]);
         featureMap.put("NumberOverlap3", results[2]);
     }
     
-    private boolean modifiedContainsAll(Set<Double> n1, Set<Double> n2)
+    private boolean modifiedContains(Set<Double> n1, Double d)
     {
+        String number = d.toString();
+        
         for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
             Double d1 = it.next();
-            BigDecimal bg1 = new BigDecimal(d1);
-            String number1 = bg1.toString();
             
-            for (Iterator<Double> it2 = n2.iterator(); it2.hasNext(); ) {
-                Double d2 = it2.next();
-                BigDecimal bg2 = new BigDecimal(d2);
-                String number2 = bg2.toString();
-                
-                if (d1.intValue() != d2.intValue()) {
-                    return false;
-                }
-                
-                if (!number1.startsWith(number2) && !number2.startsWith(number1) ) {
-                    return false;
-                }
+            if (d1 == d) {
+                return true;
             }
+
+            String number1 = d1.toString();
+
+            if (number1.startsWith(number) || number.startsWith(number1) ) {
+                return true;
+            }
+
+        }
+        
+        return false;
+    }
+    
+    private boolean modifiedContainsAll(Set<Double> n1, Set<Double> n2)
+    {
+        if (n1.isEmpty() || n2.isEmpty()) {
+            return false;
+        }
+        
+        for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
+            Double d = it.next();
             
+            if (!modifiedContains(n2, d)) {
+                return false;
+            }
         }
         
         return true;
@@ -307,7 +389,7 @@ public class FeatureCollector
     {
         double overlap = (set1.size() + set2.size());
         set1.retainAll(set2);
-        
+
         if (!set1.isEmpty()) {
             overlap /= set1.size();
             overlap = Math.pow(overlap, -1.0);

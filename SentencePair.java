@@ -20,5 +20,24 @@ public class SentencePair
         this.s1 = s1;
         this.s2 = s2;
     }
+    
+    public String toString()
+    {
+        String p = "";
+        
+        for (TaggedToken tt : s1) {
+            p += tt.token + "_" + tt.tag + ", ";
+        }
+        
+        p += "\n";
+        
+        for (TaggedToken tt : s2) {
+            p += tt.token + "_" + tt.tag + ", ";
+        }
+        
+        p += "\n";
+        
+        return p;
+    }
 } 
 

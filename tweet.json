@@ -20,7 +20,7 @@
     
     "qpairs": [
       {
-	"question": "Why is the sky blue?",
+	"question": "Why is the sky blue ?",
 	"answer": "Because of scattering. Blue light scatters more than other colours, because of its high frequency.",
 	"sentiment": {
 	  "class": "Neutral",
@@ -29,8 +29,8 @@
       }
       
       {
-	"question": "Why is blue the colour of the sky?",
-	"answer": "Because of scattering. Blue light scatters more than other colours, because of its high frequency.",
+	"question": "Why is Dora on at 1 pm when kids sleep?",
+	"answer": "Because there was no other place for it to be broadcasted.",
 	"sentiment": {
 	  "class": "Neutral",
 	  "score": 1.0

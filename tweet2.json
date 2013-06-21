@@ -16,4 +16,24 @@
     "profile_image_url_https": "https://si0.twimg.com/profile_images/3642725941/25bcba06a2d94196e319b95b074cdbf7_normal.jpeg",
     "source": "&lt;a href=&quot;http://twitter.com/download/android&quot;&gt;Twitter for Android&lt;/a&gt;",
     "text": "RT @itsesmiibruh: why do girls in tampon commercials seem so happy? i am never happy when i'm on my period.",
+    
+    "qpairs": [
+      {
+	"question": "Why are girls in tampon commercials always cheerful?",
+	"answer": "Because they are paid to be that way.",
+	"sentiment": {
+	  "class": "Neutral",
+	  "score": 1.0
+	}
+      }
+      
+      {
+	"question": "Why is Dora on when kids sleep?",
+	"answer": "Because there was no other place for it to be broadcasted.",
+	"sentiment": {
+	  "class": "Neutral",
+	  "score": 1.0
+	}
+      }
+    ]
 }, 
