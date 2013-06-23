@@ -5,6 +5,13 @@
 
 import java.io.*;
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 
 /**
  *
@@ -12,8 +19,91 @@ import java.math.BigInteger;
  */
 public class FrequencyCounter
 {
+    private Map<String, BigInteger> cache;
+    
     public FrequencyCounter()
-    {}
+    {
+        this.cache = new HashMap<>();
+    }
+    
+    public void createCache(List<SentencePair> pairs)
+    {
+        System.out.println(":: Building cache");
+        destroyCache();
+        Map<String, Set<String> > groups = new HashMap<>();
+        
+        for (SentencePair sentencePair : pairs) {
+            for (TaggedToken tt : sentencePair.s1) {
+                String token = tt.token.toLowerCase();
+                String word = token + "_" + translateTag(tt.tag);
+                
+                int initialIndex = 0;
+                while (initialIndex < token.length() && !Character.isLetter( token.charAt(initialIndex) )) {
+                    initialIndex++;
+                }
+                
+                if (initialIndex == token.length()) {
+                    continue;
+                }
+                
+                Set<String> set;
+                String key;
+                if (token.substring(initialIndex).length() == 1) {
+                    key = "a";
+                } else {
+                    key = token.substring(initialIndex, initialIndex+2);
+                }
+                
+                set = groups.get(key);
+                if (set == null) {
+                    set = new HashSet<>();
+                }
+
+                set.add(word);
+                groups.put(key, set);
+            }
+        }
+        
+        for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
+            String string = entry.getKey();
+            Set<String> set = entry.getValue();
+         
+            try {
+                String f = "googlebooks/" + string.charAt(0) + "/" + string;
+                
+                if (string.length() == 1) {
+                    f = "googlebooks/oneLetter";
+                }
+                
+                BufferedReader br = new BufferedReader( new FileReader(f) );
+                String line;
+                
+                while ((line = br.readLine()) != null) {
+                    String[] fields = line.split("\t");
+                    String[] wordPieces = fields[0].split("_");
+                    String word = wordPieces[0].toLowerCase();
+                    
+                    if (wordPieces.length == 2) {
+                        word += "_" + wordPieces[1];
+                    }
+
+                    if (set.contains(word)) {
+                        cache.put(word, new BigInteger(fields[1]));
+                    }
+                }
+            
+                br.close();
+                
+            } catch (IOException e) {
+                System.err.println(":: Could not read from frequency files: " + e.getMessage());
+            }
+        }
+    }
+    
+    public void destroyCache()
+    {
+        cache.clear();
+    }
     
     private String translateTag(String tag)
     {
@@ -55,7 +145,17 @@ public class FrequencyCounter
     public BigInteger getFrequencyCount(String token, String tag)
     {
         token = token.toLowerCase();
-        String filename = "";
+        String translatedTag = translateTag(tag);
+                
+        if (!cache.isEmpty()) {
+            String word = token + "_" + translatedTag;
+            
+            if (cache.containsKey(word)) {
+                return cache.get(word);
+            }
+        }
+        
+        String filename;
         
         int initialIndex = 0;
         while (!Character.isLetter( token.charAt(initialIndex) )) {
@@ -69,7 +169,6 @@ public class FrequencyCounter
             String initials = token.substring(initialIndex, initialIndex+2);
             filename = initial + "/" + initials;
         }
-        String translatedTag = translateTag(tag);
         BigInteger frequencyCount = null;
         
         try {
@@ -84,6 +183,7 @@ public class FrequencyCounter
                 
                 if (word.length == 2 && word[0].equals(token) && word[1].equals(translatedTag)) {
                     frequencyCount = new BigInteger( fields[1] );
+                    break;
                 }
             }
             
