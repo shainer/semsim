@@ -3,14 +3,14 @@
  * and open the template in the editor.
  */
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import cmu.arktweetnlp.Tagger.TaggedToken;
-import java.util.Map;
 import edu.cmu.lti.ws4j.WS4J;
 import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.Iterator;
 
 /**
@@ -18,14 +18,27 @@ import java.util.Iterator;
  */
 public class FeatureCollector
 {
-    private SentencePair sp;
-    HashMap<String, Double> featureMap;
-    FrequencyCounter counter;
+    private SentencePair sp;    
+    private FrequencyCounter counter;
+    
+    private double[] features;
+    private final int FEATURE_SIZE = Properties.getFeatureNumber();
+    private int featureIndex = 0;
     
     public FeatureCollector()
     {
-        counter = new FrequencyCounter();
-        featureMap = new HashMap<String, Double>();
+        this.counter = new FrequencyCounter();
+        this.features = new double[FEATURE_SIZE];
+    }
+    
+    public void initialize(List<SentencePair> sps)
+    {
+        this.counter.createCache(sps);
+    } 
+    
+    public void deinitialize()
+    {
+        this.counter.destroyCache();
     }
     
     private void printSentence(List<TaggedToken> s)
@@ -36,10 +49,10 @@ public class FeatureCollector
         System.out.println();
     }
     
-    public HashMap<String, Double> features(SentencePair sp)
+    public double[] features(SentencePair sp)
     {
         this.sp = sp;
-        featureMap.clear();
+        featureIndex = 0;
         
         ngramOverlaps();
         numberOverlaps();
@@ -49,26 +62,31 @@ public class FeatureCollector
         weightedWords();
         sentenceLength();
         
-        printMap(featureMap);
-        return featureMap;
+        for (int i = 0; i < features.length; i++) {
+            if (!Double.isNaN(features[i]) && !Double.isInfinite(features[i])) {
+                BigDecimal bd = new BigDecimal( features[i] );
+                bd = bd.setScale(3, BigDecimal.ROUND_HALF_UP);
+                features[i] = bd.doubleValue();
+            }
+        }
+        
+        //printFeatures();
+        return features;
     }
     
-    private void printMap(HashMap<String, Double> map)
+    private void printFeatures()
     {
         System.out.println(":: Features for sentences :: ");
         System.out.println(sp);
         
-        for (Map.Entry<String, Double> entry : map.entrySet()) {
-            String string = entry.getKey();
-            Double double1 = entry.getValue();
-            
-            System.out.println(string + ": " + double1);
+        for (int i = 0; i < FEATURE_SIZE; i++) {
+            System.out.println(features[i]);
         }
     }
     
     private void sentenceLength()
     {
-        featureMap.put("LengthDifference", (double)Math.abs(sp.s2.size() - sp.s1.size()));
+        features[featureIndex++] = (double)Math.abs(sp.s2.size() - sp.s1.size());
     }
     
     private void weightedWords()
@@ -97,8 +115,8 @@ public class FeatureCollector
         }
     
         double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
-        featureMap.put("WordWeightedOverlap", wwo);
-        featureMap.put("AggregatedWordContentDifference", Math.abs(s2TotalContent - s1TotalContent));
+        features[featureIndex++] = wwo;
+        features[featureIndex++] = Math.abs(s2TotalContent - s1TotalContent);
     }
     
     private boolean sentenceContains(List<TaggedToken> s, TaggedToken tt)
@@ -133,7 +151,7 @@ public class FeatureCollector
     
     private void wordnetOverlap()
     {        
-        featureMap.put("WordNetOverlap", harmonicMean(pwn(sp.s1, sp.s2), pwn(sp.s2, sp.s1)) );
+        features[featureIndex++] = harmonicMean(pwn(sp.s1, sp.s2), pwn(sp.s2, sp.s1));
     }
     
     private double harmonicMean(double d1, double d2)
@@ -223,9 +241,9 @@ public class FeatureCollector
             }
         }
         
-        featureMap.put("UniGramOverlap", setOverlap(s1unigrams, s2unigrams));
-        featureMap.put("BiGramOverlap", setOverlap(s1bigrams, s2bigrams));
-        featureMap.put("TriGramOverlap", setOverlap(s1trigrams, s2trigrams));
+        features[featureIndex++] = setOverlap(s1unigrams, s2unigrams);
+        features[featureIndex++] = setOverlap(s1bigrams, s2bigrams);
+        features[featureIndex++] = setOverlap(s1trigrams, s2trigrams);
     }
 
     private void numberOverlaps()
@@ -251,9 +269,13 @@ public class FeatureCollector
         
         results[2] *= nIntersect.size() * 2;
         
-        featureMap.put("NumberOverlap1", results[0]);
-        featureMap.put("NumberOverlap2", results[1]);
-        featureMap.put("NumberOverlap3", results[2]);
+        if (Double.isNaN(results[2])) {
+            results[2] = 0.0;
+        }
+        
+        features[featureIndex++] = results[0];
+        features[featureIndex++] = results[1];
+        features[featureIndex++] = results[2];
     }
     
     private boolean modifiedContains(Set<Double> n1, Double d)
@@ -301,12 +323,15 @@ public class FeatureCollector
         
         for (TaggedToken t : sentence) {
             if (t.tag.equals("$")) {
-                n.add( Double.parseDouble(t.token) );
+                try {
+                    n.add( Double.parseDouble(t.token) );
+                } catch (NumberFormatException nfe) {
+                    continue;
+                }
             }
         }
         
         return n;
-        
     }
     
     private void capitalizedOverlap()
@@ -315,8 +340,8 @@ public class FeatureCollector
         Set<String> capTokens2 = findCapitalizedWords(sp.s2);
         double presence = (!capTokens1.isEmpty() || !capTokens2.isEmpty()) ? 1.0 : 0.0;
         
-        featureMap.put("CapitalizedOverlap", setOverlap(capTokens1, capTokens2) );
-        featureMap.put("CapitalizedPresence", presence);
+        features[featureIndex++] = setOverlap(capTokens1, capTokens2);
+        features[featureIndex++] = presence;
     }
     
     private Set<String> findCapitalizedWords(List<TaggedToken> sentence)
@@ -341,8 +366,8 @@ public class FeatureCollector
         Set<String> stockItems2 = findStockItems(sp.s2);
         double presence = (!stockItems1.isEmpty() || !stockItems2.isEmpty()) ? 1.0 : 0.0;
         
-        featureMap.put("StockOverlap", setOverlap(stockItems1, stockItems2));
-        featureMap.put("StockPresence", presence);
+        features[featureIndex++] = setOverlap(stockItems1, stockItems2);
+        features[featureIndex++] = presence;
     }
    
     private Set<String> findStockItems(List<TaggedToken> sentence)
