@@ -10,6 +10,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import cmu.arktweetnlp.Tagger.TaggedToken;
+import java.io.PrintStream;
+import java.io.StringReader;
 
 /**
  *
@@ -19,6 +21,7 @@ public class TweetParser
 {
     private String inputFile;
     private String outputFile;
+    private Object inputJSON;
     private List<SentencePair> sentencePairs;
     private Tagger tagger;
         
@@ -39,11 +42,18 @@ public class TweetParser
     public void parse()
     {
         JSONParser json = new JSONParser();
-        List<TaggedToken> tweetQuestionTokens = new LinkedList<TaggedToken>();
-        this.sentencePairs = new LinkedList<SentencePair>();
+        List<TaggedToken> tweetQuestionTokens = new LinkedList<>();
+        this.sentencePairs = new LinkedList<>();
 
         try {
-            Object obj = json.parse( new FileReader(inputFile) );
+            Object obj;
+            
+            if (inputFile == null) {
+                obj = json.parse( new StringReader( IOUtils.readJSONFromStdin() ));
+            } else {
+                obj = json.parse( new FileReader(inputFile) );
+            }
+            
             JSONObject jsonObject = (JSONObject)obj;
             
             JSONArray tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens");
@@ -60,9 +70,10 @@ public class TweetParser
             for (Object p : questions) {
                 JSONObject qaPair = (JSONObject)p;
                 String question = (String)qaPair.get("question");
-                sentencePairs.add( new SentencePair(tweetQuestionTokens, preprocess(question)) );
+                sentencePairs.add( new SentencePair(tweetQuestionTokens, question, tagger) );
             }
             
+            this.inputJSON = obj;
         } catch (IOException e) {
             System.err.println(":: IO Error: " + e);
         } catch (ParseException e) {
@@ -70,17 +81,12 @@ public class TweetParser
         }
     }
     
-    public List<SentencePair> getSentencePairs()
-    {
-        return sentencePairs;
-    }
-    
     public void writeSimilarities(double[] similarities)
-    {
+    {        
         JSONParser json = new JSONParser();
         
         try {
-            Object obj = json.parse( new FileReader(inputFile) );
+            Object obj = this.inputJSON;
             JSONObject jsonObject = (JSONObject)obj;
             JSONArray questions = (JSONArray)jsonObject.get("qpairs");
             String tweet = (String)jsonObject.get("text");
@@ -91,20 +97,25 @@ public class TweetParser
                 qaPair.put("similarity", similarities[index++]);
             }
             
-            FileWriter writer = new FileWriter(outputFile);
-            writer.write(jsonObject.toJSONString());
+            PrintStream writer;
+            
+            if (outputFile != null) {
+                writer = new PrintStream(outputFile);
+            } else {
+                writer = System.out;
+            }
+            
+            writer.println(jsonObject.toJSONString());
             writer.flush();
             writer.close();
         } catch (IOException e) {
             System.err.println(":: IO Error: " + e);
-        } catch (ParseException e) {
-            System.err.println(":: Parse error: " + e);
         }
 
     }
     
-    private List<TaggedToken> preprocess(String sentence)
+    public List<SentencePair> getSentencePairs()
     {
-        return tagger.tokenizeAndTag(sentence);
+        return sentencePairs;
     }
 }
