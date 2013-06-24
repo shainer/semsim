@@ -42,7 +42,6 @@ public class TweetParser
     public void parse()
     {
         JSONParser json = new JSONParser();
-        List<TaggedToken> tweetQuestionTokens = new LinkedList<>();
         this.sentencePairs = new LinkedList<>();
 
         try {
@@ -58,19 +57,12 @@ public class TweetParser
             
             JSONArray tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens");
             JSONArray tweetPOSTags = (JSONArray)jsonObject.get("pos");
-            for (int i = 0; i < tweetNormalizedTokens.size(); i++) {
-                TaggedToken tt = new TaggedToken();
-                tt.tag = (String)tweetPOSTags.get(i);
-                tt.token = (String)tweetNormalizedTokens.get(i);
-                
-                tweetQuestionTokens.add(tt);
-            }
-
             JSONArray questions = (JSONArray)jsonObject.get("qpairs");
+            
             for (Object p : questions) {
                 JSONObject qaPair = (JSONObject)p;
                 String question = (String)qaPair.get("question");
-                sentencePairs.add( new SentencePair(tweetQuestionTokens, question, tagger) );
+                sentencePairs.add( new SentencePair(tweetNormalizedTokens, tweetPOSTags, question, tagger) );
             }
             
             this.inputJSON = obj;
