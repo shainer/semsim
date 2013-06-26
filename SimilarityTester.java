@@ -1,5 +1,8 @@
 
+import cmu.arktweetnlp.Tagger;
+import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 /*
  * To change this template, choose Tools | Templates
@@ -13,13 +16,23 @@ import java.util.List;
 public class SimilarityTester
 {
     private FeatureCollector fc;
+    private Tagger tagger;
     
-    public SimilarityTester()
+    public SimilarityTester(String model)
     {
         this.fc = new FeatureCollector();
+        this.tagger = new Tagger();
+        
+        try {
+            this.tagger.loadModel("src/taggerModel");
+        } catch (IOException e) {
+            System.err.println("Error loading model for POS tagging: " + e.getLocalizedMessage());
+        }
+        
+        loadModel(model);
     }
     
-    /* TODO: load model from file and use it for getSimilarity */
+    /* TODO: load model from file */
     public void loadModel(String modelFile)
     {}
     
@@ -27,7 +40,9 @@ public class SimilarityTester
     {
         System.out.println(":: Getting similarity for pair " + sp);
         double[] features = fc.features(sp);
-        return 0.0; /* TODO: use loaded model to get answer from features */
+        
+        /* feed features to libSVM and get answer */
+        return 0.0;
     }
     
     public double[] getSimilarities(List<SentencePair> sps)
@@ -41,5 +56,22 @@ public class SimilarityTester
         }
         
         return sims;
+    }
+    
+    public void printSimilaritiesFromFile(String filepath)
+    {        
+        for (String line : IOUtils.readlines(filepath)) {
+            String[] fields = line.split("\t");
+            
+            SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
+            double rightAnswer = Double.parseDouble(fields[2]);
+            double answer = getSimilarity(sp);
+            
+            System.out.println(fields[0]);
+            System.out.println(fields[1]);
+            System.out.println(":: Given answer: " + answer);
+            System.out.println(":: Correct answer: " + rightAnswer);
+            System.out.println();
+        }
     }
 }
