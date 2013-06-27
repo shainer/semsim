@@ -1,0 +1,80 @@
+{
+   "created_at": "Thu Jun 27 20:04:33 CEST 2013",
+   "from_user": "its_slamon",
+   "from_user_id": 481735861,
+   "from_user_name": "Bethany Slamon",
+   "id": 350313718279700480,
+   "iso_language_code": "en",
+   "source": "<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>",
+   "text": "@1dworldmerch how do you get the chance to work at a store?",
+   
+   "language": "en",
+   "tokens": ["@1dworldmerch", "how", "do", "you", "get", "the", "chance", "to", "work", "at", "a", "store", "?"],
+   "normalized_tokens": ["@1dworldmerch", "how", "do", "you", "get", "the", "chance", "to", "work", "at", "a", "store", "?"],
+   "lemmas": ["@1dworldmerch", "how", "do", "you", "get", "the", "chance", "to", "work", "at", "a", "store", "?"],
+   "pos": ["@", "R", "V", "O", "V", "D", "N", "P", "V", "P", "D", "N", ","],
+   
+   "senses": ["", "", "", "", "get%2:40:01::", "", "chance%1:26:00::", "", "work%2:41:00::", "", "", "store%1:06:00::", "?"],
+   "type": ["Subjective", "Deliberative", "Advice"],
+   "categories": ["Careers & Employment", "Education & Reference"],
+   
+    "paraphrases": [
+	{
+	    "text": "How do you get a job at a store?",
+	    "rating": 0.82
+	},
+
+	{
+	    "text": "How do you get the opportunity to work at a shop?",
+	    "rating": 0.96
+	},
+	
+	{
+	    "text": "How can I find a job at a store?",
+	    "rating": 0.75
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "Teenager - How to ask for a job in a shop?",
+	    "answer": "something along the lines of:
+
+(If there ARE jobs being advertised)
+Hi, I was just enquiring about the job position in the window.
+
+(IF there isnt a job being advertised)
+Hi, I was just wondering if there were any jobs going.
+
+
+now theyll probably say theyll need to ask the manager etc, however, if they do say no etc, just ask them if its possible to leave your CV with them..",
+	    "url": "http://uk.answers.yahoo.com/question/index?qid=20100416180855AApaGCB",
+	    
+	    "sentiment": {
+		"class": "Positive",
+		"score": 0.5
+	    },
+	    
+	    "similarity": 0.78,
+	    
+	    "simplified_answer": "If there are jobs advertised, ask about the job position, otherwise ask if they are positions going. They'll say they need to ask the manager. If they say no, ask if you can leave your CV to them.",
+	    "summarized_answer": "Ask if they have job positions available. Ask if you can leave your CV to them."
+	},
+	
+	{
+	    "question": "How can you find a job in a store?",
+	    "answer": "Look for stores who are hiring. Hand your curriculum to a manager or employee and fill up an application if required.",
+	    "url": "http://wiki.answers.com/Q/How_can_you_find_a_job_in_a_store",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 1.0,
+	    
+	    "simplified_answer": "Look for stores who are hiring new employees. Hand your CV to someone working there and fill up their application.",
+	    "summarized_answer": "Look for stores who are hiring new employees. Hand your CV to someone working there and fill up their application."
+	}
+    ]
+}
