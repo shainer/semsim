@@ -48,7 +48,7 @@
     
     "qpairs": [
 	{
-	    "question": "Is it illegal to buy fireworks in Tennessee? Q:",
+	    "question": "Is it illegal to buy fireworks in Tennessee?",
 	    "answer": "In Tennessee ground salutes and mail order purchase of fireworks is illegal. Selling periods are 6-20 to 7-5 and 12-10 to 1-2.",
 	    "url": "http://www.chacha.com/question/is-it-illegal-to-buy-fireworks-in-tennessee",
 	    
@@ -78,5 +78,5 @@
 	    "simplified_answer": "Buying them is fine. However, you cannot transport them to a state where they are illegal.",
 	    "summarized_answer": "Only trasportation to another state is a problem, not buying."
 	}
-    ],
+    ]
 }
