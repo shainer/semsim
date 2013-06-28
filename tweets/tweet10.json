@@ -1,0 +1,70 @@
+{
+    "created_at": "Fri, 07 Jun 2013 17:01:03 +0000",
+    "from_user": "EmmaLee_Anne",
+    "from_user_id": 552270433,
+    "from_user_name": "Emily Anne ♥ ",
+    "id": 343049981277646850,
+    "source": "&lt;a href=&quot;http://twitter.com/download/android&quot;&gt;Twitter for Android&lt;/a&gt;",
+    "text": "RT @itsesmiibruh: why do girls in tampon commercials seem so happy? i am never happy when i'm on my period.",
+
+    "language": "en",
+    "tokens": ["RT", "@itsesmiibruh", ":", "why", "do", "girls", "in", "tampon", "commercials", "seem", "so", "happy", "?", "i", "am", "never", "happy" "when", "i'm", "on", "my", "period", "."],
+    "normalized_tokens": ["RT", "@itsesmiibruh", ":", "why", "do", "girls", "in", "tampon", "commercials", "seem", "so", "happy", "?", "I", "am", "never", "happy" "when", "I", "am", "on", "my", "period", "."],
+    "lemmas": ["RT", "@itsesmiibruh", ":", "why", "do", "girl", "in", "tampon", "commercial", "seem", "so", "happy", "?", "I", "be", "never", "happy" "when", "I", "be", "on", "my", "period", "."],
+    "pos": ["~", "@", "~", "R", "V", "N", "P", "N", "N", "V", "R", "A", ",", "O", "V", "R", "A", "P", "N", "V", "P", "D", "N", ","],
+    
+    "senses": ["", "", "", "", "", "girl%1:18:00::", "", "tampon%1:06:00::", "commercial%1:10:00::", "seem%2:39:00::", "so%4:02:02::", "happy%3:00:00::", "", "", "be%2:42:03::", "never%4:02:00::", "happy%3:00:00::", "", "", "be%2:42:03::", "", "", "period%1:22:00::", ""],
+    "type": ["Subjective", "Deliberative", "Identification"],
+    "categories": ["Health", "Women's Health"],
+    
+    "paraphrases": [
+	{
+	    "text": "Why are girls in tampon commercials always very happy?",
+	    "rating": 0.75
+	},
+
+	{
+	    "text": "Why are girls and women in tampon commercials happy?",
+	    "rating": 0.8
+	},
+	
+	{
+	    "text": "Why do girls in tampon commercials dance and laugh around happily?",
+	    "rating": 0.62
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "Why is it that girls in tampon commercials are laughing and dancing?",
+	    "answer": "Because they are commercials and just interested in selling stuff so they make things up and make everyone look ridiculously happy even when there really isn't anything to be happy about.",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=AsPDYxiLGF0mGdXVU.HS88sjzKIX;_ylv=3?qid=20130514181539AAqKMzl",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 0.75
+	    },
+	    
+	    "similarity": 0.62,
+	    
+	    "simplified_answer": "Because commercials are just interested in selling stuff so they make things up and make everyone look happy even when there really isn't anything to be happy about.",
+	    "summarized_answer": "Because commercials are just interested in selling stuff, so they make things up and make everyone look happy."
+	},
+	
+	{
+	    "question": "Why is it that in Tampon Commercials the females are always laughing & dancing around??",
+	    "answer": " I agree with you. But if they showed us weeping and breaking dishes, they wouldn't sell many tampons.",
+	    "url": "http://www.answerbag.com/q_view/2760817",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 0.8
+	    },
+	    
+	    "similarity": 0.6,
+	    
+	    "simplified_answer": "But if they showed girls weeping and breaking dishes, they wouldn't sell many tampons.",
+	    "summarized_answer": "If they showed girls weeping and breaking dishes, they wouldn't sell many tampons.."
+	}
+    ]
+}
