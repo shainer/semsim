@@ -1,0 +1,94 @@
+{
+    "created_at": "Thu Jun 27 18:41:14 CEST 2013",
+    "from_user": "eyebidem",
+    "from_user_id": 199209667,
+    "from_user_name": "Nico Groenenberg",
+    "id": 350292751708979202,
+    "source": "web",
+    "text": "@Microsoft How do I remove win8 apps? I had replace them win-7 software because the w8 apps are to instable",
+    
+    "language": "en",
+    "tokens": ["@Microsoft", "How", "do", "I", "remove", "win", "8", "apps", "?", "I", "had", "replace", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "apps", "are", "to", "instable"],
+    "normalized_tokens": ["@Microsoft", "How", "do", "I", "remove", "win", "8", "applications", "?", "I", "had", "replaced", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "applications", "are", "too", "unstable"],
+    "lemmas": ["@Microsoft", "How", "do", "I", "remove", "win", "8" "application", "?", "I", "have", "replace", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "application", "be", "too", "unstable"],
+    "pos": ["@", "R", "V", "O", "V", "^", "$", "N", ",", "O", "V", "V", "O", "&", "^", ",", "$", "N", "P", "D", "^", "$", "N", "V", "R", "A"],
+    
+    "entities": [
+        {
+            "tokens": [ "win", "8" ],
+            "type": "Product",
+            "positions": [5, 6]
+        },
+        
+        {
+            "tokens": [ "win", "-", "7" ],
+            "type": "Product",
+            "positions": [14, 15, 16]
+        },
+        
+        {
+            "tokens": [ "w", "8" ],
+            "type": "Product",
+            "positions": [20, 21]
+        }
+    ],
+    
+    "normalized_tokens_with_entities": ["@Microsoft", "How", "do", "I", "remove", "win8", "applications", "?", "I", "had", "replaced", "them", "with", "win-7", "software", "because", "the", "w8", "applications", "are", "too", "unstable"],
+    "lemmas_with_entities": ["@Microsoft", "How", "do", "I", "remove", "win8" "application", "?", "I", "have", "replace", "them", "with", "win-7", "software", "because", "the", "w8", "application", "be", "too", "unstable"],
+    "pos_with_entities": ["@", "R", "V", "O", "V", "N", "N", ",", "O", "V", "V", "O", "&", "N", "N", "P", "D", "N", "N", "V", "R", "A"],
+    
+    "senses": ["", "", "", "", "remove%2:30:00::", "", "application%1:10:01::", "", "", "", "replace%2:30:00::", "", "", "", "software%1:10:00::", "", "", "", "application%1:10:01::", "be%2:42:03::", "excessively%4:02:00::", "unstable%3:00:00::"],
+    "type": ["Objective", "Forensic", "Factual"],
+    "categories": ["Computers & Internet", "Software"],
+    
+    "paraphrases": [
+	{
+	    "text": "How can windows 8 apps be removed?",
+	    "rating": 0.95
+	},
+
+	{
+	    "text": "How do I uninstall windows 8 apps",
+	    "rating": 0.9
+	},
+	
+	{
+	    "text": "How can I delete unstable windows 8 apps?",
+	    "rating": 0.9
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "How to remove apps in windows 8?",
+	    "answer": "Go to control panel. Go to add/remove. Pick App and uninstall.",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=AhYVp_.AUcv.e0CgeEJjXXsjzKIX;_ylv=3?qid=20130310150758AAsFzON",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 1.0,
+	    
+	    "simplified_answer": "Go to control panel. Go to add/remove. Pick App and uninstall.",
+	    "summarized_answer": "Go to control panel. Go to add/remove. Pick App and uninstall."
+	},
+	
+	{
+	    "question": "How to proper uninstall a windows 8 phone app deployed from visual studio?",
+	    "answer": "Just tap and hold the app icon in the \"all apps\" list in the phone or in the emulator, context menu shows up and there click the \"uninstall\" option, that's all.",
+	    "url": "http://stackoverflow.com/questions/14543932/how-to-proper-uninstall-a-windows-8-phone-app-deployed-from-visual-studio",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.72,
+	    
+	    "simplified_answer": "Just tap and hold the app icon in the \"all apps\" list in the phone, context menu shows up and then click the \"uninstall\" option.",
+	    "summarized_answer": "Tap and hold the app icon in the \"all apps\" list, then from the context menu choose \"uninstall\".",
+	}
+    ]
+}
