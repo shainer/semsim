@@ -1,0 +1,82 @@
+{
+    "created_at": "Thu Jun 27 18:41:19 CEST 2013",
+    "from_user": "AlexaDigital",
+    "from_user_id": 407857538,
+    "from_user_name": "AlexaDigital",
+    "id": 350292769429925888,
+    "source": "<a href="http://www.sharedby.co" rel="nofollow">SharedBy</a>",
+    "text": "Should You Use Twitter DM for Marketing? http://t.co/uDGlaDgdOS #SocialMedia",
+
+    "language": "en",
+    "tokens": ["Should", "You", "Use", "Twitter", "DM", "for", "Marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
+    "normalized_tokens": ["should", "you", "use", "Twitter", "DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
+    "lemmas": ["shall", "you", "use", "Twitter", "DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
+    "pos": ["V", "O", "V", "^", "^", "P", "N", ",", "U", "#"],
+    
+    "entities": [
+        {
+            "tokens": [ "Twitter", "DM" ],
+            "type": "Product",
+            "positions": [3, 4]
+        }
+    ],
+    
+    "normalized_tokens_with_entities": ["should", "you", "use", "Twitter DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
+    "lemmas_with_entities": ["shall", "you", "use", "Twitter DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
+    "pos_with_entities": ["V", "O", "V", "N", "P", "N", ",", "U", "#"],
+    
+    "senses": ["", "", "use%2:34:01::", "", "", "marketing%1:04:02::", "", "", ""],
+    "type": ["Subjective", "Deliberative", "Advice"],
+    "categories": ["Business & Finance", "Advertising & Marketing", "Search Engine Optimization"],
+    
+    "paraphrases": [
+	{
+	    "text": "Is it good to use Twitter DM for marketing?",
+	    "rating": 0.8
+	},
+
+	{
+	    "text": "Is it worth to use Twitter DM for marketing?",
+	    "rating": 0.8
+	},
+	
+	{
+	    "text": "Should you advertise your business on Twitter?",
+	    "rating": 0.7
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "Do Twitter marketing really a good strategy to grow your business?",
+	    "answer": "Yes, it is a really good marketing strategy to grow you business. you can follow as many people and get their status updates and you can further re-tweet them. And all those people following you will get your updates and tweets. This way you can tweet your links as many u want!",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=Av.OhGgG5GN7zsl27FssVYkjzKIX;_ylv=3?qid=20110927015114AA08MsC",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.6,
+	    
+	    "simplified_answer": "Yes, it is a really good marketing strategy to grow your business. You can follow as many people as you like and get their status updates. And all those people following you will get your updates and tweets.",
+	    "summarized_answer": "Yes, it is a really good marketing strategy to grow your business. You can follow a lot of people and they may follow you and get your tweets."
+	},
+	
+	{
+	    "question": "How to use twitter marketing? And where can I get the script?",
+	    "answer": "Well, you must already know that Twitter is one of the largest social marketing platforms on the Internet. It actually provides great opportunity for you to create a potential marketplace. You could actually do what the guy you mentioned above did, or better yet, you could actually do this the easy way. Why don't you sign up for a campaign that gets you twitter followers and tweets and retweets at some cheap affordable price? You'd actually turn up profitable in the long run.",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=AowsKse.HeB2pTiMDy0K0ggjzKIX;_ylv=3?qid=20130623010504AAiRJzV",
+	    
+	    "sentiment": {
+		"class": "Positive",
+		"score": 0.9
+	    },
+	    
+	    "similarity": 0.8,
+	    
+	    "simplified_answer": "Twitter is one of the largest social marketing platforms on the Internet. It provides great opportunity for you to create a potential marketplace. Why don't you sign up for a campaign that gets you twitter followers and tweets and retweets at some cheap affordable price? You'd actually turn up profitable in the long run.",
+	    "summarized_answer": "Twitter is a big social platform and provides great opportunity for marketplaces. You can sign up for campaigns and get followers."
+	}
+    ]
+}
