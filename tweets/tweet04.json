@@ -1,0 +1,76 @@
+{
+    "created_at": "Thu Jun 27 20:04:33 CEST 2013",
+    "from_user": "WINNDetroit",
+    "from_user_id": 1231553569,
+    "from_user_name": "WIN Network Detroit",
+    "id": 350313716027367425,
+    "source": "<a href="http://www.hootsuite.com" rel="nofollow">HootSuite</a>",
+    "text": "What's your reason for getting out of bed each morning? Who motivates you?",
+
+    "language": "en",
+    "tokens": ["What", "'", "s", "your", "reason", "for", "getting", "out", "of", "bed", "each", "morning", "?", "Who", "motivates", "you", "?"],
+    "normalized_tokens": ["What's", "your", "reason", "for", "getting", "out", "of", "bed", "each", "morning", "?", "Who", "motivates", "you", "?"],
+    "lemmas": ["What", "be", "your", "reason", "for", "get", "out", "of", "bed", "each", "morning", "?", "Who", "motivate", "you", "?"],
+    "pos": ["O", "V", "D", "N", "P", "V", "T", "P", "N", "A", "N", ",", "O", "V", "O", ","],
+    
+    "senses": ["", "be%2:42:03::", "", "reason%1:16:00::", "", "get%2:38:00::", "", "", "bed%1:06:00::", "each%5:00:00:all:00", "morning%1:28:00::", "", "", "motivate%2:36:00::", "", ""],
+    "type": ["Subjective", "Deliberative", "Identification"],
+    "categories": ["Health", "General Health Care"],
+    
+    "paraphrases": [
+	{
+	    "text": "Why do you get out of bed each morning?",
+	    "rating": 0.8
+	},
+
+	{
+	    "text": "What motivates you to get out of bed each morning?",
+	    "rating": 0.78
+	},
+	
+	{
+	    "text": "For what reason do you get out of bed each morning?",
+	    "rating": 0.82
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "What are 5 good reasons for getting out of bed and staying up?",
+	    "answer": "Work
+Play
+Exercise
+Make friends
+Find someone to go back to bed with...",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=Ar_AI0dkeDlQAtC06y6_BuYjzKIX;_ylv=3?qid=1005122003279",
+	    
+	    "sentiment": {
+		"class": "Positive",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.85,
+	    
+	    "simplified_answer": "Work, play, exercise, make friends, find someone to go back to bed with...",
+	    "summarized_answer": "Work, play, exercise, make friends, find someone to go back to bed with...",
+	},
+	
+	{
+	    "question": "What makes you get out of bed every day?",
+	    "answer": "My alarm.
+
+and the fact that I have to go to school.",
+	    "url": "http://www.answerbag.com/q_view/1358014",
+	    
+	    "sentiment": {
+		"class": "Positive",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.97,
+	    
+	    "simplified_answer": "The alarm clock and the fact that I have to go to school.",
+	    "summarized_answer": "The alarm clock and the fact that I have to go to school."
+	}
+    ]
+}
