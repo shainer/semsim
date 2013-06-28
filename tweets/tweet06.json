@@ -1,0 +1,80 @@
+{
+    "created_at": "Thu Jun 27 18:41:18 CEST 2013",
+    "from_user": "GabyK_Lister",
+    "from_user_id": 232245317,
+    "from_user_name": "Gaby Lister",
+    "id": 350292768834326528,
+    "source": "<a href="http://twitter.com/download/android" rel="nofollow">Twitter for Android</a>",
+    "text": "Quick way to loose weight?",
+    
+    "language": "en",
+    "tokens": ["Quick", "way", "to", "loose", "weight", "?"],
+    "normalized_tokens": ["Quick", "way", "to", "lose", "weight", "?"],
+    "lemmas": ["Quick", "way", "to", "lose", "weight", "?"],
+    "pos": ["A", "N", "P", "V", "N", ","],
+    
+    "senses": ["quick%5:00:00:fast:01", "way%1:07:01::", "", "lose%2:40:02::", "weight%1:07:00::", ""],
+    "type": ["Objective", "Forensic", "Factual"],
+    "categories": ["Health", "Diet & Fitness"],
+    
+    "paraphrases": [
+	{
+	    "text": "What is a quick way to lose weight?",
+	    "rating": 1.0
+	},
+
+	{
+	    "text": "Fast way to lose weight?",
+	    "rating": 1.0
+	},
+	
+	{
+	    "text": "What is a fast way to lose weight?",
+	    "rating": 1.0
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "What is the quickest way to lose weight?",
+	    "answer": "hi dear
+just follow these simple tips to shed extra pounds from your weight
+- take balanced diet
+- take 5 meals in the day
+- add fruits and vegetables in your meals
+- zip your lips for fried and fast foods
+- avoid colas and sweets
+- drink more water and fresh juice
+- do regular workout, yoga or brisk walk
+- think positive and keep smiling
+good luck",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=AtSpGUS8JuJvl_eZrj9vTWMjzKIX;_ylv=3?qid=20100529203254AA1TXYn",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.95,
+	    
+	    "simplified_answer": "Just follow these simple tips to remove extra pounds: balanced diet, 5 meals during the day with fruit and vegetables, no fried and fast foods, no colas or sweets, drink more water or fresh juice, exercise regularly, for example a quick walk.",
+	    "summarized_answer": "Simple tips: balanced diet (fruit and vegetables), no fast or fried food, no sweets, regular exercise."
+	},
+	
+	{
+	    "question": "Whats the fastest way to lose weight?",
+	    "answer": "Run on the treadmill.",
+	    "url": "http://www.answerbag.com/q_view/2691918",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.9,
+	    
+	    "simplified_answer": "Run on the treadmill.",
+	    "summarized_answer": "Run on the treadmill."
+	}
+    ]
+}
