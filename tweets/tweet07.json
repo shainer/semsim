@@ -1,0 +1,79 @@
+{
+    "created_at": "Thu Jun 27 18:41:19 CEST 2013",
+    "from_user": "Basil_AB_Malik",
+    "from_user_id": 241027112,
+    "from_user_name": "BasilAbdulMalikEvans",
+    "id": 350292772483375104,
+    "source": "<a href="http://twitter.com/download/android" rel="nofollow">Twitter for Android</a>",
+    "text": "RT @framednetwork: Is it possible for a photographer to make more than 4 million dollars a year?",
+    
+    "language": "en",
+    "tokens": ["RT", "@framednetwork", ":", "is", "it", "possible", "for", "a", "photographer", "to", "make", "more", "than", "4 million", "dollars", "a", "year", "?"],
+    "normalized_tokens": ["RT", "@framednetwork", ":", "is", "it", "possible", "for", "a", "photographer", "to", "make", "more", "than", "4 million", "dollars", "a", "year", "?"],
+    "lemmas": ["RT", "@framednetwork", ":", "is", "it", "possible", "for", "a", "photographer", "to", "make", "much", "than", "4 million", "dollar", "a", "year", "?"],
+    "pos": ["~", "@", ",", "V", "O", "A", "P", "D", "N", "P", "V", "A", "&" "$" "N", "D", "N", ","],
+    
+    "senses": ["", "", "", "", "", "possible%3:00:00::", "", "", "photographer%1:18:00::", "", "make%2:40:01::", "more%3:00:02::", "", "", "dollar%1:23:00::", "", "year%1:28:01::", ""],
+    "type": ["Objective", "Forensic", "Factual"],
+    "categories": ["Arts & Humanities", "Visual Arts", "Photography", "Business & Finance", "Local Businesses"],
+    
+    "paraphrases": [
+	{
+	    "text": "How much do photographers make per year? More than 4 million dollars?",
+	    "rating": 0.8
+	},
+
+	{
+	    "text": "How much do photographers get paid on average?",
+	    "rating": 0.65
+	},
+	
+	{
+	    "text": "Can you make more than 4 million dollars a year as a photographer?",
+	    "rating": 0.95
+	}
+    ],
+    
+    "qpairs": [
+	{
+	    "question": "What kind of photographers are there and how much do they get paid?",
+	    "answer": "Good ones
+bad ones
+average ones
+
+Good ones with good business sense and contacts make the most.
+
+Do you know anything at all about photography or wedding photography specifically?
+Since you are asking this question then I doubt it so you will probably fall into the middle category above and make peanuts or be out of business in weeks.
+
+Being a successful photographer in any field means having the necessary skills and knowledge and this takes time to learn.",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=Ai92zMR7K3IzDpBsJI9XbpEjzKIX;_ylv=3?qid=20110206093111AA6Mnas",
+	    
+	    "sentiment": {
+		"class": "Negative",
+		"score": 0.75
+	    },
+	    
+	    "similarity": 0.4,
+	    
+	    "simplified_answer": "Good ones with good business sense or contacts. In any field this needs a lot of skills and knowledge that can take time to learn.",
+	    "summarized_answer": "The best photographers are those with a lot of skills and knowledge, with good business sense or contacts."
+	},
+	
+	{
+	    "question": "How much does a photographer make per year?",
+	    "answer": "According to the Bureau of Labor Statistics, as of May 2008, photographers had a mean hourly wage of $17.14 and a mean annual wage of $35,640. The lowest 10 percent made $8.14 per hour or $16,920 annually, while the highest made $30.02 per hour or $62,430 annually.",
+	    "url": "http://www.answerbag.com/q_view/1866073",
+	    
+	    "sentiment": {
+		"class": "Neutral",
+		"score": 1.0
+	    },
+	    
+	    "similarity": 0.78,
+	    
+	    "simplified_answer": "According to the Bureau of Labor, as of May 2008, photographers had a mean hourly wage of $17.14 and a mean annual wage of $35,640.",
+	    "summarized_answer": "According to the Bureau of Labor, as of May 2008, photographers had a mean hourly wage of $17.14 and a mean annual wage of $35,640."
+	}
+    ]
+}
