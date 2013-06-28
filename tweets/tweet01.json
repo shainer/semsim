@@ -25,7 +25,7 @@
     "lemmas_with_entities": ["Do", "they", "sell", "firework", "in", "Tennessee", "or", "something", "?"],
     "pos_with_entities": ["V", "O", "V", "N", "P", "N", "&", "N", ","],
     
-    "senses": ["", "", "sell%2:40:00::", "firework%1:06:00::" "" "tennessee%1:15:00::" "" "" ""],
+    "senses": ["", "", "sell%2:40:00::", "firework%1:06:00::", "", "tennessee%1:15:00::", "", "", ""],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Law & Ethics", "Local Businesses"],
     
