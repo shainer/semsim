@@ -1,10 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Feature extraction module.
  */
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import cmu.arktweetnlp.Tagger.TaggedToken;
@@ -25,12 +23,31 @@ public class FeatureCollector
     private final int FEATURE_SIZE = Properties.getFeatureNumber();
     private int featureIndex = 0;
     
-    public FeatureCollector()
+    /*
+     * When training using the SemCor samples, the frequency counts we need are all available
+     * in a (relatively) small file, so they are taken from there.
+     */
+    public FeatureCollector(String frequencyFile)
     {
-        this.counter = new FrequencyCounter();
+        this.counter = new FrequencyCounterFile(frequencyFile);
         this.features = new double[FEATURE_SIZE];
     }
     
+    /*
+     * When extracting features for a generic sentence pair, we need to look into the Google
+     * NGram corpus.
+     */
+    public FeatureCollector()
+    {
+        this.counter = new FrequencyCounterGoogle();
+        this.features = new double[FEATURE_SIZE];
+    }
+    
+    /*
+     * When extracting features for a huge number of sentence pairs, this builds a cache of
+     * the frequency counts that speeds up the lookup in the Google Corpus. For the "file" corpus,
+     * these methods do nothing.
+     */
     public void initialize(List<SentencePair> sps)
     {
         this.counter.createCache(sps);
@@ -41,14 +58,9 @@ public class FeatureCollector
         this.counter.destroyCache();
     }
     
-    private void printSentence(List<TaggedToken> s)
-    {
-        for (TaggedToken tt : s) {
-            System.out.print(tt.token + "_" + tt.tag + " ");
-        }
-        System.out.println();
-    }
-    
+    /*
+     * Actual feature extraction.
+     */
     public double[] features(SentencePair sp)
     {
         this.sp = sp;
@@ -62,6 +74,7 @@ public class FeatureCollector
         weightedWords();
         sentenceLength();
         
+        /* Rounds features values at their third decimal digit. */
         for (int i = 0; i < features.length; i++) {
             if (!Double.isNaN(features[i]) && !Double.isInfinite(features[i])) {
                 BigDecimal bd = new BigDecimal( features[i] );
@@ -84,14 +97,22 @@ public class FeatureCollector
         }
     }
     
+    /*
+     * Normalized differences, feature (A)
+     */
     private void sentenceLength()
     {
         features[featureIndex++] = (double)Math.abs(sp.s2.size() - sp.s1.size());
-    }
+    } 
     
+    /*
+     * Weighted Word Overlap
+     * Normalized Differences, feature (C)
+     */
     private void weightedWords()
     {
-        BigInteger totalFrequencyCount = new BigInteger("468491999592");
+        BigInteger totalFrequencyCount = counter.getTotalCount();
+        
         double s1TotalContent = 0.0;
         double s2TotalContent = 0.0;
         double sharedContent = 0.0;
@@ -119,17 +140,6 @@ public class FeatureCollector
         features[featureIndex++] = Math.abs(s2TotalContent - s1TotalContent);
     }
     
-    private boolean sentenceContains(List<TaggedToken> s, TaggedToken tt)
-    {
-        for (TaggedToken sTT : s) {
-            if (sTT.token.equals(tt.token) && sTT.tag.equals(tt.tag)) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
     private double informationContent(TaggedToken tt, BigInteger totalFrequencyCount)
     {
         char[] uselessTags = {'#', '@', '~', 'U', 'E', '$', ',', 'G'};
@@ -149,6 +159,20 @@ public class FeatureCollector
         return Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
     }
     
+    private boolean sentenceContains(List<TaggedToken> s, TaggedToken tt)
+    {
+        for (TaggedToken sTT : s) {
+            if (sTT.token.equals(tt.token) && sTT.tag.equals(tt.tag)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /*
+     * WordNet-Augmented Word Overlap
+     */
     private void wordnetOverlap()
     {        
         features[featureIndex++] = harmonicMean(pwn(sp.s1, sp.s2), pwn(sp.s2, sp.s1));
@@ -200,18 +224,21 @@ public class FeatureCollector
         return maxScore;
     }
     
+    /*
+     * NGram Overlap(s)
+     */
     private void ngramOverlaps()
     {
-        Set<String> s1unigrams = new HashSet<String>();
-        Set<String> s1bigrams = new HashSet<String>();
-        Set<String> s1trigrams = new HashSet<String>();
-        Set<String> s2unigrams = new HashSet<String>();
-        Set<String> s2bigrams = new HashSet<String>();
-        Set<String> s2trigrams = new HashSet<String>();
+        Set<String> s1unigrams = new HashSet<>();
+        Set<String> s1bigrams = new HashSet<>();
+        Set<String> s1trigrams = new HashSet<>();
+        Set<String> s2unigrams = new HashSet<>();
+        Set<String> s2bigrams = new HashSet<>();
+        Set<String> s2trigrams = new HashSet<>();
         
         for (int i = 0; i < sp.s1.size(); i++) {
             String token1 = sp.s1.get(i).token.toLowerCase();
-            String token2 = "", token3 = "";
+            String token2 = "", token3;
             s1unigrams.add(token1);
             
             if (i < sp.s1.size() - 1) {
@@ -246,6 +273,9 @@ public class FeatureCollector
         features[featureIndex++] = setOverlap(s1trigrams, s2trigrams);
     }
 
+    /*
+     * Numbers Overlap
+     */
     private void numberOverlaps()
     {
         Set<Double> n1 = numberTokens(sp.s1);
@@ -257,7 +287,7 @@ public class FeatureCollector
         results[2] = 1.0;
         results[2] /= (n1.size() + n2.size());
         
-        Set<Double> nIntersect = new HashSet<Double>();
+        Set<Double> nIntersect = new HashSet<>();
         
         for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
             Double d = it.next();
@@ -319,7 +349,7 @@ public class FeatureCollector
     
     private Set<Double> numberTokens(List<TaggedToken> sentence)
     {
-        Set<Double> n = new HashSet<Double>();
+        Set<Double> n = new HashSet<>();
         
         for (TaggedToken t : sentence) {
             if (t.tag.equals("$")) {
@@ -334,6 +364,9 @@ public class FeatureCollector
         return n;
     }
     
+    /*
+     * Named Entity Features: overlap of capitalized words
+     */
     private void capitalizedOverlap()
     {
         Set<String> capTokens1 = findCapitalizedWords(sp.s1);
@@ -346,7 +379,7 @@ public class FeatureCollector
     
     private Set<String> findCapitalizedWords(List<TaggedToken> sentence)
     {
-        Set<String> cap = new HashSet<String>();
+        Set<String> cap = new HashSet<>();
         
         for (int i = 0; i < sentence.size(); i++) {
             String token = sentence.get(i).token;
@@ -360,6 +393,9 @@ public class FeatureCollector
         return cap;
     }
 
+    /*
+     * Named Entity Features: overlap of stock index symbols
+     */
     private void stockOverlap()
     {
         Set<String> stockItems1 = findStockItems(sp.s1);
@@ -372,7 +408,7 @@ public class FeatureCollector
    
     private Set<String> findStockItems(List<TaggedToken> sentence)
     {
-        Set<String> stockItems = new HashSet<String>();
+        Set<String> stockItems = new HashSet<>();
         
         for (int i = 0; i < sentence.size(); i++) {
             String token = sentence.get(i).token;
