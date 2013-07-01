@@ -1,7 +1,6 @@
 
 import cmu.arktweetnlp.Tagger;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +8,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import cmu.arktweetnlp.Tagger.TaggedToken;
 import java.io.PrintStream;
 import java.io.StringReader;
 
@@ -55,7 +53,12 @@ public class TweetParser
             
             JSONObject jsonObject = (JSONObject)obj;
             
-            JSONArray tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens");
+            JSONArray tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens_with_entities");
+            
+            if (tweetNormalizedTokens == null) {
+                tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens");
+            }
+            
             JSONArray tweetPOSTags = (JSONArray)jsonObject.get("pos");
             JSONArray questions = (JSONArray)jsonObject.get("qpairs");
             

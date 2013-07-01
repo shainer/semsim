@@ -2,7 +2,6 @@
 import cmu.arktweetnlp.Tagger;
 import java.io.IOException;
 import java.util.List;
-import java.util.ArrayList;
 
 /*
  * To change this template, choose Tools | Templates
@@ -24,7 +23,7 @@ public class SimilarityTester
         this.tagger = new Tagger();
         
         try {
-            this.tagger.loadModel("src/taggerModel");
+            this.tagger.loadModel( Properties.getTaggerModelPath() );
         } catch (IOException e) {
             System.err.println("Error loading model for POS tagging: " + e.getLocalizedMessage());
         }

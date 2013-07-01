@@ -32,6 +32,7 @@ public class IOUtils
             br.close();
         } catch (IOException e) {
             System.err.println("Could not read \"" + input + "\": " + e.getLocalizedMessage());
+            System.exit(-1);
         }
         
         return lines;

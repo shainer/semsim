@@ -18,6 +18,8 @@ public class Properties
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
                                                "have", "has", "had", "were", "'ll"};
     
+    private static final String taggerModelPath = "taggerModel";
+    
     public static int getFeatureNumber()
     {
         return FEATURE_SIZE;
@@ -26,5 +28,10 @@ public class Properties
     public static String[] getStopWords()
     {
         return stopWords;
+    }
+    
+    public static String getTaggerModelPath()
+    {
+        return taggerModelPath;
     }
 }
