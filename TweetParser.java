@@ -52,16 +52,17 @@ public class TweetParser
             }
             
             JSONObject jsonObject = (JSONObject)obj;
+            List<String> tweetPOSTags = new LinkedList<>();
+            List<String> tweetNormalizedTokens = new LinkedList<>();
+            JSONArray tweetTokens = (JSONArray)jsonObject.get("tokens");
             
-            JSONArray tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens_with_entities");
-            
-            if (tweetNormalizedTokens == null) {
-                tweetNormalizedTokens = (JSONArray)jsonObject.get("normalized_tokens");
+            for (Object t : tweetTokens) {
+                JSONObject token = (JSONObject)t;
+                tweetNormalizedTokens.add( (String)token.get("normalized") );
+                tweetPOSTags.add( (String)token.get("pos") );
             }
             
-            JSONArray tweetPOSTags = (JSONArray)jsonObject.get("pos");
-            JSONArray questions = (JSONArray)jsonObject.get("qpairs");
-            
+            JSONArray questions = (JSONArray)jsonObject.get("qpairs");            
             for (Object p : questions) {
                 JSONObject qaPair = (JSONObject)p;
                 String question = (String)qaPair.get("question");

@@ -21,7 +21,7 @@ public class SentencePair
     public List<TaggedToken> s1;
     public List<TaggedToken> s2;
     
-    public SentencePair(JSONArray s1Tokens, JSONArray s1Tags, String s2, Tagger tagger)
+    public SentencePair(List<String> s1Tokens, List<String> s1Tags, String s2, Tagger tagger)
     {
         this.s1 = new LinkedList<>();
         this.s2 = new LinkedList<>();
@@ -147,7 +147,7 @@ public class SentencePair
             TaggedToken tt = it.next();
 
             for (int i = 0; i < stopWords.length; i++) {
-                if (stopWords[i].equals(tt.token)) {
+                if (stopWords[i].equals( tt.token.toLowerCase() )) {
                     it.remove();
                     break;
                 }
