@@ -7,30 +7,172 @@
     "source": "<a href="http://twitter.com/download/android" rel="nofollow">Twitter for Android</a>",
     "text": "RT @framednetwork: Is it possible for a photographer to make more than 4 million dollars a year?",
     
-    "language": "en",
-    "tokens": ["RT", "@framednetwork", ":", "is", "it", "possible", "for", "a", "photographer", "to", "make", "more", "than", "4 million", "dollars", "a", "year", "?"],
-    "normalized_tokens": ["RT", "@framednetwork", ":", "is", "it", "possible", "for", "a", "photographer", "to", "make", "more", "than", "4 million", "dollars", "a", "year", "?"],
-    "lemmas": ["RT", "@framednetwork", ":", "is", "it", "possible", "for", "a", "photographer", "to", "make", "much", "than", "4 million", "dollar", "a", "year", "?"],
-    "pos": ["~", "@", ",", "V", "O", "A", "P", "D", "N", "P", "V", "A", "&" "$" "N", "D", "N", ","],
+    "language": "EN",
+
+    "tokens": [
+      {
+        "lemma": "RT",
+        "normalized": "RT",
+        "token": "RT",
+        "bnsense": "",
+        "type": "token",
+        "pos": "~",
+      },
+      {
+        "lemma": "@framednetwork",
+        "normalized": "@framednetwork",
+        "token": "@framednetwork",
+        "bnsense": "",
+        "type": "token",
+        "pos": "@",
+      },
+      {
+        "lemma": ":",
+        "normalized": ":",
+        "token": ":",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+      {
+        "lemma": "is",
+        "normalized": "is",
+        "token": "is",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "it",
+        "normalized": "it",
+        "token": "it",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "possible",
+        "normalized": "possible",
+        "token": "possible",
+        "bnsense": "possible%3:00:00::",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "for",
+        "normalized": "for",
+        "token": "for",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "a",
+        "normalized": "a",
+        "token": "a",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "photographer",
+        "normalized": "photographer",
+        "token": "photographer",
+        "bnsense": "photographer%1:18:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "to",
+        "normalized": "to",
+        "token": "to",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "make",
+        "normalized": "make",
+        "token": "make",
+        "bnsense": "make%2:40:01::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "much",
+        "normalized": "more",
+        "token": "more",
+        "bnsense": "more%3:00:02::",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "than",
+        "normalized": "than",
+        "token": "than",
+        "bnsense": "",
+        "type": "token",
+        "pos": "&",
+      },
+      {
+        "lemma": "4 million",
+        "normalized": "4 million",
+        "token": "4 million",
+        "bnsense": "",
+        "type": "token",
+        "pos": "$",
+      },
+      {
+        "lemma": "dollar",
+        "normalized": "dollars",
+        "token": "dollars",
+        "bnsense": "dollar%1:23:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "a",
+        "normalized": "a",
+        "token": "a",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "year",
+        "normalized": "year",
+        "token": "year",
+        "bnsense": "year%1:28:01::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+    ],
     
-    "senses": ["", "", "", "", "", "possible%3:00:00::", "", "", "photographer%1:18:00::", "", "make%2:40:01::", "more%3:00:02::", "", "", "dollar%1:23:00::", "", "year%1:28:01::", ""],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Arts & Humanities", "Visual Arts", "Photography", "Business & Finance", "Local Businesses"],
     
     "paraphrases": [
 	{
 	    "text": "How much do photographers make per year? More than 4 million dollars?",
-	    "rating": 0.8
+	    "rating": 4.7
 	},
 
 	{
 	    "text": "How much do photographers get paid on average?",
-	    "rating": 0.65
+	    "rating": 2.6
 	},
 	
 	{
 	    "text": "Can you make more than 4 million dollars a year as a photographer?",
-	    "rating": 0.95
+	    "rating": 4.0
 	}
     ],
     
@@ -54,7 +196,7 @@ Being a successful photographer in any field means having the necessary skills a
 		"score": 0.75
 	    },
 	    
-	    "similarity": 0.4,
+	    "similarity": 2.5,
 	    
 	    "simplified_answer": "Good ones with good business sense or contacts. In any field this needs a lot of skills and knowledge that can take time to learn.",
 	    "summarized_answer": "The best photographers are those with a lot of skills and knowledge, with good business sense or contacts."
@@ -70,10 +212,12 @@ Being a successful photographer in any field means having the necessary skills a
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.78,
+	    "similarity": 4.3,
 	    
 	    "simplified_answer": "According to the Bureau of Labor, as of May 2008, photographers had a mean hourly wage of $17.14 and a mean annual wage of $35,640.",
 	    "summarized_answer": "According to the Bureau of Labor, as of May 2008, photographers had a mean hourly wage of $17.14 and a mean annual wage of $35,640."
 	}
-    ]
+    ],
+    
+    "qrel": ["how much", "average pay of", "photographer"],
 }

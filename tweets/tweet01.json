@@ -7,42 +7,100 @@
     "source": "<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>",
     "text": "Do they sell fireworks in Tennessee or something?",
 
-    "language": "en",
-    "tokens": ["Do", "they", "sell", "fireworks", "in", "Tennessee", "or", "something", "?"],
-    "normalized_tokens": ["Do", "they", "sell", "fireworks", "in", "Tennessee", "or", "something", "?"],
-    "lemmas": ["Do", "they", "sell", "firework", "in", "Tennessee", "or", "something", "?"],
-    "pos": ["V", "O", "V", "N", "P", "^", "&", "N", ","],
+    "language": "EN",
 
-    "entities": [
-        {
-            "tokens": [ "Tennessee" ],
-            "type": "Geographic location",
-            "positions": [5]
-        }
+    "tokens": [
+      {
+        "lemma": "Do",
+        "normalized": "Do",
+        "token": "Do",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "they",
+        "normalized": "they",
+        "token": "they",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "sell",
+        "normalized": "sell",
+        "token": "sell",
+        "bnsense": "sell%2:40:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "firework",
+        "normalized": "fireworks",
+        "token": "fireworks",
+        "bnsense": "firework%1:06:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "in",
+        "normalized": "in",
+        "token": "in",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "Tennessee",
+        "normalized": "Tennessee",
+        "token": "Tennessee",
+        "bnsense": "tennessee%1:15:00::",
+        "type": "NE",
+        "pos": "^",
+      },
+      {
+        "lemma": "or",
+        "normalized": "or",
+        "token": "or",
+        "bnsense": "",
+        "type": "token",
+        "pos": "&",
+      },
+      {
+        "lemma": "something",
+        "normalized": "something",
+        "token": "something",
+        "bnsense": "",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
     ],
     
-    "normalized_tokens_with_entities": ["Do", "they", "sell", "fireworks", "in", "Tennessee", "or", "something", "?"],
-    "lemmas_with_entities": ["Do", "they", "sell", "firework", "in", "Tennessee", "or", "something", "?"],
-    "pos_with_entities": ["V", "O", "V", "N", "P", "N", "&", "N", ","],
-    
-    "senses": ["", "", "sell%2:40:00::", "firework%1:06:00::", "", "tennessee%1:15:00::", "", "", ""],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Law & Ethics", "Local Businesses"],
     
     "paraphrases": [
 	{
 	    "text": "Is it legal to sell fireworks in Tennessee?",
-	    "rating": 0.75
+	    "rating": 4.2
 	},
 
 	{
 	    "text": "Is it possible to buy fireworks in Tennessee?",
-	    "rating": 0.9
+	    "rating": 4.9
 	},
 	
 	{
 	    "text": "Can you sell fireworks in Tennessee?",
-	    "rating": 0.9
+	    "rating": 4.6
 	}
     ],
     
@@ -57,7 +115,7 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.88,
+	    "similarity": 3.7,
 	    
 	    "simplified_answer": "In Tennessee ground salutes and mail orders of fireworks are illegal. In all the other cases, selling periods are Selling periods are 6-20 to 7-5 and 12-10 to 1-2.",
 	    "summarized_answer": "Selling periods are 6-20 to 7-5 and 12-10 to 1-2. Ground salutes and mail orders are forbidden."
@@ -73,10 +131,14 @@
 		"score": 0.8
 	    },
 	    
-	    "similarity": 0.7,
+	    "similarity": 3.0,
 	    
 	    "simplified_answer": "Buying them is fine. However, you cannot transport them to a state where they are illegal.",
-	    "summarized_answer": "Only trasportation to another state is a problem, not buying."
+	    "summarized_answer": "Only moving them to another state is a problem, not buying them."
 	}
-    ]
+    ],
+    
+    "qrel": [
+      "fireworks", "can be bought", "Tennessee",
+    ],
 }

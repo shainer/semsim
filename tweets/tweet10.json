@@ -7,30 +7,224 @@
     "source": "&lt;a href=&quot;http://twitter.com/download/android&quot;&gt;Twitter for Android&lt;/a&gt;",
     "text": "RT @itsesmiibruh: why do girls in tampon commercials seem so happy? i am never happy when i'm on my period.",
 
-    "language": "en",
-    "tokens": ["RT", "@itsesmiibruh", ":", "why", "do", "girls", "in", "tampon", "commercials", "seem", "so", "happy", "?", "i", "am", "never", "happy" "when", "i'm", "on", "my", "period", "."],
-    "normalized_tokens": ["RT", "@itsesmiibruh", ":", "why", "do", "girls", "in", "tampon", "commercials", "seem", "so", "happy", "?", "I", "am", "never", "happy" "when", "I", "am", "on", "my", "period", "."],
-    "lemmas": ["RT", "@itsesmiibruh", ":", "why", "do", "girl", "in", "tampon", "commercial", "seem", "so", "happy", "?", "I", "be", "never", "happy" "when", "I", "be", "on", "my", "period", "."],
-    "pos": ["~", "@", "~", "R", "V", "N", "P", "N", "N", "V", "R", "A", ",", "O", "V", "R", "A", "P", "N", "V", "P", "D", "N", ","],
+    "language": "EN",
     
-    "senses": ["", "", "", "", "", "girl%1:18:00::", "", "tampon%1:06:00::", "commercial%1:10:00::", "seem%2:39:00::", "so%4:02:02::", "happy%3:00:00::", "", "", "be%2:42:03::", "never%4:02:00::", "happy%3:00:00::", "", "", "be%2:42:03::", "", "", "period%1:22:00::", ""],
+    "tokens": [
+      {
+        "lemma": "RT",
+        "normalized": "RT",
+        "token": "RT",
+        "bnsense": "",
+        "type": "token",
+        "pos": "~",
+      },
+      {
+        "lemma": "@itsesmiibruh",
+        "normalized": "@itsesmiibruh",
+        "token": "@itsesmiibruh",
+        "bnsense": "",
+        "type": "token",
+        "pos": "@",
+      },
+      {
+        "lemma": ":",
+        "normalized": ":",
+        "token": ":",
+        "bnsense": "",
+        "type": "token",
+        "pos": "~",
+      },
+      {
+        "lemma": "why",
+        "normalized": "why",
+        "token": "why",
+        "bnsense": "",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "do",
+        "normalized": "do",
+        "token": "do",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "girl",
+        "normalized": "girls",
+        "token": "girls",
+        "bnsense": "girl%1:18:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "in",
+        "normalized": "in",
+        "token": "in",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "tampon",
+        "normalized": "tampon",
+        "token": "tampon",
+        "bnsense": "tampon%1:06:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "commercial",
+        "normalized": "commercials",
+        "token": "commercials",
+        "bnsense": "commercial%1:10:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "seem",
+        "normalized": "seem",
+        "token": "seem",
+        "bnsense": "seem%2:39:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "so",
+        "normalized": "so",
+        "token": "so",
+        "bnsense": "so%4:02:02::",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "happy",
+        "normalized": "happy",
+        "token": "happy",
+        "bnsense": "happy%3:00:00::",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+      {
+        "lemma": "I",
+        "normalized": "I",
+        "token": "i",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "be",
+        "normalized": "am",
+        "token": "am",
+        "bnsense": "be%2:42:03::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "never",
+        "normalized": "never",
+        "token": "never",
+        "bnsense": "never%4:02:00::",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "happy",
+        "normalized": "happy",
+        "token": "happy",
+        "bnsense": "happy%3:00:00::",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "when",
+        "normalized": "when",
+        "token": "when",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "token": "I'm",
+        "type": "MME",
+        "expansion": [
+          {
+	    "token": "I",
+	    "normalized": "I",
+	    "lemma": "I",
+	    "pos": "O",
+	    "bnsense": "",
+          },
+          {
+	    "token": "'m",
+	    "normalized": "am",
+	    "lemma": "be",
+	    "pos": "V",
+	    "bnsense": "be%2:42:03::",
+          }
+        ],
+      },
+      {
+        "lemma": "on",
+        "normalized": "on",
+        "token": "on",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "my",
+        "normalized": "my",
+        "token": "my",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "period",
+        "normalized": "period",
+        "token": "period",
+        "bnsense": "period%1:22:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": ".",
+        "normalized": ".",
+        "token": ".",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+    ],
+    
     "type": ["Subjective", "Deliberative", "Identification"],
     "categories": ["Health", "Women's Health"],
     
     "paraphrases": [
 	{
 	    "text": "Why are girls in tampon commercials always very happy?",
-	    "rating": 0.75
+	    "rating": 4.8
 	},
 
 	{
 	    "text": "Why are girls and women in tampon commercials happy?",
-	    "rating": 0.8
+	    "rating": 4.8
 	},
 	
 	{
 	    "text": "Why do girls in tampon commercials dance and laugh around happily?",
-	    "rating": 0.62
+	    "rating": 4.0
 	}
     ],
     
@@ -45,7 +239,7 @@
 		"score": 0.75
 	    },
 	    
-	    "similarity": 0.62,
+	    "similarity": 3.9,
 	    
 	    "simplified_answer": "Because commercials are just interested in selling stuff so they make things up and make everyone look happy even when there really isn't anything to be happy about.",
 	    "summarized_answer": "Because commercials are just interested in selling stuff, so they make things up and make everyone look happy."
@@ -61,10 +255,12 @@
 		"score": 0.8
 	    },
 	    
-	    "similarity": 0.6,
+	    "similarity": 3.2,
 	    
 	    "simplified_answer": "But if they showed girls weeping and breaking dishes, they wouldn't sell many tampons.",
 	    "summarized_answer": "If they showed girls weeping and breaking dishes, they wouldn't sell many tampons.."
 	}
-    ]
+    ],
+    
+    "qrel": ["what", "reason of", "happy girls in tampon commercials"]
 }

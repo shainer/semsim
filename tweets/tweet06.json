@@ -7,30 +7,76 @@
     "source": "<a href="http://twitter.com/download/android" rel="nofollow">Twitter for Android</a>",
     "text": "Quick way to loose weight?",
     
-    "language": "en",
-    "tokens": ["Quick", "way", "to", "loose", "weight", "?"],
-    "normalized_tokens": ["Quick", "way", "to", "lose", "weight", "?"],
-    "lemmas": ["Quick", "way", "to", "lose", "weight", "?"],
-    "pos": ["A", "N", "P", "V", "N", ","],
+    "language": "EN",
+
+    "tokens": [
+      {
+        "lemma": "Quick",
+        "normalized": "Quick",
+        "token": "Quick",
+        "bnsense": "quick%5:00:00:fast:01",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "way",
+        "normalized": "way",
+        "token": "way",
+        "bnsense": "way%1:07:01::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "to",
+        "normalized": "to",
+        "token": "to",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "lose",
+        "normalized": "lose",
+        "token": "loose",
+        "bnsense": "lose%2:40:02::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "weight",
+        "normalized": "weight",
+        "token": "weight",
+        "bnsense": "weight%1:07:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+    ],
     
-    "senses": ["quick%5:00:00:fast:01", "way%1:07:01::", "", "lose%2:40:02::", "weight%1:07:00::", ""],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Health", "Diet & Fitness"],
     
     "paraphrases": [
 	{
 	    "text": "What is a quick way to lose weight?",
-	    "rating": 1.0
+	    "rating": 5.0
 	},
 
 	{
 	    "text": "Fast way to lose weight?",
-	    "rating": 1.0
+	    "rating": 5.0
 	},
 	
 	{
 	    "text": "What is a fast way to lose weight?",
-	    "rating": 1.0
+	    "rating": 5.0
 	}
     ],
     
@@ -55,7 +101,7 @@ good luck",
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.95,
+	    "similarity": 4.8,
 	    
 	    "simplified_answer": "Just follow these simple tips to remove extra pounds: balanced diet, 5 meals during the day with fruit and vegetables, no fried and fast foods, no colas or sweets, drink more water or fresh juice, exercise regularly, for example a quick walk.",
 	    "summarized_answer": "Simple tips: balanced diet (fruit and vegetables), no fast or fried food, no sweets, regular exercise."
@@ -71,10 +117,12 @@ good luck",
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.9,
+	    "similarity": 4.8,
 	    
 	    "simplified_answer": "Run on the treadmill.",
 	    "summarized_answer": "Run on the treadmill."
 	}
-    ]
+    ],
+    
+    "qrel": ["way of", "losing weight"]
 }

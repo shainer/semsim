@@ -7,54 +7,244 @@
     "source": "web",
     "text": "@Microsoft How do I remove win8 apps? I had replace them win-7 software because the w8 apps are to instable",
     
-    "language": "en",
-    "tokens": ["@Microsoft", "How", "do", "I", "remove", "win", "8", "apps", "?", "I", "had", "replace", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "apps", "are", "to", "instable"],
-    "normalized_tokens": ["@Microsoft", "How", "do", "I", "remove", "win", "8", "applications", "?", "I", "had", "replaced", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "applications", "are", "too", "unstable"],
-    "lemmas": ["@Microsoft", "How", "do", "I", "remove", "win", "8" "application", "?", "I", "have", "replace", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "application", "be", "too", "unstable"],
-    "pos": ["@", "R", "V", "O", "V", "^", "$", "N", ",", "O", "V", "V", "O", "&", "^", ",", "$", "N", "P", "D", "^", "$", "N", "V", "R", "A"],
+    "language": "EN",
+    "tokens": ["@Microsoft", "How", "do", "I", "remove", "apps", "?", "I", "had", "replace", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "apps", "are", "to", "instable"],
+    "normalized_tokens": ["@Microsoft", "How", "do", "I", "remove", "applications", "?", "I", "had", "replaced", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "applications", "are", "too", "unstable"],
+    "lemmas": ["@Microsoft", "How", "do", "I", "remove", "application", "?", "I", "have", "replace", "them", "with", "win", "-", "7", "software", "because", "the", "w", "8", "application", "be", "too", "unstable"],
+    "pos": ["@", "R", "V", "O", "V", "N", ",", "O", "V", "V", "O", "&", "^", ",", "$", "N", "P", "D", "^", "$", "N", "V", "R", "A"],
     
-    "entities": [
-        {
-            "tokens": [ "win", "8" ],
-            "type": "Product",
-            "positions": [5, 6]
-        },
+    "tokens": [
+      {
+        "lemma": "@Microsoft",
+        "normalized": "@Microsoft",
+        "token": "@Microsoft",
+        "bnsense": "",
+        "type": "token",
+        "pos": "@",
+      },
+      {
+        "lemma": "How",
+        "normalized": "How",
+        "token": "How",
+        "bnsense": "",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "do",
+        "normalized": "do",
+        "token": "do",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "I",
+        "normalized": "I",
+        "token": "I",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "remove",
+        "normalized": "remove",
+        "token": "remove",
+        "bnsense": "remove%2:30:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+	"lemma": "win8",
+	"normalized": "Windows8",
+	"token": "win8",
+	"bnsense": "",
+	"type": "NE",
+	"pos", "^"
+      },
+      {
+        "lemma": "application",
+        "normalized": "applications",
+        "token": "apps",
+        "bnsense": "application%1:10:01::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+      {
+        "lemma": "I",
+        "normalized": "I",
+        "token": "I",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "have",
+        "normalized": "had",
+        "token": "had",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "replace",
+        "normalized": "replaced",
+        "token": "replace",
+        "bnsense": "replace%2:30:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "them",
+        "normalized": "them",
+        "token": "them",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "with",
+        "normalized": "with",
+        "token": "with",
+        "bnsense": "",
+        "type": "token",
+        "pos": "&",
+      },
+      {
+        "lemma": "win-7",
+        "normalized": "win-7",
+        "token": "win-7",
+        "bnsense": "",
+        "type": "NE",
+        "pos": "^",
         
-        {
-            "tokens": [ "win", "-", "7" ],
-            "type": "Product",
-            "positions": [14, 15, 16]
-        },
+        "expansion": [
+	  {
+	    "lemma": "win",
+	    "normalized": "Windows",
+	    "token": "win",
+	    "pos": "^"
+	  },
+	  {
+	    "lemma": "-",
+	    "normalized": "-",
+	    "token": "-",
+	    "pos": ",",
+	  },
+	  {
+	    "lemma": "7",
+	    "normalized": "7",
+	    "token": "7",
+	    "pos": "$"
+	  },  
+        ]
+      },
+      {
+        "lemma": "software",
+        "normalized": "software",
+        "token": "software",
+        "bnsense": "software%1:10:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "because",
+        "normalized": "because",
+        "token": "because",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "the",
+        "normalized": "the",
+        "token": "the",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "w 8",
+        "normalized": "Windows 8",
+        "token": "w 8",
+        "bnsense": "",
+        "type": "NE",
+        "pos": "^",
         
-        {
-            "tokens": [ "w", "8" ],
-            "type": "Product",
-            "positions": [20, 21]
-        }
+        "expansion": [
+	  {
+	    "lemma": "w",
+	    "normalized": "Windows",
+	    "token": "w",
+	    "pos": "^"
+	  },
+	  {
+	    "lemma": "8",
+	    "normalized": "8",
+	    "token": "8",
+	    "pos": "$",
+	  },
+        ]
+      },
+      {
+        "lemma": "application",
+        "normalized": "applications",
+        "token": "apps",
+        "bnsense": "application%1:10:01::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "be",
+        "normalized": "are",
+        "token": "are",
+        "bnsense": "be%2:42:03::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "too",
+        "normalized": "too",
+        "token": "to",
+        "bnsense": "excessively%4:02:00::",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "unstable",
+        "normalized": "unstable",
+        "token": "instable",
+        "bnsense": "unstable%3:00:00::",
+        "type": "token",
+        "pos": "A",
+      },
     ],
     
-    "normalized_tokens_with_entities": ["@Microsoft", "How", "do", "I", "remove", "win8", "applications", "?", "I", "had", "replaced", "them", "with", "win-7", "software", "because", "the", "w8", "applications", "are", "too", "unstable"],
-    "lemmas_with_entities": ["@Microsoft", "How", "do", "I", "remove", "win8" "application", "?", "I", "have", "replace", "them", "with", "win-7", "software", "because", "the", "w8", "application", "be", "too", "unstable"],
-    "pos_with_entities": ["@", "R", "V", "O", "V", "N", "N", ",", "O", "V", "V", "O", "&", "N", "N", "P", "D", "N", "N", "V", "R", "A"],
-    
-    "senses": ["", "", "", "", "remove%2:30:00::", "", "application%1:10:01::", "", "", "", "replace%2:30:00::", "", "", "", "software%1:10:00::", "", "", "", "application%1:10:01::", "be%2:42:03::", "excessively%4:02:00::", "unstable%3:00:00::"],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Computers & Internet", "Software"],
     
     "paraphrases": [
 	{
 	    "text": "How can windows 8 apps be removed?",
-	    "rating": 0.95
+	    "rating": 4.9
 	},
 
 	{
 	    "text": "How do I uninstall windows 8 apps",
-	    "rating": 0.9
+	    "rating": 4.9
 	},
 	
 	{
 	    "text": "How can I delete unstable windows 8 apps?",
-	    "rating": 0.9
+	    "rating": 5.0
 	}
     ],
     
@@ -69,7 +259,7 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 1.0,
+	    "similarity": 5.0,
 	    
 	    "simplified_answer": "Go to control panel. Go to add/remove. Pick App and uninstall.",
 	    "summarized_answer": "Go to control panel. Go to add/remove. Pick App and uninstall."
@@ -85,10 +275,12 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.72,
+	    "similarity": 3.0,
 	    
 	    "simplified_answer": "Just tap and hold the app icon in the \"all apps\" list in the phone, context menu shows up and then click the \"uninstall\" option.",
 	    "summarized_answer": "Tap and hold the app icon in the \"all apps\" list, then from the context menu choose \"uninstall\".",
 	}
-    ]
+    ],
+    
+    "qrel": ["how", "to uninstall", "windows 8 apps"],
 }

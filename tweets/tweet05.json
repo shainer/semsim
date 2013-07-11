@@ -7,30 +7,100 @@
     "source": "<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>",
     "text": "why do i have random scratches on me?",
     
-    "language": "en",
-    "tokens": ["why", "do", "i", "have", "random", "scratches", "on", "me", "?"],
-    "normalized_tokens": ["why", "do", "I", "have", "random", "scratches", "on", "me", "?"],
-    "lemmas": ["why", "do", "I", "have", "random", "scratch", "on", "me", "?"],
-    "pos": ["R", "V", "O", "V", "A", "N", "P", "O", ","],
+    "language": "EN",
+
+    "tokens": [
+      {
+        "lemma": "why",
+        "normalized": "why",
+        "token": "why",
+        "bnsense": "",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "do",
+        "normalized": "do",
+        "token": "do",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "I",
+        "normalized": "I",
+        "token": "i",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "have",
+        "normalized": "have",
+        "token": "have",
+        "bnsense": "have%2:40:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "random",
+        "normalized": "random",
+        "token": "random",
+        "bnsense": "random%3:00:00::",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "scratch",
+        "normalized": "scratches",
+        "token": "scratches",
+        "bnsense": "scratch%1:26:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "on",
+        "normalized": "on",
+        "token": "on",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "me",
+        "normalized": "me",
+        "token": "me",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+    ],
     
-    "senses": ["", "", "", "have%2:40:00::", "random%3:00:00::", "scratch%1:26:00::", "", "", ""],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Diseases & Condition", "Health", "Skin Conditions"],
     
     "paraphrases": [
 	{
 	    "text": "Why do I find random scratches on me?",
-	    "rating": 0.98
+	    "rating": 4.4
 	},
 
 	{
 	    "text": "What is the reason of random scratches on me?",
-	    "rating": 0.98
+	    "rating": 5.0
 	},
 	
 	{
 	    "text": "How come I have random scratches on me?",
-	    "rating": 0.98
+	    "rating": 5.0
 	}
     ],
     
@@ -45,7 +115,7 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.8,
+	    "similarity": 2.5,
 	    
 	    "simplified_answer": "If you have ever been told you sleepwalk that might be why, I recommend recording yourself when you sleep and watching it in fast mode to see if you do something.",
 	    "summarized_answer": "You may be a sleepwalker. Record yourself while sleeping and then watch later to see what happens."
@@ -61,10 +131,12 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.5,
+	    "similarity": 2.0,
 	    
 	    "simplified_answer": "From eczema to herpes, so see a doctor for correct diagnosis and treatment.",
 	    "summarized_answer": "From eczema to herpes, so see a doctor for correct diagnosis and treatment."
 	}
-    ]
+    ],
+    
+    "qrel": ["what", "reason of", "random scratches on me"]
 }

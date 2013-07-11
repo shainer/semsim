@@ -7,30 +7,100 @@
     "source": "<a href="http://twitter.com/download/android" rel="nofollow">Twitter for Android</a>",
     "text": "RT @ArielleDRoss: What Causes Green Potato Chips? http://t.co/9Hc4Euy4yQ",
     
-    "language": "en",
-    "tokens": ["RT", "@ArielleDRoss", ":", "What", "Causes", "Green", "Potato", "Chips", "http://t.co/9Hc4Euy4yQ"],
-    "normalized_tokens": ["RT", "@ArielleDRoss", ":", "what", "causes", "green", "potato", "chips", "http://t.co/9Hc4Euy4yQ"],
-    "lemmas": ["RT", "@ArielleDRoss", ":", "what", "cause", "green", "potato", "chip", "http://t.co/9Hc4Euy4yQ"],
-    "pos": ["~", "@", ",", "O", "V", "A", "N", "N", "U" ],
+    "language": "EN",
+
+    "tokens": [
+      {
+        "lemma": "RT",
+        "normalized": "RT",
+        "token": "RT",
+        "bnsense": "",
+        "type": "token",
+        "pos": "~",
+      },
+      {
+        "lemma": "@ArielleDRoss",
+        "normalized": "@ArielleDRoss",
+        "token": "@ArielleDRoss",
+        "bnsense": "",
+        "type": "token",
+        "pos": "@",
+      },
+      {
+        "lemma": ":",
+        "normalized": ":",
+        "token": ":",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+      {
+        "lemma": "what",
+        "normalized": "what",
+        "token": "What",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "cause",
+        "normalized": "causes",
+        "token": "Causes",
+        "bnsense": "cause%2:36:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "green",
+        "normalized": "green",
+        "token": "Green",
+        "bnsense": "green%5:00:00:chromatic:00",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "potato",
+        "normalized": "potato",
+        "token": "Potato",
+        "bnsense": "potato%1:13:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "chip",
+        "normalized": "chips",
+        "token": "Chips",
+        "bnsense": "chip%1:13:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "http://t.co/9Hc4Euy4yQ",
+        "normalized": "http://t.co/9Hc4Euy4yQ",
+        "token": "http://t.co/9Hc4Euy4yQ",
+        "bnsense": "",
+        "type": "token",
+        "pos": "U",
+      },
+    ],    
     
-    "senses": ["", "", "", "", "cause%2:36:00::", "green%5:00:00:chromatic:00", "potato%1:13:00::", "chip%1:13:00::", ""],
     "type": ["Objective", "Forensic", "Factual"],
     "categories": ["Food & Drink"],
     
     "paraphrases": [
 	{
 	    "text": "What is the cause of green potato chips?",
-	    "rating": 1.0
+	    "rating": 5.0
 	},
 
 	{
 	    "text": "Why are there green potato chips?",
-	    "rating": 0.9
+	    "rating": 4.5
 	},
 	
 	{
 	    "text": "Why are some potato chips green?",
-	    "rating": 0.75
+	    "rating": 4.3
 	}
     ],
     
@@ -45,7 +115,7 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 1.0,
+	    "similarity": 5.0,
 	    
 	    "simplified_answer": "The green colour is caused by excessive exposure to light.",
 	    "summarized_answer": "The green colour is caused by excessive exposure to light."
@@ -61,10 +131,14 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.85,
+	    "similarity": 4.2,
 	    
 	    "simplified_answer": "Green chips come from potatoes that have had a lot of exposure to light and have built up too much chlorophyll. The brown chips you see sometimes in the bags come from potatoes that have been stored too much, and their sugar has caramelized. It's okay to eat both in small amounts.",
 	    "summarized_answer": "Green chips come from potatoes that have had a lot of exposure to light and have built up too much chlorophyll."
 	}
     ],
+    
+    "qrel": [
+      "what", "cause of", "green potato chips",
+    ]
 }

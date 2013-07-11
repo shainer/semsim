@@ -7,30 +7,160 @@
     "source": "<a href="http://www.hootsuite.com" rel="nofollow">HootSuite</a>",
     "text": "What's your reason for getting out of bed each morning? Who motivates you?",
 
-    "language": "en",
-    "tokens": ["What", "'", "s", "your", "reason", "for", "getting", "out", "of", "bed", "each", "morning", "?", "Who", "motivates", "you", "?"],
-    "normalized_tokens": ["What's", "your", "reason", "for", "getting", "out", "of", "bed", "each", "morning", "?", "Who", "motivates", "you", "?"],
-    "lemmas": ["What", "be", "your", "reason", "for", "get", "out", "of", "bed", "each", "morning", "?", "Who", "motivate", "you", "?"],
-    "pos": ["O", "V", "D", "N", "P", "V", "T", "P", "N", "A", "N", ",", "O", "V", "O", ","],
+    "language": "EN",
+
+    "tokens": [
+      {
+        "token": "What's",
+        "type": "MME",
+        "expansion": [
+          {
+	    "token": "What",
+	    "normalized": "What",
+	    "lemma": "What",
+	    "pos": "O",
+	    "bnsense": ""
+          },
+          {
+	    "token": "'s",
+	    "normalized": "is",
+	    "lemma": "be",
+	    "pos": "V",
+	    "bnsense": "be%2:42:03::",
+          }
+        ]
+      },
+      {
+        "lemma": "your",
+        "normalized": "your",
+        "token": "your",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "reason",
+        "normalized": "reason",
+        "token": "reason",
+        "bnsense": "reason%1:16:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "for",
+        "normalized": "for",
+        "token": "for",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "get",
+        "normalized": "getting",
+        "token": "getting",
+        "bnsense": "get%2:38:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "out",
+        "normalized": "out",
+        "token": "out",
+        "bnsense": "",
+        "type": "token",
+        "pos": "T",
+      },
+      {
+        "lemma": "of",
+        "normalized": "of",
+        "token": "of",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "bed",
+        "normalized": "bed",
+        "token": "bed",
+        "bnsense": "bed%1:06:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "each",
+        "normalized": "each",
+        "token": "each",
+        "bnsense": "each%5:00:00:all:00",
+        "type": "token",
+        "pos": "A",
+      },
+      {
+        "lemma": "morning",
+        "normalized": "morning",
+        "token": "morning",
+        "bnsense": "morning%1:28:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+      {
+        "lemma": "Who",
+        "normalized": "Who",
+        "token": "Who",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "motivate",
+        "normalized": "motivates",
+        "token": "motivates",
+        "bnsense": "motivate%2:36:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "you",
+        "normalized": "you",
+        "token": "you",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+    ],
     
-    "senses": ["", "be%2:42:03::", "", "reason%1:16:00::", "", "get%2:38:00::", "", "", "bed%1:06:00::", "each%5:00:00:all:00", "morning%1:28:00::", "", "", "motivate%2:36:00::", "", ""],
     "type": ["Subjective", "Deliberative", "Identification"],
     "categories": ["Health", "General Health Care"],
     
     "paraphrases": [
 	{
 	    "text": "Why do you get out of bed each morning?",
-	    "rating": 0.8
+	    "rating": 4.0
 	},
 
 	{
 	    "text": "What motivates you to get out of bed each morning?",
-	    "rating": 0.78
+	    "rating": 5.0
 	},
 	
 	{
 	    "text": "For what reason do you get out of bed each morning?",
-	    "rating": 0.82
+	    "rating": 4.0
 	}
     ],
     
@@ -49,7 +179,7 @@ Find someone to go back to bed with...",
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.85,
+	    "similarity": 4.2,
 	    
 	    "simplified_answer": "Work, play, exercise, make friends, find someone to go back to bed with...",
 	    "summarized_answer": "Work, play, exercise, make friends, find someone to go back to bed with...",
@@ -67,10 +197,12 @@ and the fact that I have to go to school.",
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.97,
+	    "similarity": 4.6,
 	    
 	    "simplified_answer": "The alarm clock and the fact that I have to go to school.",
 	    "summarized_answer": "The alarm clock and the fact that I have to go to school."
 	}
-    ]
+    ],
+    
+    "qrel": ["what", "reason of", "getting out of bed"],
 }

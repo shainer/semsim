@@ -8,30 +8,132 @@
    "source": "<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>",
    "text": "@1dworldmerch how do you get the chance to work at a store?",
    
-   "language": "en",
-   "tokens": ["@1dworldmerch", "how", "do", "you", "get", "the", "chance", "to", "work", "at", "a", "store", "?"],
-   "normalized_tokens": ["@1dworldmerch", "how", "do", "you", "get", "the", "chance", "to", "work", "at", "a", "store", "?"],
-   "lemmas": ["@1dworldmerch", "how", "do", "you", "get", "the", "chance", "to", "work", "at", "a", "store", "?"],
-   "pos": ["@", "R", "V", "O", "V", "D", "N", "P", "V", "P", "D", "N", ","],
+   "language": "EN",
+
+    "tokens": [
+      {
+        "lemma": "@1dworldmerch",
+        "normalized": "@1dworldmerch",
+        "token": "@1dworldmerch",
+        "bnsense": "",
+        "type": "token",
+        "pos": "@",
+      },
+      {
+        "lemma": "how",
+        "normalized": "how",
+        "token": "how",
+        "bnsense": "",
+        "type": "token",
+        "pos": "R",
+      },
+      {
+        "lemma": "do",
+        "normalized": "do",
+        "token": "do",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "you",
+        "normalized": "you",
+        "token": "you",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "get",
+        "normalized": "get",
+        "token": "get",
+        "bnsense": "get%2:40:01::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "the",
+        "normalized": "the",
+        "token": "the",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "chance",
+        "normalized": "chance",
+        "token": "chance",
+        "bnsense": "chance%1:26:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "to",
+        "normalized": "to",
+        "token": "to",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "work",
+        "normalized": "work",
+        "token": "work",
+        "bnsense": "work%2:41:00::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "at",
+        "normalized": "at",
+        "token": "at",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "a",
+        "normalized": "a",
+        "token": "a",
+        "bnsense": "",
+        "type": "token",
+        "pos": "D",
+      },
+      {
+        "lemma": "store",
+        "normalized": "store",
+        "token": "store",
+        "bnsense": "store%1:06:00::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "?",
+        "type": "token",
+        "pos": ",",
+      },
+    ],
    
-   "senses": ["", "", "", "", "get%2:40:01::", "", "chance%1:26:00::", "", "work%2:41:00::", "", "", "store%1:06:00::", "?"],
    "type": ["Subjective", "Deliberative", "Advice"],
    "categories": ["Careers & Employment", "Education & Reference"],
    
     "paraphrases": [
 	{
 	    "text": "How do you get a job at a store?",
-	    "rating": 0.82
+	    "rating": 4.0
 	},
 
 	{
 	    "text": "How do you get the opportunity to work at a shop?",
-	    "rating": 0.96
+	    "rating": 5.0
 	},
 	
 	{
 	    "text": "How can I find a job at a store?",
-	    "rating": 0.75
+	    "rating": 3.9
 	}
     ],
     
@@ -55,7 +157,7 @@ now theyll probably say theyll need to ask the manager etc, however, if they do 
 		"score": 0.5
 	    },
 	    
-	    "similarity": 0.78,
+	    "similarity": 3.5,
 	    
 	    "simplified_answer": "If there are jobs advertised, ask about the job position, otherwise ask if they are positions going. They'll say they need to ask the manager. If they say no, ask if you can leave your CV to them.",
 	    "summarized_answer": "Ask if they have job positions available. Ask if you can leave your CV to them."
@@ -71,10 +173,12 @@ now theyll probably say theyll need to ask the manager etc, however, if they do 
 		"score": 1.0
 	    },
 	    
-	    "similarity": 1.0,
+	    "similarity": 4.6,
 	    
 	    "simplified_answer": "Look for stores who are hiring new employees. Hand your CV to someone working there and fill up their application.",
 	    "summarized_answer": "Look for stores who are hiring new employees. Hand your CV to someone working there and fill up their application."
 	}
-    ]
+    ],
+    
+    "qrel": [],
 }

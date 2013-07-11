@@ -7,42 +7,115 @@
     "source": "<a href="http://www.sharedby.co" rel="nofollow">SharedBy</a>",
     "text": "Should You Use Twitter DM for Marketing? http://t.co/uDGlaDgdOS #SocialMedia",
 
-    "language": "en",
-    "tokens": ["Should", "You", "Use", "Twitter", "DM", "for", "Marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
-    "normalized_tokens": ["should", "you", "use", "Twitter", "DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
-    "lemmas": ["shall", "you", "use", "Twitter", "DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
-    "pos": ["V", "O", "V", "^", "^", "P", "N", ",", "U", "#"],
+    "language": "EN",
     
-    "entities": [
-        {
-            "tokens": [ "Twitter", "DM" ],
-            "type": "Product",
-            "positions": [3, 4]
-        }
+    "tokens": [
+      {
+        "lemma": "shall",
+        "normalized": "should",
+        "token": "Should",
+        "bnsense": "",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+        "lemma": "you",
+        "normalized": "you",
+        "token": "You",
+        "bnsense": "",
+        "type": "token",
+        "pos": "O",
+      },
+      {
+        "lemma": "use",
+        "normalized": "use",
+        "token": "Use",
+        "bnsense": "use%2:34:01::",
+        "type": "token",
+        "pos": "V",
+      },
+      {
+	"lemma": "Twitter DM",
+	"normalized": "Twitter DM",
+	"token": "Twitter DM",
+	"bnsense": "",
+	"type": "NE",
+	"pos": "^",
+	
+	"expansion": [
+	  {
+	    "lemma": "Twitter",
+	    "normalized": "Twitter",
+	    "token": "Twitter",
+	    "pos": "^"
+	  },
+	  {
+	    "lemma": "DM",
+	    "normalized": "DM",
+	    "token": "DM",
+	    "pos": "^",
+	  },
+	]
+      },
+      {
+        "lemma": "for",
+        "normalized": "for",
+        "token": "For",
+        "bnsense": "",
+        "type": "token",
+        "pos": "P",
+      },
+      {
+        "lemma": "market",
+        "normalized": "marketing",
+        "token": "Marketing",
+        "bnsense": "marketing%1:04:02::",
+        "type": "token",
+        "pos": "N",
+      },
+      {
+        "lemma": "?",
+        "normalized": "?",
+        "token": "?",
+        "bnsense": "",
+        "type": "token",
+        "pos": ",",
+      },
+      {
+        "lemma": "http://t.co/uDGlaDgdOS",
+        "normalized": "http://t.co/uDGlaDgdOS",
+        "token": "http://t.co/uDGlaDgdOS",
+        "bnsense": "",
+        "type": "token",
+        "pos": "U",
+      },
+      {
+        "lemma": "#SocialMedia",
+        "normalized": "#SocialMedia",
+        "token": "#SocialMedia",
+        "bnsense": "",
+        "type": "token",
+        "pos": "#",
+      },
     ],
-    
-    "normalized_tokens_with_entities": ["should", "you", "use", "Twitter DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
-    "lemmas_with_entities": ["shall", "you", "use", "Twitter DM", "for", "marketing", "?", "http://t.co/uDGlaDgdOS", "#SocialMedia"],
-    "pos_with_entities": ["V", "O", "V", "N", "P", "N", ",", "U", "#"],
-    
-    "senses": ["", "", "use%2:34:01::", "", "", "marketing%1:04:02::", "", "", ""],
+
     "type": ["Subjective", "Deliberative", "Advice"],
     "categories": ["Business & Finance", "Advertising & Marketing", "Search Engine Optimization"],
     
     "paraphrases": [
 	{
 	    "text": "Is it good to use Twitter DM for marketing?",
-	    "rating": 0.8
+	    "rating": 4.0
 	},
 
 	{
 	    "text": "Is it worth to use Twitter DM for marketing?",
-	    "rating": 0.8
+	    "rating": 4.7
 	},
 	
 	{
 	    "text": "Should you advertise your business on Twitter?",
-	    "rating": 0.7
+	    "rating": 3.2
 	}
     ],
     
@@ -57,7 +130,7 @@
 		"score": 1.0
 	    },
 	    
-	    "similarity": 0.6,
+	    "similarity": 3.2,
 	    
 	    "simplified_answer": "Yes, it is a really good marketing strategy to grow your business. You can follow as many people as you like and get their status updates. And all those people following you will get your updates and tweets.",
 	    "summarized_answer": "Yes, it is a really good marketing strategy to grow your business. You can follow a lot of people and they may follow you and get your tweets."
@@ -73,10 +146,12 @@
 		"score": 0.9
 	    },
 	    
-	    "similarity": 0.8,
+	    "similarity": 2.5,
 	    
 	    "simplified_answer": "Twitter is one of the largest social marketing platforms on the Internet. It provides great opportunity for you to create a potential marketplace. Why don't you sign up for a campaign that gets you twitter followers and tweets and retweets at some cheap affordable price? You'd actually turn up profitable in the long run.",
 	    "summarized_answer": "Twitter is a big social platform and provides great opportunity for marketplaces. You can sign up for campaigns and get followers."
 	}
-    ]
+    ],
+    
+    "qrel": [],
 }
