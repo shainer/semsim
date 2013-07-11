@@ -30,7 +30,7 @@
         "lemma": "sell",
         "normalized": "sell",
         "token": "sell",
-        "bnsense": "sell%2:40:00::",
+        "bnsense": "bn:00093472v",
         "type": "token",
         "pos": "V",
       },
@@ -38,7 +38,7 @@
         "lemma": "firework",
         "normalized": "fireworks",
         "token": "fireworks",
-        "bnsense": "firework%1:06:00::",
+        "bnsense": "bn:00034718n",
         "type": "token",
         "pos": "N",
       },
@@ -54,7 +54,7 @@
         "lemma": "Tennessee",
         "normalized": "Tennessee",
         "token": "Tennessee",
-        "bnsense": "tennessee%1:15:00::",
+        "bnsense": "bn:00076518n",
         "type": "NE",
         "pos": "^",
       },
@@ -70,7 +70,7 @@
         "lemma": "something",
         "normalized": "something",
         "token": "something",
-        "bnsense": "",
+        "bnsense": "bn:00032239n",
         "type": "token",
         "pos": "N",
       },
@@ -106,19 +106,19 @@
     
     "qpairs": [
 	{
-	    "question": "Is it illegal to buy fireworks in Tennessee?",
-	    "answer": "In Tennessee ground salutes and mail order purchase of fireworks is illegal. Selling periods are 6-20 to 7-5 and 12-10 to 1-2.",
-	    "url": "http://www.chacha.com/question/is-it-illegal-to-buy-fireworks-in-tennessee",
+	    "question": "What are the legal dates to shoot fireworks in Tennessee?",
+	    "answer": "It depends on the location. For instance, it's never legal to shoot off fireworks in Davidson County, even on the Fourth of July.",
+	    "url": "http://answers.yahoo.com/question/index;_ylt=Ag9bjO_h1Kb5BwtaWGojALEjzKIX;_ylv=3?qid=20070706065133AAV27EC",
 	    
 	    "sentiment": {
 		"class": "Neutral",
 		"score": 1.0
 	    },
 	    
-	    "similarity": 3.7,
+	    "similarity": 2.0,
 	    
-	    "simplified_answer": "In Tennessee ground salutes and mail orders of fireworks are illegal. In all the other cases, selling periods are Selling periods are 6-20 to 7-5 and 12-10 to 1-2.",
-	    "summarized_answer": "Selling periods are 6-20 to 7-5 and 12-10 to 1-2. Ground salutes and mail orders are forbidden."
+	    "simplified_answer": "It depends on the location. For instance, it's never legal to shoot off fireworks in Davidson County.",
+	    "summarized_answer": "It depends on the location. For example, it's never legal to shoot fireworks in Davidson County."
 	},
 	
 	{
