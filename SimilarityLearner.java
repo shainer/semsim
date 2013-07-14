@@ -24,8 +24,12 @@ public class SimilarityLearner
     
     public SimilarityLearner()
     {
+        System.out.print(":: Initializing LSA information... ");
+        LSA lsa = new LSA();
+        System.out.println("OK.");
+        
         System.out.print(":: Initializing feature collector... ");
-        fc = new FeatureCollector("word-frequencies.txt");
+        fc = new FeatureCollector("word-frequencies.txt", lsa);
         System.out.println("OK.");
         
         System.out.print(":: Initializing tokenizer and POS tagger... ");

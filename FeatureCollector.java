@@ -5,7 +5,6 @@
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
-import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.cmu.lti.ws4j.WS4J;
 import java.math.BigInteger;
 import java.math.BigDecimal;
@@ -18,6 +17,7 @@ public class FeatureCollector
 {
     private SentencePair sp;    
     private FrequencyCounter counter;
+    private LSA lsa;
     
     private double[] features;
     private final int FEATURE_SIZE = Properties.getFeatureNumber();
@@ -27,10 +27,11 @@ public class FeatureCollector
      * When training using the SemCor samples, the frequency counts we need are all available
      * in a (relatively) small file, so they are taken from there.
      */
-    public FeatureCollector(String frequencyFile)
+    public FeatureCollector(String frequencyFile, LSA lsa)
     {
         this.counter = new FrequencyCounterFile(frequencyFile);
         this.features = new double[FEATURE_SIZE];
+        this.lsa = lsa;
     }
     
     /*
@@ -73,6 +74,7 @@ public class FeatureCollector
         wordnetOverlap();
         weightedWords();
         sentenceLength();
+        vectorSpaceSimilarity();
         
         /* Rounds features values at their third decimal digit. */
         for (int i = 0; i < features.length; i++) {
@@ -117,20 +119,20 @@ public class FeatureCollector
         double s2TotalContent = 0.0;
         double sharedContent = 0.0;
         
-        for (TaggedToken tt : sp.s1) {
+        for (POSTaggedToken tt : sp.s1) {
             double icw = informationContent(tt, totalFrequencyCount);
             s1TotalContent += icw;
             
-            if (sentenceContains(sp.s2, tt)) {
+            if (sp.s2.contains(tt)) {
                 sharedContent += icw;
             }
         }
         
-        for (TaggedToken tt : sp.s2) {
+        for (POSTaggedToken tt : sp.s2) {
             double icw = informationContent(tt, totalFrequencyCount);
             s2TotalContent += icw;
             
-            if (sentenceContains(sp.s1, tt)) {
+            if (sp.s1.contains(tt)) {
                 sharedContent += icw;
             }
         }
@@ -140,7 +142,7 @@ public class FeatureCollector
         features[featureIndex++] = Math.abs(s2TotalContent - s1TotalContent);
     }
     
-    private double informationContent(TaggedToken tt, BigInteger totalFrequencyCount)
+    private double informationContent(POSTaggedToken tt, BigInteger totalFrequencyCount)
     {
         char[] uselessTags = {'#', '@', '~', 'U', 'E', '$', ',', 'G'};
         
@@ -159,17 +161,6 @@ public class FeatureCollector
         return Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
     }
     
-    private boolean sentenceContains(List<TaggedToken> s, TaggedToken tt)
-    {
-        for (TaggedToken sTT : s) {
-            if (sTT.token.equals(tt.token) && sTT.tag.equals(tt.tag)) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
     /*
      * WordNet-Augmented Word Overlap
      */
@@ -185,11 +176,11 @@ public class FeatureCollector
         return mean;
     }
     
-    private double pwn(List<TaggedToken> s1, List<TaggedToken> s2)
+    private double pwn(List<POSTaggedToken> s1, List<POSTaggedToken> s2)
     {
         double res = 0.0;
         
-        for (TaggedToken tt : s1) {
+        for (POSTaggedToken tt : s1) {
             if (tt.tag.equals(",") || tt.tag.equals("$")) {
                 continue;
             }
@@ -201,18 +192,18 @@ public class FeatureCollector
         return res;
     }
     
-    private double wordnetScore(String word1, List<TaggedToken> sentence)
+    private double wordnetScore(String word1, List<POSTaggedToken> sentence)
     {
         double maxScore = 0.0;
         word1 = word1.toLowerCase();
         
-        for (TaggedToken tt : sentence) {
+        for (POSTaggedToken tt : sentence) {
             if (tt.token.equals(word1)) {
                 return 1.0;
             }
         }
         
-        for (TaggedToken tt : sentence) {
+        for (POSTaggedToken tt : sentence) {
             String otherWord = tt.token;
             double score = WS4J.runPATH(word1, otherWord);
             
@@ -268,9 +259,12 @@ public class FeatureCollector
             }
         }
         
-        features[featureIndex++] = setOverlap(s1unigrams, s2unigrams);
-        features[featureIndex++] = setOverlap(s1bigrams, s2bigrams);
-        features[featureIndex++] = setOverlap(s1trigrams, s2trigrams);
+        double f1 = setOverlap(s1unigrams, s2unigrams);
+        double f2 = setOverlap(s1bigrams, s2bigrams);
+        double f3 = setOverlap(s1trigrams, s2trigrams);
+        features[featureIndex++] = f1;
+        features[featureIndex++] = f2;
+        features[featureIndex++] = f3;
     }
 
     /*
@@ -347,11 +341,11 @@ public class FeatureCollector
         return true;
     }
     
-    private Set<Double> numberTokens(List<TaggedToken> sentence)
+    private Set<Double> numberTokens(List<POSTaggedToken> sentence)
     {
         Set<Double> n = new HashSet<>();
         
-        for (TaggedToken t : sentence) {
+        for (POSTaggedToken t : sentence) {
             if (t.tag.equals("$")) {
                 try {
                     n.add( Double.parseDouble(t.token) );
@@ -377,7 +371,7 @@ public class FeatureCollector
         features[featureIndex++] = presence;
     }
     
-    private Set<String> findCapitalizedWords(List<TaggedToken> sentence)
+    private Set<String> findCapitalizedWords(List<POSTaggedToken> sentence)
     {
         Set<String> cap = new HashSet<>();
         
@@ -406,7 +400,7 @@ public class FeatureCollector
         features[featureIndex++] = presence;
     }
    
-    private Set<String> findStockItems(List<TaggedToken> sentence)
+    private Set<String> findStockItems(List<POSTaggedToken> sentence)
     {
         Set<String> stockItems = new HashSet<>();
         
@@ -460,6 +454,11 @@ public class FeatureCollector
         }
         
         return overlap;
+    }
+    
+    private void vectorSpaceSimilarity()
+    {
+        
     }
 
 }

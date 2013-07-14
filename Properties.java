@@ -12,7 +12,8 @@ import java.util.List;
  */
 public class Properties
 {
-    private static final int FEATURE_SIZE = 14;
+    private static final int FEATURE_SIZE = 16;
+    private static final int LSA_VECTOR_SIZE = 100;
     private static final String[] stopWords = {"i", "a", "about", "an", "are", "as", "at", "be", "by", "for", "from",
                                                "how", "in", "is", "it", "of", "on", "or", "that", "the", "this", "to",
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
@@ -33,5 +34,10 @@ public class Properties
     public static String getTaggerModelPath()
     {
         return taggerModelPath;
+    }
+    
+    public static int getLSAVectorSize()
+    {
+        return LSA_VECTOR_SIZE;
     }
 }

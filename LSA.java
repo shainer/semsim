@@ -3,15 +3,11 @@
  * and open the template in the editor.
  */
 
-import cmu.arktweetnlp.Tagger.TaggedToken;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 /**
  *
@@ -19,18 +15,15 @@ import java.util.LinkedList;
  */
 public class LSA
 {
-    private Map<TaggedToken, ArrayList<Double> > lsa;
+    private Map<POSTaggedToken, double[] > lsa;
     
     public LSA()
     {
         lsa = new HashMap<>();
         
-        List<String> lines = new LinkedList<>();
-        
         try {
             BufferedReader br = new BufferedReader( new FileReader("lsa_matrix.txt") );
             parseFile(br);
-            System.out.println("finished");
             
             br.close();
         } catch (IOException e) {
@@ -44,8 +37,9 @@ public class LSA
         int c;
         String currentToken = "";
         
-        TaggedToken tt = new TaggedToken();
-        ArrayList<Double> currentVector = new ArrayList<>();
+        POSTaggedToken tt = new POSTaggedToken();
+        double[] currentVector = new double[ Properties.getLSAVectorSize() ];
+        int currentVectorIndex = 0;
 
         int countTab = 0;
         int state = 0;
@@ -60,7 +54,14 @@ public class LSA
                         tt.token = currentToken;
                         br.read();
                         tt.tag = "";
-                        tt.tag += (char)br.read();
+                        
+                        char next = (char)br.read();
+                        
+                        if (next == '\t') {
+                            countTab++;
+                        } else {
+                            tt.tag += next;
+                        }
                         
                         currentToken = "";
                         state = 1;
@@ -82,22 +83,35 @@ public class LSA
                     
                 case 2:
                         if (ch == ',') {
-                            currentVector.add( Double.parseDouble(currentToken) );
+                            currentVector[currentVectorIndex++] = Double.parseDouble(currentToken);
                             currentToken = "";
                         } else if (ch == '\n') {
-                            System.out.println(line++);
-                            currentVector.add( Double.parseDouble(currentToken) );
+                            //System.out.println(line++);
+                            currentVector[currentVectorIndex++] = Double.parseDouble(currentToken);
                             lsa.put(tt, currentVector);
 
                             currentToken = "";
-                            tt = new TaggedToken();
+                            tt = new POSTaggedToken();
                             countTab = 0;
-                            currentVector.clear();
+                            currentVectorIndex = 0;
                             state = 0;
                         } else {
                             currentToken += ch;
                         }
             }
         }
+    }
+    
+    public double[] getWordVector(POSTaggedToken tt)
+    {
+        double[] vector;
+        
+        if (!lsa.containsKey(tt)) {
+            vector = new double[ Properties.getLSAVectorSize() ];
+        } else {
+            vector = lsa.get(tt);
+        }
+        
+        return vector;
     }
 }

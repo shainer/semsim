@@ -8,9 +8,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import cmu.arktweetnlp.Tagger;
-import cmu.arktweetnlp.Tagger.TaggedToken;
-
-import org.json.simple.JSONArray;
 
 /**
  *
@@ -18,8 +15,8 @@ import org.json.simple.JSONArray;
  */
 public class SentencePair
 {
-    public List<TaggedToken> s1;
-    public List<TaggedToken> s2;
+    public List<POSTaggedToken> s1;
+    public List<POSTaggedToken> s2;
     
     public SentencePair(List<String> s1Tokens, List<String> s1Tags, String s2, Tagger tagger)
     {
@@ -27,13 +24,14 @@ public class SentencePair
         this.s2 = new LinkedList<>();
         
         for (int i = 0; i < s1Tokens.size(); i++) {
-            TaggedToken tt = new TaggedToken();
-            tt.token = (String)s1Tokens.get(i);
-            tt.tag = (String)s1Tags.get(i);
+            POSTaggedToken tt = new POSTaggedToken( (String)s1Tokens.get(i), (String)s1Tokens.get(i) );
             this.s1.add(tt);
         }
+       
+        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
+            this.s2.add( new POSTaggedToken(tt) );
+        }
         
-        this.s2 = tagger.tokenizeAndTag(s2);
         preprocess();
     }
     
@@ -41,24 +39,30 @@ public class SentencePair
     {
         this.s1 = new LinkedList<>();
         this.s2 = new LinkedList<>();
-        this.s1 = tagger.tokenizeAndTag(s1);
-        this.s2 = tagger.tokenizeAndTag(s2);
+
+        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s1)) {
+            this.s1.add( new POSTaggedToken(tt) );
+        }
+        
+        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
+            this.s2.add( new POSTaggedToken(tt) );
+        }
         
         preprocess();
     }
     
-    public String toString()
+    @Override public String toString()
     {
         String p = "";
         
-        for (TaggedToken tt : s1) {
-            p += tt.token + "_" + tt.tag + ", ";
+        for (POSTaggedToken tt : s1) {
+            p += tt + ", ";
         }
         
         p += "\n";
         
-        for (TaggedToken tt : s2) {
-            p += tt.token + "_" + tt.tag + ", ";
+        for (POSTaggedToken tt : s2) {
+            p += tt + ", ";
         }
         
         p += "\n";
@@ -80,10 +84,10 @@ public class SentencePair
         System.out.println(this);
     }
     
-    private void removeHyphensSlashes(List<TaggedToken> list)
+    private void removeHyphensSlashes(List<POSTaggedToken> list)
     {
-        for (ListIterator<TaggedToken> it = list.listIterator(); it.hasNext();) {
-            TaggedToken tt = it.next();
+        for (ListIterator<POSTaggedToken> it = list.listIterator(); it.hasNext();) {
+            POSTaggedToken tt = it.next();
             String s = tt.token;
             
             s = s.replaceAll("-", "");
@@ -98,10 +102,10 @@ public class SentencePair
         }
     }
     
-    private void expandVerbAbbreviations(List<TaggedToken> list)
+    private void expandVerbAbbreviations(List<POSTaggedToken> list)
     {
-        for (ListIterator<TaggedToken> it = list.listIterator(); it.hasNext();) {
-            TaggedToken tt = it.next();
+        for (ListIterator<POSTaggedToken> it = list.listIterator(); it.hasNext();) {
+            POSTaggedToken tt = it.next();
             String string = tt.token;
             
             if (string.endsWith("n't")) {
@@ -115,10 +119,7 @@ public class SentencePair
                     it.set(tt);
                 }
                 
-                TaggedToken newTT = new TaggedToken();
-                newTT.token = "not";
-                newTT.tag = "R";
-                it.add(newTT);
+                it.add( new POSTaggedToken("not", "R") );
             } else if (string.endsWith("'m")) {
                 int index = string.lastIndexOf("'");
                 
@@ -131,20 +132,17 @@ public class SentencePair
                     it.set(tt);
                 }
                 
-                TaggedToken newTT = new TaggedToken();
-                newTT.token = "am";
-                newTT.tag = "V";
-                it.add(newTT);
+                it.add( new POSTaggedToken("am", "V") );
             }
         }
     }
 
-    private void removeStopWords(List<TaggedToken> list)
+    private void removeStopWords(List<POSTaggedToken> list)
     {
         String[] stopWords = Properties.getStopWords();
         
-        for (ListIterator<TaggedToken> it = list.listIterator(); it.hasNext();) {
-            TaggedToken tt = it.next();
+        for (ListIterator<POSTaggedToken> it = list.listIterator(); it.hasNext();) {
+            POSTaggedToken tt = it.next();
 
             for (int i = 0; i < stopWords.length; i++) {
                 if (stopWords[i].equals( tt.token.toLowerCase() )) {
@@ -155,13 +153,13 @@ public class SentencePair
         }
     }
     
-    private void mergeCompounds(List<TaggedToken> list1, List<TaggedToken> list2)
+    private void mergeCompounds(List<POSTaggedToken> list1, List<POSTaggedToken> list2)
     {
-        for (ListIterator<TaggedToken> it = list1.listIterator(); it.hasNext();) {
-            TaggedToken tt1 = it.next();
+        for (ListIterator<POSTaggedToken> it = list1.listIterator(); it.hasNext();) {
+            POSTaggedToken tt1 = it.next();
             
             if (it.hasNext()) {
-                TaggedToken tt2 = it.next();
+                POSTaggedToken tt2 = it.next();
                 String compound = tt1.token + tt2.token;
                 String tag = containsTokenWithTag(list2, compound);
                 
@@ -179,9 +177,9 @@ public class SentencePair
         }
     }
     
-    private String containsTokenWithTag(List<TaggedToken> list, String s)
+    private String containsTokenWithTag(List<POSTaggedToken> list, String s)
     {
-        for (TaggedToken tt : list) {
+        for (POSTaggedToken tt : list) {
             if (tt.token.equals(s)) {
                 return tt.tag;
             }
