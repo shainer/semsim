@@ -458,7 +458,42 @@ public class FeatureCollector
     
     private void vectorSpaceSimilarity()
     {
+        double[] U1 = sentenceVector(sp.s1, false);
+        double[] U2 = sentenceVector(sp.s2, false);
+        double[] U1Weighted = sentenceVector(sp.s1, true);
+        double[] U2Weighted = sentenceVector(sp.s2, true);
         
+        features[featureIndex++] = Math.cos( dotProduct(U1, U2) );
+        features[featureIndex++] = Math.cos( dotProduct(U1Weighted, U2Weighted) );
     }
-
+    
+    private double[] sentenceVector(List<POSTaggedToken> sentence, boolean weighted)
+    {
+        double[] V = new double[ Properties.getLSAVectorSize() ];
+        
+        for (POSTaggedToken tt : sentence) {
+            double[] word = lsa.getWordVector(tt);
+            
+            for (int i = 0; i < V.length; i++) {
+                if (weighted) {
+                    word[i] *= counter.getFrequencyCount(tt.token, tt.tag).doubleValue();
+                }
+                
+                V[i] += word[i];
+            }
+        }
+        
+        return V;
+    }
+    
+    private double dotProduct(double[] v1, double[] v2)
+    {
+        double sum = 0.0;
+        
+        for (int i = 0; i < v1.length; i++) {
+            sum += (v1[i] * v2[i]);
+        }
+        
+        return sum;
+    }
 }

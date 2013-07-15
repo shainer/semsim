@@ -1,5 +1,4 @@
 
-import cmu.arktweetnlp.Tagger;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -35,7 +34,7 @@ public class FrequencyCounterGoogle extends FrequencyCounter
         Map<String, Set<String> > groups = new HashMap<>();
         
         for (SentencePair sentencePair : pairs) {
-            for (Tagger.TaggedToken tt : sentencePair.s1) {
+            for (POSTaggedToken tt : sentencePair.s1) {
                 String token = tt.token.toLowerCase();
                 String word = token + "_" + translateTag(tt.tag);
                 
@@ -111,9 +110,9 @@ public class FrequencyCounterGoogle extends FrequencyCounter
     {
         token = token.toLowerCase();
         String translatedTag = translateTag(tag);
-                
+        String word = token + "_" + translatedTag;
+        
         if (!cache.isEmpty()) {
-            String word = token + "_" + translatedTag;
             
             if (cache.containsKey(word)) {
                 return cache.get(word);
@@ -143,10 +142,10 @@ public class FrequencyCounterGoogle extends FrequencyCounter
             
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split("\t");
-                String[] word = fields[0].split("_");
-                word[0] = word[0].toLowerCase();
+                String[] w = fields[0].split("_");
+                w[0] = w[0].toLowerCase();
                 
-                if (word.length == 2 && word[0].equals(token) && word[1].equals(translatedTag)) {
+                if (w.length == 2 && w[0].equals(token) && w[1].equals(translatedTag)) {
                     frequencyCount = new BigInteger( fields[1] );
                     break;
                 }
@@ -161,6 +160,7 @@ public class FrequencyCounterGoogle extends FrequencyCounter
             frequencyCount = new BigInteger("0");
         }
         
+        cache.put(word, frequencyCount);
         return frequencyCount;
     }
     

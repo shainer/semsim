@@ -1,4 +1,3 @@
-
 import cmu.arktweetnlp.Tagger;
 import java.io.IOException;
 import java.util.List;

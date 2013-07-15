@@ -43,7 +43,7 @@ public class POSTaggedToken
     
     @Override public int hashCode()
     {
-        return System.identityHashCode(this);
+        return (token.hashCode() + tag.hashCode());
     }
     
     @Override public String toString()
