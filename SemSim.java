@@ -112,7 +112,7 @@ public class SemSim
         if (outputFeatures) {
             String featureOutput = prop.getProperty("featureoutput");
             sl.writeFeatures(samples, featureOutput);
-        } else {
+        } else { /* otherwise, use them straight away to learn the model */
             sl.learnModel(samples);
         }
     }

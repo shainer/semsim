@@ -6,6 +6,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -60,7 +61,7 @@ public class LSA
                         if (next == '\t') {
                             countTab++;
                         } else {
-                            tt.tag += next;
+                            tt.tag += translateTag(next);
                         }
                         
                         currentToken = "";
@@ -86,14 +87,16 @@ public class LSA
                             currentVector[currentVectorIndex++] = Double.parseDouble(currentToken);
                             currentToken = "";
                         } else if (ch == '\n') {
-                            //System.out.println(line++);
                             currentVector[currentVectorIndex++] = Double.parseDouble(currentToken);
                             lsa.put(tt, currentVector);
 
                             currentToken = "";
                             tt = new POSTaggedToken();
                             countTab = 0;
+                            
                             currentVectorIndex = 0;
+                            currentVector = new double[ Properties.getLSAVectorSize() ];
+                            
                             state = 0;
                         } else {
                             currentToken += ch;
@@ -105,6 +108,7 @@ public class LSA
     public double[] getWordVector(POSTaggedToken tt)
     {
         double[] vector;
+        tt.token = tt.token.toLowerCase();
         
         if (!lsa.containsKey(tt)) {
             vector = new double[ Properties.getLSAVectorSize() ];
@@ -113,5 +117,45 @@ public class LSA
         }
         
         return vector;
+    }
+    
+    private char translateTag(char tag)
+    {        
+        switch (tag)
+        {
+            case 'p':
+                tag = 'O';
+                break;
+                
+            case 'c':
+                tag = '&';
+                break;
+                
+            case 'm':
+                tag = 'V';
+                break;
+                
+            case 'w':
+                tag = 'R';
+                break;
+                
+            case 'i':
+                tag = 'P';
+                break;
+                
+            case 'j':
+                tag = 'A';
+                break;
+                
+            case '#':
+                tag = ',';
+                break;
+                
+            default:
+                tag = Character.toUpperCase(tag);
+                break;
+        }
+        
+        return tag;
     }
 }

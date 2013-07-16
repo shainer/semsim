@@ -147,12 +147,8 @@ public class SimilarityLearner
         List<TrainingSample> samples = new LinkedList<>();
         List<SentencePair> pairs = new LinkedList<>();
         List<Double> targets = new LinkedList<>();
-        List<String> sampleLines = IOUtils.readlines(sampleFile);
-        
-        BufferedReader br = new BufferedReader( new FileReader(sampleFile) );
-        String line;
             
-        while ((line = br.readLine()) != null) {
+        for (String line : IOUtils.readlines(sampleFile)) {
             String[] fields = line.split("\t");
 
             SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
@@ -161,18 +157,14 @@ public class SimilarityLearner
             targets.add(target);
         }
 
-        br.close();
         System.out.println("Collected " + pairs.size() + " sentence pairs from " + sampleFile);
         
         Iterator<SentencePair> spIt;
         Iterator<Double> targetIt;
         
         for (spIt = pairs.iterator(), targetIt = targets.iterator(); spIt.hasNext() && targetIt.hasNext();) {
-            double[] featureCopy = new double[ Properties.getFeatureNumber() ];
             double[] features = fc.features( spIt.next() );
-            featureCopy = Arrays.copyOf(features, features.length);
-            
-            TrainingSample sample = new TrainingSample(featureCopy, targetIt.next());
+            TrainingSample sample = new TrainingSample(features, targetIt.next());
             samples.add(sample);
         }
         

@@ -5,10 +5,13 @@
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
 import edu.cmu.lti.ws4j.WS4J;
 import java.math.BigInteger;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author shainer
@@ -18,6 +21,7 @@ public class FeatureCollector
     private SentencePair sp;    
     private FrequencyCounter counter;
     private LSA lsa;
+    private HashMap<POSTaggedToken, Double> icwMap;
     
     private double[] features;
     private final int FEATURE_SIZE = Properties.getFeatureNumber();
@@ -32,6 +36,7 @@ public class FeatureCollector
         this.counter = new FrequencyCounterFile(frequencyFile);
         this.features = new double[FEATURE_SIZE];
         this.lsa = lsa;
+        this.icwMap = new HashMap<>();
     }
     
     /*
@@ -86,7 +91,7 @@ public class FeatureCollector
         }
         
         //printFeatures();
-        return features;
+        return Arrays.copyOf(features, features.length);
     }
     
     private void printFeatures()
@@ -112,15 +117,13 @@ public class FeatureCollector
      * Normalized Differences, feature (C)
      */
     private void weightedWords()
-    {
-        BigInteger totalFrequencyCount = counter.getTotalCount();
-        
+    {        
         double s1TotalContent = 0.0;
         double s2TotalContent = 0.0;
         double sharedContent = 0.0;
         
         for (POSTaggedToken tt : sp.s1) {
-            double icw = informationContent(tt, totalFrequencyCount);
+            double icw = informationContent(tt);
             s1TotalContent += icw;
             
             if (sp.s2.contains(tt)) {
@@ -129,7 +132,7 @@ public class FeatureCollector
         }
         
         for (POSTaggedToken tt : sp.s2) {
-            double icw = informationContent(tt, totalFrequencyCount);
+            double icw = informationContent(tt);
             s2TotalContent += icw;
             
             if (sp.s1.contains(tt)) {
@@ -142,7 +145,7 @@ public class FeatureCollector
         features[featureIndex++] = Math.abs(s2TotalContent - s1TotalContent);
     }
     
-    private double informationContent(POSTaggedToken tt, BigInteger totalFrequencyCount)
+    private double informationContent(POSTaggedToken tt)
     {
         char[] uselessTags = {'#', '@', '~', 'U', 'E', '$', ',', 'G'};
         
@@ -152,13 +155,20 @@ public class FeatureCollector
             }
         }
         
+        if (icwMap.containsKey(tt)) {
+            return icwMap.get(tt);
+        }
+        
+        BigInteger totalFrequencyCount = counter.getTotalCount();
         BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
         
         if (frequency.doubleValue() == 0) {
             return 0;
         }
         
-        return Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
+        double icw = Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
+        icwMap.put(tt, icw);
+        return icw;
     }
     
     /*
@@ -172,7 +182,7 @@ public class FeatureCollector
     private double harmonicMean(double d1, double d2)
     {
         double mean = 2.0;
-        mean /= ((1.0 / d1) + (1.0 / d2));
+        mean /= (((double)1.0 / d1) + ((double)1.0 / d2));
         return mean;
     }
     
@@ -188,14 +198,13 @@ public class FeatureCollector
             res += wordnetScore(tt.token.toLowerCase(), s2);
         }
         
-        res /= s2.size();
+        res /= (double)s2.size();
         return res;
     }
     
     private double wordnetScore(String word1, List<POSTaggedToken> sentence)
     {
         double maxScore = 0.0;
-        word1 = word1.toLowerCase();
         
         for (POSTaggedToken tt : sentence) {
             if (tt.token.equals(word1)) {
@@ -258,13 +267,10 @@ public class FeatureCollector
                 s2trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
-        
-        double f1 = setOverlap(s1unigrams, s2unigrams);
-        double f2 = setOverlap(s1bigrams, s2bigrams);
-        double f3 = setOverlap(s1trigrams, s2trigrams);
-        features[featureIndex++] = f1;
-        features[featureIndex++] = f2;
-        features[featureIndex++] = f3;
+
+        features[featureIndex++] = setOverlap(s1unigrams, s2unigrams);
+        features[featureIndex++] = setOverlap(s1bigrams, s2bigrams);
+        features[featureIndex++] = setOverlap(s1trigrams, s2trigrams);
     }
 
     /*
@@ -456,6 +462,9 @@ public class FeatureCollector
         return overlap;
     }
     
+    /*
+     * Vector Space Sentence Similarity
+     */
     private void vectorSpaceSimilarity()
     {
         double[] U1 = sentenceVector(sp.s1, false);
@@ -463,8 +472,8 @@ public class FeatureCollector
         double[] U1Weighted = sentenceVector(sp.s1, true);
         double[] U2Weighted = sentenceVector(sp.s2, true);
         
-        features[featureIndex++] = Math.cos( dotProduct(U1, U2) );
-        features[featureIndex++] = Math.cos( dotProduct(U1Weighted, U2Weighted) );
+        features[featureIndex++] = dotProduct(U1, U2) / (double)(U1.length * U2.length);
+        features[featureIndex++] = dotProduct(U1Weighted, U2Weighted) / (double)(U1Weighted.length * U2Weighted.length);
     }
     
     private double[] sentenceVector(List<POSTaggedToken> sentence, boolean weighted)
@@ -476,7 +485,7 @@ public class FeatureCollector
             
             for (int i = 0; i < V.length; i++) {
                 if (weighted) {
-                    word[i] *= counter.getFrequencyCount(tt.token, tt.tag).doubleValue();
+                    word[i] *= informationContent(tt);
                 }
                 
                 V[i] += word[i];

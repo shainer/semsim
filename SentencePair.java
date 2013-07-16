@@ -72,39 +72,80 @@ public class SentencePair
     
     private void preprocess()
     {
-        removeHyphensSlashes(this.s1);
-        removeHyphensSlashes(this.s2);
-        expandVerbAbbreviations(this.s1);
-        expandVerbAbbreviations(this.s2);
-        removeStopWords(this.s1);
-        removeStopWords(this.s2);
+        //System.out.println(this);
+        System.out.print(":: Preprocessing sentences... ");
+        preprocessSentence(this.s1);
+        preprocessSentence(this.s2);
         
         mergeCompounds(this.s1, this.s2);
         mergeCompounds(this.s2, this.s1);
-        System.out.println(this);
+        System.out.println("OK.");
+        //System.out.println(this);
     }
     
-    private void removeHyphensSlashes(List<POSTaggedToken> list)
+    private void preprocessSentence(List<POSTaggedToken> sentence)
     {
-        for (ListIterator<POSTaggedToken> it = list.listIterator(); it.hasNext();) {
+        for (ListIterator<POSTaggedToken> it = sentence.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
-            String s = tt.token;
             
-            s = s.replaceAll("-", "");
-            s = s.replaceAll("/", "");
+            tt = stripAngularBrackets(tt);
+            tt = removeHyphensSlashes(tt);
+            tt = removeStopWords(tt);
             
-            if (s.isEmpty()) {
+            if (tt.token.isEmpty()) {
                 it.remove();
             } else {
-                tt.token = s;
                 it.set(tt);
             }
         }
+        
+        expandVerbAbbreviations(sentence);
     }
     
-    private void expandVerbAbbreviations(List<POSTaggedToken> list)
+    private POSTaggedToken stripAngularBrackets(POSTaggedToken tt)
     {
-        for (ListIterator<POSTaggedToken> it = list.listIterator(); it.hasNext();) {
+        String token = tt.token;
+
+        while (token.startsWith("<") || token.startsWith(">")) {
+            token = token.substring(1);
+        }
+
+        while (token.endsWith("<") || token.endsWith(">")) {
+            token = token.substring(0, token.length() - 2);
+        }
+
+        tt.token = token;
+        return tt;
+    }
+        
+    private POSTaggedToken removeHyphensSlashes(POSTaggedToken tt)
+    {
+        String s = tt.token;
+
+        s = s.replaceAll("-", "");
+        s = s.replaceAll("/", "");
+        tt.token = s;
+        
+        return tt;
+    }
+
+    private POSTaggedToken removeStopWords(POSTaggedToken tt)
+    {
+        String[] stopWords = Properties.getStopWords();
+
+        for (int i = 0; i < stopWords.length; i++) {
+            if (stopWords[i].equals( tt.token.toLowerCase() )) {
+                tt.token = "";
+                return tt;
+            }
+        }
+        
+        return tt;
+    }
+    
+    private void expandVerbAbbreviations(List<POSTaggedToken> sentence)
+    {
+        for (ListIterator<POSTaggedToken> it = sentence.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
             String string = tt.token;
             
@@ -136,32 +177,16 @@ public class SentencePair
             }
         }
     }
-
-    private void removeStopWords(List<POSTaggedToken> list)
-    {
-        String[] stopWords = Properties.getStopWords();
-        
-        for (ListIterator<POSTaggedToken> it = list.listIterator(); it.hasNext();) {
-            POSTaggedToken tt = it.next();
-
-            for (int i = 0; i < stopWords.length; i++) {
-                if (stopWords[i].equals( tt.token.toLowerCase() )) {
-                    it.remove();
-                    break;
-                }
-            }
-        }
-    }
     
-    private void mergeCompounds(List<POSTaggedToken> list1, List<POSTaggedToken> list2)
+    private void mergeCompounds(List<POSTaggedToken> sentence1, List<POSTaggedToken> sentence2)
     {
-        for (ListIterator<POSTaggedToken> it = list1.listIterator(); it.hasNext();) {
+        for (ListIterator<POSTaggedToken> it = sentence1.listIterator(); it.hasNext();) {
             POSTaggedToken tt1 = it.next();
             
             if (it.hasNext()) {
                 POSTaggedToken tt2 = it.next();
                 String compound = tt1.token + tt2.token;
-                String tag = containsTokenWithTag(list2, compound);
+                String tag = containsTokenWithTag(sentence2, compound);
                 
                 if (!tag.isEmpty()) {
                     it.remove();
@@ -187,5 +212,4 @@ public class SentencePair
         
         return "";
     }
-} 
-
+}
