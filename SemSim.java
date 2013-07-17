@@ -90,7 +90,7 @@ public class SemSim
             System.exit(-1);
         }
 
-        SimilarityLearner sl = new SimilarityLearner();
+        SimilarityLearner sl = new SimilarityLearner(!outputFeatures);
         List<TrainingSample> samples = new LinkedList<>();
 
         /* If sample files are specified, extract features for those samples */

@@ -5,7 +5,6 @@
 
 import libsvm.*;
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
@@ -22,25 +21,27 @@ public class SimilarityLearner
     private Tagger tagger;
     private svm svr;
     
-    public SimilarityLearner()
+    public SimilarityLearner(boolean featureCollection)
     {
-        System.out.print(":: Initializing LSA information... ");
-        LSA lsa = new LSA();
-        System.out.println("OK.");
-        
-        System.out.print(":: Initializing feature collector... ");
-        fc = new FeatureCollector("word-frequencies.txt", lsa);
-        System.out.println("OK.");
-        
-        System.out.print(":: Initializing tokenizer and POS tagger... ");
-        tagger = new Tagger();
-        
-        try {
-            tagger.loadModel( Properties.getTaggerModelPath() );
+        if (featureCollection) {
+            System.out.print(":: Initializing LSA information... ");
+            LSA lsa = new LSA();
             System.out.println("OK.");
-        } catch (IOException e) {
-            System.err.println("\nError loading model for POS tagging: " + e.getMessage());
-            System.exit(-1);
+
+            System.out.print(":: Initializing feature collector... ");
+            fc = new FeatureCollector("word-frequencies.txt", lsa);
+            System.out.println("OK.");
+
+            System.out.print(":: Initializing tokenizer and POS tagger... ");
+            tagger = new Tagger();
+
+            try {
+                tagger.loadModel( Properties.getTaggerModelPath() );
+                System.out.println("OK.");
+            } catch (IOException e) {
+                System.err.println("\nError loading model for POS tagging: " + e.getMessage());
+                System.exit(-1);
+            }
         }
     }
 
@@ -114,7 +115,12 @@ public class SimilarityLearner
     
     public void learnModel(List<TrainingSample> features)
     {
-        System.out.print(":: Learning model from " + features.size() + " samples... ");
+        System.out.println("\nLearning process begins!");
+        
+        System.out.print(":: Scaling features... ");
+        scale(features);
+        System.out.println("OK.");
+        
         svm_problem problem = new svm_problem();
         double[] targetArray = new double[ features.size() ];
         svm_node[][] featureMatrix = new svm_node[ features.size() ][ Properties.getFeatureNumber() ];
@@ -135,11 +141,24 @@ public class SimilarityLearner
         problem.l = features.size();
         problem.y = targetArray;
         problem.x = featureMatrix;
-        System.out.println("OK (fake!)");
-        /* Scale features */
-        /* Cross validation to decide the best parameters of the kernel */
-        /* train the model */
-        /* store the model */
+
+        System.out.println("DONE.");
+    }
+    
+    private void scale(List<TrainingSample> features)
+    {
+        double[] featureMaxs = new double[ Properties.getFeatureNumber() ];
+        int i = 0;
+        
+        for (String line : IOUtils.readlines("train/maxs.txt")) {
+            featureMaxs[i++] = Double.parseDouble(line);
+        }
+        
+        for (TrainingSample sample: features) {
+            for (int j = 0; j < Properties.getFeatureNumber(); j++) {
+                sample.features[j] /= featureMaxs[j];
+            }
+        }
     }
     
     private List<TrainingSample> getSamples(String sampleFile) throws IOException
