@@ -3,6 +3,8 @@
  * and open the template in the editor.
  */
 
+import libsvm.svm_parameter;
+
 /**
  *
  * @author shainer
@@ -36,5 +38,17 @@ public class Properties
     public static int getLSAVectorSize()
     {
         return LSA_VECTOR_SIZE;
+    }
+    
+    public static svm_parameter getSVMParameters()
+    {
+        svm_parameter param = new svm_parameter();
+        
+        param.svm_type = svm_parameter.EPSILON_SVR;
+        param.kernel_type = svm_parameter.RBF;
+        param.cache_size = 10.0;
+        param.eps = 0.001;
+        
+        return param;
     }
 }

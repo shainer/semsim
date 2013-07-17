@@ -121,12 +121,18 @@ public class SimilarityLearner
         scale(features);
         System.out.println("OK.");
         
+        svm_problem problem = buildSVMProblem(features);
+        System.out.println("DONE.");
+    }
+    
+    public svm_problem buildSVMProblem(List<TrainingSample> samples)
+    {
         svm_problem problem = new svm_problem();
-        double[] targetArray = new double[ features.size() ];
-        svm_node[][] featureMatrix = new svm_node[ features.size() ][ Properties.getFeatureNumber() ];
+        double[] targetArray = new double[ samples.size() ];
+        svm_node[][] featureMatrix = new svm_node[ samples.size() ][ Properties.getFeatureNumber() ];
         
         int sampleIndex = 0;
-        for (TrainingSample sample : features) {
+        for (TrainingSample sample : samples) {
             targetArray[sampleIndex] = sample.target;
             
             for (int j = 0; j < Properties.getFeatureNumber(); j++) {
@@ -138,11 +144,10 @@ public class SimilarityLearner
             sampleIndex++;
         }
         
-        problem.l = features.size();
+        problem.l = samples.size();
         problem.y = targetArray;
         problem.x = featureMatrix;
-
-        System.out.println("DONE.");
+        return problem;
     }
     
     private void scale(List<TrainingSample> features)
