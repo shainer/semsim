@@ -35,7 +35,7 @@ public class POSTaggedToken
         if (o instanceof POSTaggedToken) {
             POSTaggedToken other = (POSTaggedToken)o;
             
-            return (token.equals(other.token) && tag.equals(other.tag));
+            return (token.toLowerCase().equals(other.token.toLowerCase()) && tag.equals(other.tag));
         }
         
         return false;

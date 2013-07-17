@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.ListIterator;
 import edu.cmu.lti.ws4j.WS4J;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author shainer
@@ -71,11 +71,25 @@ public class FeatureCollector
     {
         this.sp = sp;
         featureIndex = 0;
+        features = new double[ Properties.getFeatureNumber() ];
+        
+        capitalizedOverlap();
+        stockOverlap();
+        
+        for (ListIterator<POSTaggedToken> it = sp.s1.listIterator(); it.hasNext();) {
+            POSTaggedToken tt = it.next();
+            tt.token = tt.token.toLowerCase();
+            it.set(tt);
+        }
+        
+        for (ListIterator<POSTaggedToken> it = sp.s2.listIterator(); it.hasNext();) {
+            POSTaggedToken tt = it.next();
+            tt.token = tt.token.toLowerCase();
+            it.set(tt);
+        }
         
         ngramOverlaps();
         numberOverlaps();
-        capitalizedOverlap();
-        stockOverlap();
         wordnetOverlap();
         weightedWords();
         sentenceLength();
@@ -195,7 +209,7 @@ public class FeatureCollector
                 continue;
             }
 
-            res += wordnetScore(tt.token.toLowerCase(), s2);
+            res += wordnetScore(tt.token, s2);
         }
         
         res /= (double)s2.size();
@@ -237,33 +251,33 @@ public class FeatureCollector
         Set<String> s2trigrams = new HashSet<>();
         
         for (int i = 0; i < sp.s1.size(); i++) {
-            String token1 = sp.s1.get(i).token.toLowerCase();
+            String token1 = sp.s1.get(i).token;
             String token2 = "", token3;
             s1unigrams.add(token1);
             
             if (i < sp.s1.size() - 1) {
-                token2 = sp.s1.get(i+1).token.toLowerCase();
+                token2 = sp.s1.get(i+1).token;
                 s1bigrams.add(token1 + " " + token2);
             }
             
             if (i < sp.s1.size() - 2) {
-                token3 = sp.s1.get(i+2).token.toLowerCase();
+                token3 = sp.s1.get(i+2).token;
                 s1trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
         
         for (int i = 0; i < sp.s2.size(); i++) {
-            String token1 = sp.s2.get(i).token.toLowerCase();
+            String token1 = sp.s2.get(i).token;
             String token2 = "", token3 = "";
             s2unigrams.add(token1);
             
             if (i < sp.s2.size() - 1) {
-                token2 = sp.s2.get(i+1).token.toLowerCase();
+                token2 = sp.s2.get(i+1).token;
                 s2bigrams.add(token1 + " " + token2);
             }
             
             if (i < sp.s2.size() - 2) {
-                token3 = sp.s2.get(i+2).token.toLowerCase();
+                token3 = sp.s2.get(i+2).token;
                 s2trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
@@ -415,7 +429,6 @@ public class FeatureCollector
             
             if (isUpper(token) && isWord(token)) {
                 if (token.startsWith(".") || (i > 0 && sentence.get(i-1).token.equals("."))) {
-                    System.out.println("\"" + token + "\" is a stock item");
                     stockItems.add(token);
                 }
             }
@@ -482,10 +495,11 @@ public class FeatureCollector
         
         for (POSTaggedToken tt : sentence) {
             double[] word = lsa.getWordVector(tt);
+            double icw = informationContent(tt);
             
             for (int i = 0; i < V.length; i++) {
                 if (weighted) {
-                    word[i] *= informationContent(tt);
+                    word[i] *= icw;
                 }
                 
                 V[i] += word[i];

@@ -18,7 +18,7 @@ public class TrainingSample
         this.target = target;
     }
     
-    public String toString()
+    @Override public String toString()
     {
         String s = "[";
         

@@ -113,7 +113,7 @@ public class LSA
         if (!lsa.containsKey(tt)) {
             vector = new double[ Properties.getLSAVectorSize() ];
         } else {
-            vector = lsa.get(tt);
+            vector = Arrays.copyOf(lsa.get(tt), Properties.getLSAVectorSize());
         }
         
         return vector;

@@ -73,7 +73,6 @@ public class SentencePair
     private void preprocess()
     {
         //System.out.println(this);
-        System.out.print(":: Preprocessing sentences... ");
         preprocessSentence(this.s1);
         preprocessSentence(this.s2);
         
