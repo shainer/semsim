@@ -24,12 +24,8 @@ public class SimilarityLearner
     public SimilarityLearner(boolean featureCollection)
     {
         if (featureCollection) {
-            System.out.print(":: Initializing LSA information... ");
-            LSA lsa = new LSA();
-            System.out.println("OK.");
-
-            System.out.print(":: Initializing feature collector... ");
-            fc = new FeatureCollector("word-frequencies.txt", lsa);
+            System.out.print(":: Initializing feature collector with LSA... ");
+            fc = new FeatureCollector("word-frequencies.txt");
             System.out.println("OK.");
 
             System.out.print(":: Initializing tokenizer and POS tagger... ");
@@ -122,7 +118,25 @@ public class SimilarityLearner
         System.out.println("OK.");
         
         svm_problem problem = buildSVMProblem(features);
-        System.out.println("DONE.");
+        svm_parameter parameter = Properties.getSVMParameters();
+        parameter.C = Properties.getBestC();
+        parameter.gamma = Properties.getBestGamma();
+        parameter.p = Properties.getBestP();
+        
+        svm_model model;
+        
+        System.out.print(":: Training model with optimal parameters... ");
+        model = svm.svm_train(problem, parameter);
+        System.out.println("OK.");
+        
+        try {
+            System.out.print(":: Saving model on file... ");
+            svm.svm_save_model(Properties.getSimilarityModelPath(), model);
+        } catch (IOException io) {
+            System.err.println("\n:: Error saving similarity model: " + io.getMessage());
+        }
+        
+        System.out.println("OK.");
     }
     
     public svm_problem buildSVMProblem(List<TrainingSample> samples)

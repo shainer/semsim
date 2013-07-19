@@ -17,8 +17,19 @@ public class Properties
                                                "how", "in", "is", "it", "of", "on", "or", "that", "the", "this", "to",
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
                                                "have", "has", "had", "were", "'ll"};
+    private static final double tolerance = 0.3;
     
     private static final String taggerModelPath = "taggerModel";
+    private static final String similarityModelPath = "similarityModel.txt";
+    
+    private static final int CROSS_VALIDATION_FOLD = 5;
+    private static final double[] C_VALUES = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000};
+    private static final double[] P_VALUES = {1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01};
+    private static final double[] G_VALUES = {2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002};
+    
+    private static final double C = 1000;
+    private static final double P = 0.2;
+    private static final double G = 0.002;
     
     public static int getFeatureNumber()
     {
@@ -35,9 +46,19 @@ public class Properties
         return taggerModelPath;
     }
     
+    public static String getSimilarityModelPath()
+    {
+        return similarityModelPath;
+    }
+    
     public static int getLSAVectorSize()
     {
         return LSA_VECTOR_SIZE;
+    }
+    
+    public static double getTolerance()
+    {
+        return tolerance;
     }
     
     public static svm_parameter getSVMParameters()
@@ -50,5 +71,40 @@ public class Properties
         param.eps = 0.001;
         
         return param;
+    }
+    
+    public static int getValidationFold()
+    {
+        return CROSS_VALIDATION_FOLD;
+    }
+    
+    public static double[] getCValues()
+    {
+        return C_VALUES;
+    }
+    
+    public static double[] getPValues()
+    {
+        return P_VALUES;
+    }
+    
+    public static double[] getGammaValues()
+    {
+        return G_VALUES;
+    }
+    
+    public static double getBestC()
+    {
+        return C;
+    }
+    
+    public static double getBestP()
+    {
+        return P;
+    }
+    
+    public static double getBestGamma()
+    {
+        return G;
     }
 }

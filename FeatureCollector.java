@@ -31,11 +31,11 @@ public class FeatureCollector
      * When training using the SemCor samples, the frequency counts we need are all available
      * in a (relatively) small file, so they are taken from there.
      */
-    public FeatureCollector(String frequencyFile, LSA lsa)
+    public FeatureCollector(String frequencyFile)
     {
         this.counter = new FrequencyCounterFile(frequencyFile);
         this.features = new double[FEATURE_SIZE];
-        this.lsa = lsa;
+        this.lsa = new LSA();
         this.icwMap = new HashMap<>();
     }
     
@@ -47,6 +47,8 @@ public class FeatureCollector
     {
         this.counter = new FrequencyCounterGoogle();
         this.features = new double[FEATURE_SIZE];
+        this.lsa = new LSA();
+        this.icwMap = new HashMap<>();
     }
     
     /*

@@ -124,6 +124,10 @@ public class FrequencyCounterGoogle extends FrequencyCounter
         int initialIndex = 0;
         while (!Character.isLetter( token.charAt(initialIndex) )) {
             initialIndex++;
+            
+            if (initialIndex == token.length()) {
+                return new BigInteger("0");
+            }
         }
         
         if (token.substring(initialIndex).length() == 1) {

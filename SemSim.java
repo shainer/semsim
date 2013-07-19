@@ -17,28 +17,35 @@ public class SemSim
         if ((paramIndex = findParameter(args, "--parameters")) != -1) {
             trainSystem(args, paramIndex);
         } else { /* otherwise, proceed with using the system */
-            String inputFile = null;
-            String outputFile = null;
+            if (args.length == 0) {
+                System.out.println(":: Usage: java SemSim <test file with samples>");
+                System.exit(-1);
+            }
             
-            if (args.length > 0) {
-                inputFile = args[0];
-            }
-
-            if (args.length > 1) {
-                outputFile = args[1];
-            }
-
-            /* Parses a JSON tweet */
-            TweetParser tp = new TweetParser(inputFile, outputFile);
-            tp.parse();
-            List<SentencePair> pairs = tp.getSentencePairs();
-
-            /* Load the pre-existing model from file */
-            SimilarityTester m = new SimilarityTester("modelfile");
-
-            /* Gets the results and writes them on the JSON output file */
-            double[] similarities = m.getSimilarities(pairs);
-            tp.writeSimilarities(similarities);
+            SimilarityTester m = new SimilarityTester();
+            m.printSimilaritiesFromFile(args[0]);
+//            String inputFile = null;
+//            String outputFile = null;
+//            
+//            if (args.length > 0) {
+//                inputFile = args[0];
+//            }
+//
+//            if (args.length > 1) {
+//                outputFile = args[1];
+//            }
+//
+//            /* Parses a JSON tweet */
+//            TweetParser tp = new TweetParser(inputFile, outputFile);
+//            tp.parse();
+//            List<SentencePair> pairs = tp.getSentencePairs();
+//
+//            /* Load the pre-existing model from file */
+//            SimilarityTester m = new SimilarityTester("modelfile");
+//
+//            /* Gets the results and writes them on the JSON output file */
+//            double[] similarities = m.getSimilarities(pairs);
+//            tp.writeSimilarities(similarities);
         }
     }
     
@@ -90,7 +97,7 @@ public class SemSim
             System.exit(-1);
         }
 
-        SimilarityLearner sl = new SimilarityLearner(!outputFeatures);
+        SimilarityLearner sl = new SimilarityLearner(samplesPresent);
         List<TrainingSample> samples = new LinkedList<>();
 
         /* If sample files are specified, extract features for those samples */

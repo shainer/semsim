@@ -1,11 +1,7 @@
 import cmu.arktweetnlp.Tagger;
 import java.io.IOException;
 import java.util.List;
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+import libsvm.*;
 
 /**
  *
@@ -15,32 +11,43 @@ public class SimilarityTester
 {
     private FeatureCollector fc;
     private Tagger tagger;
+    private svm_model model;
     
-    public SimilarityTester(String model)
+    public SimilarityTester()
     {
+        System.out.print(":: Initializing feature collector with LSA... ");
         this.fc = new FeatureCollector();
+        System.out.println("OK.");
+        
+        System.out.print(":: Initializing tokenizer and POS tagger... ");
         this.tagger = new Tagger();
         
         try {
             this.tagger.loadModel( Properties.getTaggerModelPath() );
+            System.out.println("OK.");
+            
+            System.out.print(":: Loading similarity model from file... ");
+            this.model = svm.svm_load_model( Properties.getSimilarityModelPath() );
+            System.out.println("OK.");
         } catch (IOException e) {
-            System.err.println("Error loading model for POS tagging: " + e.getLocalizedMessage());
-        }
-        
-        loadModel(model);
+            System.err.println("Error loading models: " + e.getLocalizedMessage());
+        }        
     }
-    
-    /* TODO: load model from file */
-    public void loadModel(String modelFile)
-    {}
     
     public double getSimilarity(SentencePair sp)
     {
         System.out.println(":: Getting similarity for pair " + sp);
         double[] features = fc.features(sp);
+        svm_node[] node = new svm_node[ Properties.getFeatureNumber() ];
         
-        /* feed features to libSVM and get answer */
-        return 0.0;
+        for (int i = 0; i < features.length; i++) {
+            node[i] = new svm_node();
+            node[i].index = i+1;
+            node[i].value = features[i];
+        }
+        
+        double sim = svm.svm_predict(model, node);
+        return (5.0 * (sim + 61.0) / (double)(10.0 + 61.0));
     }
     
     public double[] getSimilarities(List<SentencePair> sps)
@@ -57,13 +64,21 @@ public class SimilarityTester
     }
     
     public void printSimilaritiesFromFile(String filepath)
-    {        
+    {
+        int good = 0;
+        int lineCount = 0;
+        
         for (String line : IOUtils.readlines(filepath)) {
+            lineCount++;
             String[] fields = line.split("\t");
             
             SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
             double rightAnswer = Double.parseDouble(fields[2]);
             double answer = getSimilarity(sp);
+            
+            if (Math.abs(answer - rightAnswer) <= 0.8) {
+                good++;
+            }
             
             System.out.println(fields[0]);
             System.out.println(fields[1]);
@@ -71,5 +86,7 @@ public class SimilarityTester
             System.out.println(":: Correct answer: " + rightAnswer);
             System.out.println();
         }
+        
+        System.out.println(good + " over " + lineCount);
     }
 }
