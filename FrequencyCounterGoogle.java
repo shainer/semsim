@@ -112,11 +112,12 @@ public class FrequencyCounterGoogle extends FrequencyCounter
         String translatedTag = translateTag(tag);
         String word = token + "_" + translatedTag;
         
-        if (!cache.isEmpty()) {
+        if (cache.containsKey(word)) {
+//            for (Map.Entry<String, BigInteger> entry : cache.entrySet()) {
+//                System.out.println("-- " + entry.getKey() + " -> " + entry.getValue());
+//            }
             
-            if (cache.containsKey(word)) {
-                return cache.get(word);
-            }
+            return cache.get(word);
         }
         
         String filename;
@@ -140,16 +141,17 @@ public class FrequencyCounterGoogle extends FrequencyCounter
         BigInteger frequencyCount = null;
         
         try {
-            String filePath = "/home/shainer/source/semnlp/googlebooks/" + filename;
+            String filePath = "googlebooks/" + filename;
+            System.out.println("Reading from \"" + filename + "\"");
             BufferedReader br = new BufferedReader( new FileReader(filePath) );
             String line;
             
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split("\t");
                 String[] w = fields[0].split("_");
-                w[0] = w[0].toLowerCase();
                 
                 if (w.length == 2 && w[0].equals(token) && w[1].equals(translatedTag)) {
+                    System.out.println("Found: " + w[0] + "_" + w[1] + ", count is " + fields[1]);
                     frequencyCount = new BigInteger( fields[1] );
                     break;
                 }
@@ -195,7 +197,7 @@ public class FrequencyCounterGoogle extends FrequencyCounter
             return "ADJ";
         }
         
-        if (tag.equals("R")) {
+        if (tag.equals("R") || tag.equals("X")) {
             return "ADV";
         }
         
