@@ -75,7 +75,9 @@ public class FeatureCollector
         featureIndex = 0;
         features = new double[ Properties.getFeatureNumber() ];
         
+        /* Feature 1, 2 */
         capitalizedOverlap();
+        /* Feature 3, 4 */
         stockOverlap();
         
         for (ListIterator<POSTaggedToken> it = sp.s1.listIterator(); it.hasNext();) {
@@ -90,9 +92,13 @@ public class FeatureCollector
             it.set(tt);
         }
         
+        /* Feature 5, 6, 7 */
         ngramOverlaps();
+        /* Feature 8, 9, 10 */
         numberOverlaps();
+        /* Feature 11 */
         wordnetOverlap();
+        /* Feature 12, 13 */
         weightedWords();
         sentenceLength();
         vectorSpaceSimilarity();
@@ -125,7 +131,9 @@ public class FeatureCollector
      */
     private void sentenceLength()
     {
-        features[featureIndex++] = (double)Math.abs(sp.s2.size() - sp.s1.size());
+        int size1 = sp.s1.size();
+        int size2 = sp.s2.size();
+        features[featureIndex++] = Math.abs(size1 - size2) / (Math.max(size1, size2) + Math.exp(-5));
     } 
     
     /*
@@ -158,7 +166,7 @@ public class FeatureCollector
     
         double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
         features[featureIndex++] = wwo;
-        features[featureIndex++] = Math.abs(s2TotalContent - s1TotalContent);
+        features[featureIndex++] = Math.abs(s1TotalContent - s2TotalContent) / (Math.max(s2TotalContent, s1TotalContent) + Math.exp(-5));
     }
     
     private double informationContent(POSTaggedToken tt)
@@ -177,7 +185,7 @@ public class FeatureCollector
         
         BigInteger totalFrequencyCount = counter.getTotalCount();
         BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
-        
+                
         if (frequency.doubleValue() == 0) {
             return 0;
         }
@@ -197,9 +205,7 @@ public class FeatureCollector
     
     private double harmonicMean(double d1, double d2)
     {
-        double mean = 2.0;
-        mean /= (((double)1.0 / d1) + ((double)1.0 / d2));
-        return mean;
+        return (d1 + d2 > 0 ) ? ((2 * d1 * d2) / (d1 + d2)) : 0.0;
     }
     
     private double pwn(List<POSTaggedToken> s1, List<POSTaggedToken> s2)

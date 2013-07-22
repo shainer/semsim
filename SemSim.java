@@ -3,6 +3,7 @@
  */
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -21,6 +22,12 @@ public class SemSim
                 System.out.println(":: Usage: java SemSim <test file with samples>");
                 System.exit(-1);
             }
+            
+//            FrequencyCounterGoogle g = new FrequencyCounterGoogle();
+//            BigInteger i = g.getFrequencyCount("object", "V");
+//            System.out.println(i);
+//            i = g.getFrequencyCount("object", "V");
+//            System.out.println(i);
             
             SimilarityTester m = new SimilarityTester();
             m.printSimilaritiesFromFile(args[0]);

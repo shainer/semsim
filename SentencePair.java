@@ -78,7 +78,6 @@ public class SentencePair
         
         mergeCompounds(this.s1, this.s2);
         mergeCompounds(this.s2, this.s1);
-        System.out.println("OK.");
         //System.out.println(this);
     }
     

@@ -113,10 +113,6 @@ public class FrequencyCounterGoogle extends FrequencyCounter
         String word = token + "_" + translatedTag;
         
         if (cache.containsKey(word)) {
-//            for (Map.Entry<String, BigInteger> entry : cache.entrySet()) {
-//                System.out.println("-- " + entry.getKey() + " -> " + entry.getValue());
-//            }
-            
             return cache.get(word);
         }
         
@@ -142,7 +138,6 @@ public class FrequencyCounterGoogle extends FrequencyCounter
         
         try {
             String filePath = "googlebooks/" + filename;
-            System.out.println("Reading from \"" + filename + "\"");
             BufferedReader br = new BufferedReader( new FileReader(filePath) );
             String line;
             
@@ -151,7 +146,6 @@ public class FrequencyCounterGoogle extends FrequencyCounter
                 String[] w = fields[0].split("_");
                 
                 if (w.length == 2 && w[0].equals(token) && w[1].equals(translatedTag)) {
-                    System.out.println("Found: " + w[0] + "_" + w[1] + ", count is " + fields[1]);
                     frequencyCount = new BigInteger( fields[1] );
                     break;
                 }

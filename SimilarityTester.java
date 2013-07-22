@@ -36,7 +36,7 @@ public class SimilarityTester
     
     public double getSimilarity(SentencePair sp)
     {
-        System.out.println(":: Getting similarity for pair " + sp);
+        //System.out.println(":: Getting similarity for pair " + sp);
         double[] features = fc.features(sp);
         svm_node[] node = new svm_node[ Properties.getFeatureNumber() ];
         
@@ -52,7 +52,7 @@ public class SimilarityTester
     
     public double[] getSimilarities(List<SentencePair> sps)
     {
-        System.out.println(":: Getting similarities for " + sps.size() + " pairs");
+        //System.out.println(":: Getting similarities for " + sps.size() + " pairs");
         double[] sims = new double[ sps.size() ];
         int simIndex = 0;
         
@@ -82,8 +82,8 @@ public class SimilarityTester
             
             System.out.println(fields[0]);
             System.out.println(fields[1]);
-            System.out.println(":: Given answer: " + answer);
-            System.out.println(":: Correct answer: " + rightAnswer);
+            //System.out.println(":: Given answer: " + answer);
+            //System.out.println(":: Correct answer: " + rightAnswer);
             System.out.println();
         }
         
