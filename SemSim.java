@@ -2,8 +2,8 @@
  * Entry point.
  */
 
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.io.*;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -14,6 +14,13 @@ public class SemSim
     {
         int paramIndex;
         
+        System.out.print(":: Initializing Stanford NLP for processing sentences... ");
+        Properties prop = new Properties();
+        prop.put("annotators", "tokenize, ssplit, pos, lemma");
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(prop);
+        Defines.setStanford(pipeline);
+        System.out.println("OK.");
+        
         /* If a properties file is passed, it must contains options for training the system. */
         if ((paramIndex = findParameter(args, "--parameters")) != -1) {
             trainSystem(args, paramIndex);
@@ -22,13 +29,7 @@ public class SemSim
                 System.out.println(":: Usage: java SemSim <test file with samples>");
                 System.exit(-1);
             }
-            
-//            FrequencyCounterGoogle g = new FrequencyCounterGoogle();
-//            BigInteger i = g.getFrequencyCount("object", "V");
-//            System.out.println(i);
-//            i = g.getFrequencyCount("object", "V");
-//            System.out.println(i);
-            
+
             SimilarityTester m = new SimilarityTester();
             m.printSimilaritiesFromFile(args[0]);
 //            String inputFile = null;

@@ -10,12 +10,10 @@ if __name__ == "__main__":
   inputFile = open(sys.argv[1], "r")
   outputFile = open(sys.argv[2], "w")
   maximum = []
-  minimum = []
-  featureSize = 14
+  featureSize = 16
   
   for i in range(0, featureSize):
     maximum.append(0)
-    minimum.append(25000)
     
   for line in inputFile:
     features = line.split("\t")
@@ -23,14 +21,13 @@ if __name__ == "__main__":
         
     for i in range(0, featureSize):
       if float(features[i]) > maximum[i]:
-	maximum[i] = features[i]
-      if float(features[i]) < minimum[i]:
-	minimum[i] = features[i]
+	maximum[i] = float(features[i])
 	
 
   for i in range(0, featureSize):
-    outputFile.write("Max: " + str(maximum[i]) + "\n")
-    outputFile.write("Min: " + str(minimum[i]) + "\n\n")
+    if (maximum[i] < 1.0):
+      maximum[i] = 1.0
+    outputFile.write(str(maximum[i]) + "\n")
   
   inputFile.close()
   outputFile.close()

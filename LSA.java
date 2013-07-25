@@ -39,7 +39,7 @@ public class LSA
         String currentToken = "";
         
         POSTaggedToken tt = new POSTaggedToken();
-        double[] currentVector = new double[ Properties.getLSAVectorSize() ];
+        double[] currentVector = new double[ Defines.getLSAVectorSize() ];
         int currentVectorIndex = 0;
 
         int countTab = 0;
@@ -95,7 +95,7 @@ public class LSA
                             countTab = 0;
                             
                             currentVectorIndex = 0;
-                            currentVector = new double[ Properties.getLSAVectorSize() ];
+                            currentVector = new double[ Defines.getLSAVectorSize() ];
                             
                             state = 0;
                         } else {
@@ -111,9 +111,9 @@ public class LSA
         tt.token = tt.token.toLowerCase();
         
         if (!lsa.containsKey(tt)) {
-            vector = new double[ Properties.getLSAVectorSize() ];
+            vector = new double[ Defines.getLSAVectorSize() ];
         } else {
-            vector = Arrays.copyOf(lsa.get(tt), Properties.getLSAVectorSize());
+            vector = Arrays.copyOf(lsa.get(tt), Defines.getLSAVectorSize());
         }
         
         return vector;

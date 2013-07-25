@@ -24,13 +24,13 @@ public class CrossValidation
         
         List<TrainingSample> samples = sl.extractFeatures(files);
         svm_problem problem = sl.buildSVMProblem(samples);
-        svm_parameter parameters = Properties.getSVMParameters();
+        svm_parameter parameters = Defines.getSVMParameters();
         double[] realTargets = problem.y;
         double[] validatedTargets = new double[ realTargets.length ];
         
-        double[] C_values = Properties.getCValues();
-        double[] P_values = Properties.getPValues();
-        double[] G_values = Properties.getGammaValues();
+        double[] C_values = Defines.getCValues();
+        double[] P_values = Defines.getPValues();
+        double[] G_values = Defines.getGammaValues();
         
         int best = 0;
         double bestC = 0.0;
@@ -48,7 +48,7 @@ public class CrossValidation
                 for (int iG = 0; iG < G_values.length; iG++) {
                     parameters.gamma = G_values[iG];
                     
-                    svm.svm_cross_validation(problem, parameters, Properties.getValidationFold(), validatedTargets);
+                    svm.svm_cross_validation(problem, parameters, Defines.getValidationFold(), validatedTargets);
                     int correctCount = compareResults(realTargets, validatedTargets);
                     
                     if (correctCount > best) {
@@ -72,7 +72,7 @@ public class CrossValidation
         int correct = 0;
         
         for (int i = 0; i < real.length; i++) {
-            if (real[i] - cross[i] <= Properties.getTolerance()) {
+            if (real[i] - cross[i] <= Defines.getTolerance()) {
                 correct++;
             }
         }

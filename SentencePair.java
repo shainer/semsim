@@ -8,6 +8,11 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import cmu.arktweetnlp.Tagger;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
 
 /**
  *
@@ -17,6 +22,9 @@ public class SentencePair
 {
     public List<POSTaggedToken> s1;
     public List<POSTaggedToken> s2;
+    
+    public List<POSTaggedToken> sLemma1;
+    public List<POSTaggedToken> sLemma2;
     
     public SentencePair(List<String> s1Tokens, List<String> s1Tags, String s2, Tagger tagger)
     {
@@ -39,16 +47,126 @@ public class SentencePair
     {
         this.s1 = new LinkedList<>();
         this.s2 = new LinkedList<>();
-
-        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s1)) {
-            this.s1.add( new POSTaggedToken(tt) );
+        this.sLemma1 = new LinkedList<>();
+        this.sLemma2 = new LinkedList<>();
+        
+        Annotation d1 = new Annotation(s1);
+        Annotation d2 = new Annotation(s2);
+        StanfordCoreNLP nlp = Defines.getStanford();
+        
+        nlp.annotate(d1);
+        for (CoreMap sentence : d1.get(CoreAnnotations.SentencesAnnotation.class)) {
+            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                POSTaggedToken tt = new POSTaggedToken();
+                tt.token = token.toString();
+                tt.tag = translateTag(token.tag());
+                this.s1.add(tt);
+            }
         }
         
-        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
-            this.s2.add( new POSTaggedToken(tt) );
+        nlp.annotate(d2);
+        
+        for (CoreMap sentence : d2.get(CoreAnnotations.SentencesAnnotation.class)) {
+            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                POSTaggedToken tt = new POSTaggedToken();
+                tt.token = token.toString();
+                tt.tag = translateTag(token.tag());
+                this.s2.add(tt);
+            }
         }
+                
+//        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s1)) {
+//            this.s1.add( new POSTaggedToken(tt) );          
+//        }
+//        
+//        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
+//            this.s2.add( new POSTaggedToken(tt) );
+//        }
         
         preprocess();
+        s1 = "";
+        s2 = "";
+        
+        for (POSTaggedToken tt : this.s1) {
+            s1 += tt.token + " ";
+        }
+        for (POSTaggedToken tt : this.s2) {
+            s2 += tt.token + " ";
+        }
+        
+        d1 = new Annotation(s1);
+        nlp.annotate(d1);
+        for (CoreMap sentence : d1.get(CoreAnnotations.SentencesAnnotation.class)) {
+            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                this.sLemma1.add( new POSTaggedToken(token.lemma(), token.tag()) );
+            }
+        }
+        
+        d2 = new Annotation(s2);
+        nlp.annotate(d2);
+        
+        for (CoreMap sentence : d2.get(CoreAnnotations.SentencesAnnotation.class)) {
+            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                this.sLemma2.add( new POSTaggedToken(token.lemma(), token.tag()));
+            }
+        }
+    }
+    
+    private String translateTag(String tag)
+    {
+        if (tag.equals("NN") || tag.equals("NNS")) {
+            return "N";
+        }
+        
+        if (tag.startsWith("V") || tag.equals("MD")) {
+            return "V";
+        }
+        
+        if (tag.equals("NNP") || tag.equals("NNPS")) {
+            return "^";
+        }
+        
+        if (tag.equals("RB") || tag.equals("RBR") || tag.equals("RBS") || tag.equals("WRB")) {
+            return "R";
+        }
+        
+        if (tag.equals("PDT") || tag.equals("X")) {
+            return "X";
+        }
+        
+        if (tag.equals("IN") || tag.equals("TO")) {
+            return "P";
+        }
+        
+        if (tag.equals("CC")) {
+            return "&";
+        }
+        
+        if (tag.equals("CD")) {
+            return "$";
+        }
+        
+        if (tag.startsWith("J")) {
+            return "A";
+        }
+        
+        if (tag.equals("PRP") || tag.equals("WP")) {
+            return "O";
+        }
+        
+        if (tag.equals("RP")) {
+            return "T";
+        }
+        
+        if (tag.equals("UH")) {
+            return "!";
+        }
+        
+        if (tag.equals("DT") || tag.equals("PRP$") || tag.equals("WDT") || tag.equals("WP$")) {
+            return "D";
+        }
+        
+        return "G";
     }
     
     @Override public String toString()
@@ -67,18 +185,27 @@ public class SentencePair
         
         p += "\n";
         
+        for (POSTaggedToken tt: sLemma1) {
+            p += tt.token + " ";
+        }
+        
+        p += "\n";
+        
+        for (POSTaggedToken tt : sLemma2) {
+            p += tt.token + " ";
+        }
+        
+        p += "\n";
         return p;
     }
     
     private void preprocess()
     {
-        //System.out.println(this);
         preprocessSentence(this.s1);
         preprocessSentence(this.s2);
         
         mergeCompounds(this.s1, this.s2);
         mergeCompounds(this.s2, this.s1);
-        //System.out.println(this);
     }
     
     private void preprocessSentence(List<POSTaggedToken> sentence)
@@ -129,7 +256,7 @@ public class SentencePair
 
     private POSTaggedToken removeStopWords(POSTaggedToken tt)
     {
-        String[] stopWords = Properties.getStopWords();
+        String[] stopWords = Defines.getStopWords();
 
         for (int i = 0; i < stopWords.length; i++) {
             if (stopWords[i].equals( tt.token.toLowerCase() )) {
@@ -150,29 +277,26 @@ public class SentencePair
             if (string.endsWith("n't")) {
                 int index = string.lastIndexOf("n");
                 string = string.substring(0, index);
-                
-                if (string.isEmpty()) {
-                    it.remove();
-                } else {
+
+                if (!string.isEmpty()) {
                     tt.token = string;
                     it.set(tt);
                 }
                 
                 it.add( new POSTaggedToken("not", "R") );
+                
             } else if (string.endsWith("'m")) {
                 int index = string.lastIndexOf("'");
                 
                 string = string.substring(0, index);
                 
-                if (string.isEmpty()) {
-                    it.remove();
-                } else {
+                if (!string.isEmpty()) {
                     tt.token = string;
                     it.set(tt);
                 }
                 
                 it.add( new POSTaggedToken("am", "V") );
-            }
+            }            
         }
     }
     

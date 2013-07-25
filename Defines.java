@@ -3,21 +3,22 @@
  * and open the template in the editor.
  */
 
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import libsvm.svm_parameter;
 
 /**
  *
  * @author shainer
  */
-public class Properties
+public class Defines
 {
-    private static final int FEATURE_SIZE = 16;
+    private static final int FEATURE_SIZE = 19;
     private static final int LSA_VECTOR_SIZE = 100;
     private static final String[] stopWords = {"i", "a", "about", "an", "are", "as", "at", "be", "by", "for", "from",
                                                "how", "in", "is", "it", "of", "on", "or", "that", "the", "this", "to",
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
                                                "have", "has", "had", "were", "'ll"};
-    private static final double tolerance = 0.3;
+    private static final double tolerance = 0.6;
     
     private static final String taggerModelPath = "taggerModel";
     private static final String similarityModelPath = "similarityModel.txt";
@@ -27,9 +28,11 @@ public class Properties
     private static final double[] P_VALUES = {1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01};
     private static final double[] G_VALUES = {2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002};
     
-    private static final double C = 1000;
-    private static final double P = 0.2;
-    private static final double G = 0.002;
+    private static final double C = 100;
+    private static final double P = 0.02;
+    private static final double G = 0.2;
+    
+    private static StanfordCoreNLP nlp;
     
     public static int getFeatureNumber()
     {
@@ -106,5 +109,15 @@ public class Properties
     public static double getBestGamma()
     {
         return G;
+    }
+    
+    public static void setStanford(StanfordCoreNLP n)
+    {
+        nlp = n;
+    }
+    
+    public static StanfordCoreNLP getStanford()
+    {
+        return nlp;
     }
 }

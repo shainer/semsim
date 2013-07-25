@@ -8,10 +8,16 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ListIterator;
 import edu.cmu.lti.ws4j.WS4J;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.*;
+import edu.stanford.nlp.util.*;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Properties;
 
 /**
  * @author shainer
@@ -24,7 +30,7 @@ public class FeatureCollector
     private HashMap<POSTaggedToken, Double> icwMap;
     
     private double[] features;
-    private final int FEATURE_SIZE = Properties.getFeatureNumber();
+    private final int FEATURE_SIZE = Defines.getFeatureNumber();
     private int featureIndex = 0;
     
     /*
@@ -55,6 +61,8 @@ public class FeatureCollector
      * When extracting features for a huge number of sentence pairs, this builds a cache of
      * the frequency counts that speeds up the lookup in the Google Corpus. For the "file" corpus,
      * these methods do nothing.
+     * 
+     * NOTE: this is actually unused for now.
      */
     public void initialize(List<SentencePair> sps)
     {
@@ -73,7 +81,7 @@ public class FeatureCollector
     {
         this.sp = sp;
         featureIndex = 0;
-        features = new double[ Properties.getFeatureNumber() ];
+        features = new double[ Defines.getFeatureNumber() ];
         
         /* Feature 1, 2 */
         capitalizedOverlap();
@@ -93,14 +101,20 @@ public class FeatureCollector
         }
         
         /* Feature 5, 6, 7 */
-        ngramOverlaps();
+        ngramOverlaps(sp.s1, sp.s2);
+        
         /* Feature 8, 9, 10 */
+        ngramOverlaps(sp.sLemma1, sp.sLemma2);
+        
+        /* Feature 11, 12, 13 */
         numberOverlaps();
-        /* Feature 11 */
+        /* Feature 14 */
         wordnetOverlap();
-        /* Feature 12, 13 */
+        /* Feature 15, 16 */
         weightedWords();
+        /* Feature 17 */
         sentenceLength();
+        /* Feature 18, 19 */
         vectorSpaceSimilarity();
         
         /* Rounds features values at their third decimal digit. */
@@ -128,6 +142,7 @@ public class FeatureCollector
     
     /*
      * Normalized differences, feature (A)
+     * Taken from Takelab implementation
      */
     private void sentenceLength()
     {
@@ -166,6 +181,7 @@ public class FeatureCollector
     
         double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
         features[featureIndex++] = wwo;
+        /* Normalized difference of aggregated word contents */
         features[featureIndex++] = Math.abs(s1TotalContent - s2TotalContent) / (Math.max(s2TotalContent, s1TotalContent) + Math.exp(-5));
     }
     
@@ -184,6 +200,8 @@ public class FeatureCollector
         }
         
         BigInteger totalFrequencyCount = counter.getTotalCount();
+        
+        /* See the FrequencyCounter* files */
         BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
                 
         if (frequency.doubleValue() == 0) {
@@ -249,7 +267,7 @@ public class FeatureCollector
     /*
      * NGram Overlap(s)
      */
-    private void ngramOverlaps()
+    private void ngramOverlaps(List<POSTaggedToken> sentence1, List<POSTaggedToken> sentence2)
     {
         Set<String> s1unigrams = new HashSet<>();
         Set<String> s1bigrams = new HashSet<>();
@@ -258,34 +276,34 @@ public class FeatureCollector
         Set<String> s2bigrams = new HashSet<>();
         Set<String> s2trigrams = new HashSet<>();
         
-        for (int i = 0; i < sp.s1.size(); i++) {
-            String token1 = sp.s1.get(i).token;
+        for (int i = 0; i < sentence1.size(); i++) {
+            String token1 = sentence1.get(i).token;
             String token2 = "", token3;
             s1unigrams.add(token1);
             
-            if (i < sp.s1.size() - 1) {
-                token2 = sp.s1.get(i+1).token;
+            if (i < sentence1.size() - 1) {
+                token2 = sentence1.get(i+1).token;
                 s1bigrams.add(token1 + " " + token2);
             }
             
-            if (i < sp.s1.size() - 2) {
-                token3 = sp.s1.get(i+2).token;
+            if (i < sentence1.size() - 2) {
+                token3 = sentence1.get(i+2).token;
                 s1trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
         
-        for (int i = 0; i < sp.s2.size(); i++) {
-            String token1 = sp.s2.get(i).token;
+        for (int i = 0; i < sentence2.size(); i++) {
+            String token1 = sentence2.get(i).token;
             String token2 = "", token3 = "";
             s2unigrams.add(token1);
             
-            if (i < sp.s2.size() - 1) {
-                token2 = sp.s2.get(i+1).token;
+            if (i < sentence2.size() - 1) {
+                token2 = sentence2.get(i+1).token;
                 s2bigrams.add(token1 + " " + token2);
             }
             
-            if (i < sp.s2.size() - 2) {
-                token3 = sp.s2.get(i+2).token;
+            if (i < sentence2.size() - 2) {
+                token3 = sentence2.get(i+2).token;
                 s2trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
@@ -499,7 +517,7 @@ public class FeatureCollector
     
     private double[] sentenceVector(List<POSTaggedToken> sentence, boolean weighted)
     {
-        double[] V = new double[ Properties.getLSAVectorSize() ];
+        double[] V = new double[ Defines.getLSAVectorSize() ];
         
         for (POSTaggedToken tt : sentence) {
             double[] word = lsa.getWordVector(tt);

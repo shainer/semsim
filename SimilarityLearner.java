@@ -10,10 +10,10 @@ import java.util.LinkedList;
 import java.util.Iterator;
 
 import cmu.arktweetnlp.Tagger;
+import java.util.Arrays;
 
 /**
- *
- * @author shainer
+ * Class to extract features in order to train a similarity model
  */
 public class SimilarityLearner
 {
@@ -32,7 +32,7 @@ public class SimilarityLearner
             tagger = new Tagger();
 
             try {
-                tagger.loadModel( Properties.getTaggerModelPath() );
+                tagger.loadModel( Defines.getTaggerModelPath() );
                 System.out.println("OK.");
             } catch (IOException e) {
                 System.err.println("\nError loading model for POS tagging: " + e.getMessage());
@@ -41,6 +41,7 @@ public class SimilarityLearner
         }
     }
 
+    /* Returns a list of samples (features + target) for each line in the supplied training files */
     public List<TrainingSample> extractFeatures(String[] trainingFiles)
     {
         System.out.println(":: Extracting features from files (this may take a lot of time!)... ");
@@ -58,6 +59,7 @@ public class SimilarityLearner
         return features;
     }
     
+    /* Writes features on an output file in our format */
     public void writeFeatures(List<TrainingSample> samples, String featureFile)
     {
         System.out.print(":: Writing features on " + featureFile + " ... ");
@@ -80,6 +82,7 @@ public class SimilarityLearner
         }
     }
     
+    /* Reads pre-computed features from feature files and creates samples */
     public List<TrainingSample> readFeatures(String[] featureFiles)
     {
         System.out.print(":: Reading features from files... ");
@@ -93,7 +96,7 @@ public class SimilarityLearner
         for (String line : featureLines) {
             String[] fields = line.split("\t");
             double target;
-            double[] features = new double[ Properties.getFeatureNumber() ];
+            double[] features = new double[ Defines.getFeatureNumber() ];
             int i;
 
             for (i = 0; i < fields.length - 1; i++) {
@@ -109,19 +112,20 @@ public class SimilarityLearner
         return samples;
     }
     
+    /* Actual learning model */
     public void learnModel(List<TrainingSample> features)
     {
         System.out.println("\nLearning process begins!");
         
-        System.out.print(":: Scaling features... ");
-        scale(features);
-        System.out.println("OK.");
+//        System.out.print(":: Scaling features... ");
+//        scale(features);
+//        System.out.println("OK.");
         
         svm_problem problem = buildSVMProblem(features);
-        svm_parameter parameter = Properties.getSVMParameters();
-        parameter.C = Properties.getBestC();
-        parameter.gamma = Properties.getBestGamma();
-        parameter.p = Properties.getBestP();
+        svm_parameter parameter = Defines.getSVMParameters();
+        parameter.C = Defines.getBestC();
+        parameter.gamma = Defines.getBestGamma();
+        parameter.p = Defines.getBestP();
         
         svm_model model;
         
@@ -131,7 +135,7 @@ public class SimilarityLearner
         
         try {
             System.out.print(":: Saving model on file... ");
-            svm.svm_save_model(Properties.getSimilarityModelPath(), model);
+            svm.svm_save_model(Defines.getSimilarityModelPath(), model);
         } catch (IOException io) {
             System.err.println("\n:: Error saving similarity model: " + io.getMessage());
         }
@@ -143,13 +147,13 @@ public class SimilarityLearner
     {
         svm_problem problem = new svm_problem();
         double[] targetArray = new double[ samples.size() ];
-        svm_node[][] featureMatrix = new svm_node[ samples.size() ][ Properties.getFeatureNumber() ];
+        svm_node[][] featureMatrix = new svm_node[ samples.size() ][ Defines.getFeatureNumber() ];
         
         int sampleIndex = 0;
         for (TrainingSample sample : samples) {
             targetArray[sampleIndex] = sample.target;
             
-            for (int j = 0; j < Properties.getFeatureNumber(); j++) {
+            for (int j = 0; j < Defines.getFeatureNumber(); j++) {
                 featureMatrix[sampleIndex][j] = new svm_node();
                 featureMatrix[sampleIndex][j].index = j+1;
                 featureMatrix[sampleIndex][j].value = sample.features[j];
@@ -159,14 +163,19 @@ public class SimilarityLearner
         }
         
         problem.l = samples.size();
-        problem.y = targetArray;
-        problem.x = featureMatrix;
+        problem.y = Arrays.copyOf(targetArray, targetArray.length);
+        
+        problem.x = new svm_node[ samples.size()][ Defines.getFeatureNumber() ];
+        for (int i = 0; i < featureMatrix.length; i++) {
+            problem.x[i] = Arrays.copyOf(featureMatrix[i], featureMatrix[i].length);
+        }
+        
         return problem;
     }
     
     private void scale(List<TrainingSample> features)
     {
-        double[] featureMaxs = new double[ Properties.getFeatureNumber() ];
+        double[] featureMaxs = new double[ Defines.getFeatureNumber() ];
         int i = 0;
         
         for (String line : IOUtils.readlines("train/maxs.txt")) {
@@ -174,12 +183,13 @@ public class SimilarityLearner
         }
         
         for (TrainingSample sample: features) {
-            for (int j = 0; j < Properties.getFeatureNumber(); j++) {
+            for (int j = 0; j < Defines.getFeatureNumber(); j++) {
                 sample.features[j] /= featureMaxs[j];
             }
         }
     }
     
+    /* Utility method: gets samples from file lines */
     private List<TrainingSample> getSamples(String sampleFile) throws IOException
     {
         List<TrainingSample> samples = new LinkedList<>();
@@ -189,7 +199,7 @@ public class SimilarityLearner
         for (String line : IOUtils.readlines(sampleFile)) {
             String[] fields = line.split("\t");
 
-            SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
+            SentencePair sp = new SentencePair(fields[0], fields[1], tagger);            
             double target = Double.parseDouble(fields[2]);
             pairs.add(sp);
             targets.add(target);
@@ -199,7 +209,7 @@ public class SimilarityLearner
         
         Iterator<SentencePair> spIt;
         Iterator<Double> targetIt;
-        
+
         for (spIt = pairs.iterator(), targetIt = targets.iterator(); spIt.hasNext() && targetIt.hasNext();) {
             double[] features = fc.features( spIt.next() );
             TrainingSample sample = new TrainingSample(features, targetIt.next());
