@@ -23,11 +23,14 @@ public class Defines
     private static final String taggerModelPath = "taggerModel";
     private static final String similarityModelPath = "similarityModel.txt";
     
-    private static final int CROSS_VALIDATION_FOLD = 5;
+    private static final int CROSS_VALIDATION_FOLD = 10;
     private static final double[] C_VALUES = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000};
     private static final double[] P_VALUES = {1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01};
     private static final double[] G_VALUES = {2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002};
     
+    //private static final double C = 5;
+    //private static final double P = 0.05;
+    //private static final double G = 2;
     private static final double C = 100;
     private static final double P = 0.02;
     private static final double G = 0.2;

@@ -100,6 +100,10 @@ public class FeatureCollector
             it.set(tt);
         }
         
+        /*
+         * Cross-validation su tutto il training set
+         */
+        
         /* Feature 5, 6, 7 */
         ngramOverlaps(sp.s1, sp.s2);
         
