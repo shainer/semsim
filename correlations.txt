@@ -1,0 +1,8 @@
+MSRpar: 0.61 - 0.61 (0.57 di precision, era 0.6)
+MSRvid: 0.77 - 0.76 (0.53 di precision, era 0.52)
+SMTeuroparl: 0.2 - 0.36 (0.41 di precision, era 0.36)
+SMTnews: 0.44 - 0.38 (0.40 di precision, era 0.43)
+OnWN: 0.60 - 0.60 (0.35 di precision, era 0.37)
+
+All: 0.70, Baseline is 0.31, TakeLab is 0.81
+Mean: 0.54 Baseline is 0.43, TakeLab is 0.67
