@@ -72,33 +72,59 @@ public class SimilarityTester
         return sims;
     }
     
-    public void printSimilaritiesFromFile(String filepath)
+    public void correlationsFromFiles(String[] filepaths)
     {
-        int good = 0;
-        int lineCount = 0;
-        double maxSim = Double.MIN_VALUE;
-        double minSim = Double.MAX_VALUE;
+        /* Used to compute the mean of all the correlations */
+        double[] correlations = new double[filepaths.length];
         
-        for (String line : IOUtils.readlines(filepath)) {
-            lineCount++;
-            String[] fields = line.split("\t");
+        /* Used to compute the total Pearson correlation */
+        ArrayList<Double> allAnswers = new ArrayList<>();
+        ArrayList<Double> allGsAnswers = new ArrayList<>();
+        
+        for (int p = 0; p < filepaths.length; p++) {
+            String filepath = filepaths[p];
+            ArrayList<Double> answers = new ArrayList<>();
+            ArrayList<Double> gsAnswers = new ArrayList<>();
 
-            SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
-            double rightAnswer = Double.parseDouble(fields[2]);
-            double answer = getSimilarity(sp);
-            
-            System.out.println(answer);
+            for (String line : IOUtils.readlines(filepath)) {
+                String[] fields = line.split("\t");
 
-            if (answer > maxSim) { maxSim = answer; }
-            if (answer < minSim) { minSim = answer; }
+                SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
+                double rightAnswer = Double.parseDouble(fields[2]);
+                double answer = getSimilarity(sp);
 
-            /* TODO: lower this tolerance value! */
-            if (Math.abs(answer - rightAnswer) <= Defines.getTolerance()) {
-                good++;
+                answers.add(answer);
+                gsAnswers.add(rightAnswer);
             }
+
+            allAnswers.addAll(answers);
+            allGsAnswers.addAll(gsAnswers);
+            
+            Double[] scores1 = answers.toArray( new Double[answers.size()] ); 
+            Double[] scores2 = gsAnswers.toArray( new Double[gsAnswers.size()] );
+            double corr = Correlation.getPearsonCorrelation(scores1, scores2);
+            correlations[p] = corr;
+            
+            System.out.println("Pearson correlation for \"" + filepath + "\": " + corr);
         }
         
-        System.out.println(good + " over " + lineCount);
-        System.out.println("Max: " + maxSim + ", min: " + minSim);
+        Double[] scores1 = allAnswers.toArray( new Double[allAnswers.size()] );
+        Double[] scores2 = allGsAnswers.toArray( new Double[allGsAnswers.size()] );
+        double totCorr = Correlation.getPearsonCorrelation(scores1, scores2);
+        
+        System.out.println("Mean Pearson correlation: " + average(correlations));
+        System.out.println("Total Pearson correlation: " + totCorr);
+    }
+    
+    /* Simple unweighted average */
+    private double average(double[] values)
+    {
+        double av = 0.0;
+        
+        for (int i = 0; i < values.length; i++) {
+            av += values[i];
+        }
+        
+        return (av / (double)values.length);
     }
 }

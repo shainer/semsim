@@ -31,7 +31,7 @@ public class SemSim
             }
 
             SimilarityTester m = new SimilarityTester();
-            m.printSimilaritiesFromFile(args[0]);
+            m.correlationsFromFiles(args);
 //            String inputFile = null;
 //            String outputFile = null;
 //            
