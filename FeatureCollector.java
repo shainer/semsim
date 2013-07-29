@@ -48,23 +48,6 @@ public class FeatureCollector
     }
     
     /*
-     * When extracting features for a huge number of sentence pairs, this builds a cache of
-     * the frequency counts that speeds up the lookup in the Google Corpus. For the "file" corpus,
-     * these methods do nothing.
-     * 
-     * NOTE: this is actually unused for now.
-     */
-    public void initialize(List<SentencePair> sps)
-    {
-        this.counter.createCache(sps);
-    } 
-    
-    public void deinitialize()
-    {
-        this.counter.destroyCache();
-    }
-    
-    /*
      * Actual feature extraction.
      */
     public double[] features(SentencePair sp)
