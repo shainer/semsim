@@ -4,13 +4,16 @@ import libsvm.svm_parameter;
 public class Constants
 {
     private static final int FEATURE_SIZE = 19;
-    private static final int LSA_VECTOR_SIZE = 100;
     private static final String[] stopWords = {"i", "a", "about", "an", "are", "as", "at", "be", "by", "for", "from",
                                                "how", "in", "is", "it", "of", "on", "or", "that", "the", "this", "to",
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
                                                "have", "has", "had", "were", "'ll"};
     
     private static final String similarityModelPath = "similarityModel.txt";
+
+    /* LSA constants */
+    private static final String lsaMatrixPath = "lsa_matrix.txt";
+    private static final int LSA_VECTOR_SIZE = 100;
     
     /* Constants for CrossValidation.java */
     private static final int CROSS_VALIDATION_FOLD = 10;
@@ -36,6 +39,11 @@ public class Constants
     public static String getSimilarityModelPath()
     {
         return similarityModelPath;
+    }
+    
+    public static String getLSAMatrixPath()
+    {
+        return lsaMatrixPath;
     }
     
     public static int getLSAVectorSize()
