@@ -1,14 +1,5 @@
-
-import cmu.arktweetnlp.Tagger;
-
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author shainer
+ * Container class for a token with a Part-of-Speech tag assigned to it.
  */
 public class POSTaggedToken
 {
@@ -21,12 +12,6 @@ public class POSTaggedToken
         this.tag = tag;
     }
     
-    public POSTaggedToken(Tagger.TaggedToken tt)
-    {
-        this.token = tt.token;
-        this.tag = tt.tag;
-    }
-    
     public POSTaggedToken()
     {}
     
@@ -35,6 +20,7 @@ public class POSTaggedToken
         if (o instanceof POSTaggedToken) {
             POSTaggedToken other = (POSTaggedToken)o;
             
+            /* Case-insensitive comparison */
             return (token.toLowerCase().equals(other.token.toLowerCase()) && tag.equals(other.tag));
         }
         
