@@ -1,0 +1,405 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language italian
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Indice
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation 0cm
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Machine learning project: TakeLab implementation
+\end_layout
+
+\begin_layout Author
+Lisa Vitolo, 1311230
+\end_layout
+
+\begin_layout Section
+Semantic Textual Similarity
+\end_layout
+
+\begin_layout Standard
+The aim of the STS problem is assigning a degree of semantic similarity
+ between two sentences.
+ This is a problem that has many applications in the Natural Language field,
+ and has been presented for the first time as a pilot task in the Semeval
+ 2012 (Task 6).
+ You can find a more detailed theoretical discussion, as well as data used
+ in the task, in their official page.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Semantic similarity can be easily seen as a regression problem.
+ With regression we try to learn a function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f\,:\, X\rightarrow\mathbb{R}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where X is the sample space: in our case it's the infinite space of all
+ the possible sentence pairs written in English, with no limits on their
+ length.
+ The values of this function are in the real domain.
+ In this problem not the whole domain is accepted, but it's restricted in
+ the range [0, 5].
+ This, however, doesn't affect the nature and solution of the problem.
+\end_layout
+
+\begin_layout Section
+TakeLab
+\end_layout
+
+\begin_layout Standard
+TakeLab is the name of one of the STS systems presented for solving the
+ Semeval 2012 task.
+ Using the evaluation measures proposed in the presentation paper (discussed
+ in the Results section), it ranked among the top fifth.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As mentioned above, solving the STS problem can be seen as solving a regression
+ task.
+ TakeLab - like many other systems presented for the contest - embraced
+ the machine learning approach, so here is a quick scheme of its organization.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename takelab.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Organization of TakeLab
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each step is explained in more details in the next chapters.
+\end_layout
+
+\begin_layout Standard
+TakeLab actually presented two systems, called simple and syntax.
+ Their difference lies in the set of features they use, although some basic
+ features are shared.
+ The syntax system tries to exploit more syntactic dependencies and similarities
+ (for instance looking at the dependency parse trees) in order to infer
+ a semantic relation between the two sentences.
+ The simple system is more focused on numeric values coming directly from
+ 
+\begin_inset Quotes eld
+\end_inset
+
+bag of words
+\begin_inset Quotes erd
+\end_inset
+
+ features, or from semantic-related tools such as WordNet.
+\end_layout
+
+\begin_layout Standard
+Looking at the performance measures for the entire test set provided for
+ the task, the simple system slighly outperformed syntax, so I decided to
+ implement this one for the project.
+\end_layout
+
+\begin_layout Subsection
+Preprocessing steps
+\end_layout
+
+\begin_layout Standard
+Before features are extracted, sentence pairs are briefly preprocessed with
+ the following rules:
+\end_layout
+
+\begin_layout Itemize
+tokenization and Part-Of-Speech tagging;
+\end_layout
+
+\begin_layout Itemize
+hyphens and slashes are removed;
+\end_layout
+
+\begin_layout Itemize
+angular brackets 
+\begin_inset Quotes eld
+\end_inset
+
+<
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+>
+\begin_inset Quotes erd
+\end_inset
+
+ appearing at the beginning or at the end of one token are removed;
+\end_layout
+
+\begin_layout Itemize
+some verb abbreviations typical of the English language, such as 
+\begin_inset Quotes eld
+\end_inset
+
+n't
+\begin_inset Quotes erd
+\end_inset
+
+, are expanded in their non-abbreviated form;
+\end_layout
+
+\begin_layout Itemize
+if a compound word appears as a single token in one sentence, but as two
+ consecutive tokens in the other, then it is replaced by one token in both;
+\end_layout
+
+\begin_layout Itemize
+stopwords
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Stopwords are words that are so common in the language that they bear no
+ additional information about the semantics, and so can be ignored completely
+ without loss of generality.
+\end_layout
+
+\end_inset
+
+ are removed using a small list.
+\end_layout
+
+\begin_layout Subsection
+Features
+\end_layout
+
+\begin_layout Standard
+Here I provide a quick discussion of all the features implemented in my
+ system.
+ Practical issues and details are covered in the Implementation section.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Introduction: the overlap between two generic sets is a measure of how much
+ elements they have in common.
+ It ranges from 0 (no common element) to 1 (identical sets).
+\end_layout
+
+\begin_layout Subsubsection
+NGram overlap
+\end_layout
+
+\begin_layout Standard
+Here we build two sets, one for each sentence, containing all the unigrams
+ (i.e.
+ tokens) from that sentence.
+ The first feature is the overlap degree between these two sets.
+\end_layout
+
+\begin_layout Standard
+Then we repeat the procedure for (consecutive) bigrams and (consecutive)
+ trigrams, that is sequences or 2 and 3 tokens.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Three additional features are obtained from the same overlaps, but instead
+ of using tokens as they are found in the sentences we use their lemmatization.
+ This is not present in the original Takelab implementation, but it was
+ likely added later as an improvement.
+\end_layout
+
+\begin_layout Subsubsection
+Wordnet-augmented word overlap
+\end_layout
+
+\begin_layout Standard
+This is an improvement of the raw ngram overlaps presented above, in which
+ we take into account different words that have however a quite close meaning.
+ Such 
+\begin_inset Quotes eld
+\end_inset
+
+closeness
+\begin_inset Quotes erd
+\end_inset
+
+ is found using the path length similarity in WordNet.
+\end_layout
+
+\begin_layout Subsubsection
+Weighted Word overlap
+\end_layout
+
+\begin_layout Standard
+Here we assign more importance to words bearing more content inside a sentence.
+ We define the information content of a token as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+ic(w)=\ln\frac{\sum_{w'}freq(w')}{freq(w)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So it's a measure of how frequent the token appears, compared with the total
+ frequency of all the possible tokens.
+ In order to obtain the frequency counts a corpus is needed.
+ The Google NGram Corpus (found here) collects and counts tokens from millions
+ of books written in English over a span of several decades.
+\end_layout
+
+\begin_layout Standard
+Descrizione della Cross-validation
+\end_layout
+
+\begin_layout Standard
+Descrizione di un SVR un po' in dettaglio
+\end_layout
+
+\begin_layout Standard
+Implementazione (spiega le varie classi, i formati dei file, le dipendenze,
+ i dati esterni usati)
+\end_layout
+
+\begin_layout Standard
+Risultati con relativo confronto
+\end_layout
+
+\begin_layout Standard
+Problemi?
+\end_layout
+
+\begin_layout Standard
+Bibliografia
+\end_layout
+
+\end_body
+\end_document
