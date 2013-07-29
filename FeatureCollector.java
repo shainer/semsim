@@ -24,7 +24,7 @@ public class FeatureCollector
     private HashMap<POSTaggedToken, Double> icwMap;
     
     private double[] features;
-    private final int FEATURE_SIZE = Defines.getFeatureNumber();
+    private final int FEATURE_SIZE = Constants.getFeatureNumber();
     private int featureIndex = 0;
     
     /*
@@ -75,7 +75,7 @@ public class FeatureCollector
     {
         this.sp = sp;
         featureIndex = 0;
-        features = new double[ Defines.getFeatureNumber() ];
+        features = new double[ Constants.getFeatureNumber() ];
         
         /* Feature 1, 2 */
         capitalizedOverlap();
@@ -507,7 +507,7 @@ public class FeatureCollector
     
     private double[] sentenceVector(List<POSTaggedToken> sentence, boolean weighted)
     {
-        double[] V = new double[ Defines.getLSAVectorSize() ];
+        double[] V = new double[ Constants.getLSAVectorSize() ];
         
         for (POSTaggedToken tt : sentence) {
             double[] word = lsa.getWordVector(tt);

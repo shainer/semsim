@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import cmu.arktweetnlp.Tagger;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -26,24 +25,7 @@ public class SentencePair
     public List<POSTaggedToken> sLemma1;
     public List<POSTaggedToken> sLemma2;
     
-    public SentencePair(List<String> s1Tokens, List<String> s1Tags, String s2, Tagger tagger)
-    {
-        this.s1 = new LinkedList<>();
-        this.s2 = new LinkedList<>();
-        
-        for (int i = 0; i < s1Tokens.size(); i++) {
-            POSTaggedToken tt = new POSTaggedToken( (String)s1Tokens.get(i), (String)s1Tokens.get(i) );
-            this.s1.add(tt);
-        }
-       
-        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
-            this.s2.add( new POSTaggedToken(tt) );
-        }
-        
-        preprocess();
-    }
-    
-    public SentencePair(String s1, String s2, Tagger tagger)
+    public SentencePair(String s1, String s2, StanfordCoreNLP nlp)
     {
         this.s1 = new LinkedList<>();
         this.s2 = new LinkedList<>();
@@ -52,7 +34,6 @@ public class SentencePair
         
         Annotation d1 = new Annotation(s1);
         Annotation d2 = new Annotation(s2);
-        StanfordCoreNLP nlp = Defines.getStanford();
         
         nlp.annotate(d1);
         for (CoreMap sentence : d1.get(CoreAnnotations.SentencesAnnotation.class)) {
@@ -74,14 +55,6 @@ public class SentencePair
                 this.s2.add(tt);
             }
         }
-                
-//        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s1)) {
-//            this.s1.add( new POSTaggedToken(tt) );          
-//        }
-//        
-//        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
-//            this.s2.add( new POSTaggedToken(tt) );
-//        }
         
         preprocess();
         s1 = "";
@@ -199,17 +172,20 @@ public class SentencePair
         return p;
     }
     
+    /* Preprocessing as described in the paper */
     private void preprocess()
     {
         preprocessSentence(this.s1);
         preprocessSentence(this.s2);
         
+        /* Since it may involve pairs of tokens at once, it needs to be done separately */
         mergeCompounds(this.s1, this.s2);
         mergeCompounds(this.s2, this.s1);
     }
     
     private void preprocessSentence(List<POSTaggedToken> sentence)
     {
+        /* For each token in the sentence, apply all steps to it */
         for (ListIterator<POSTaggedToken> it = sentence.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
             
@@ -218,15 +194,20 @@ public class SentencePair
             tt = removeStopWords(tt);
             
             if (tt.token.isEmpty()) {
-                it.remove();
+                it.remove(); /* remove the token from the list */
             } else {
-                it.set(tt);
+                it.set(tt); /* replace with the modified token at the same position */
             }
         }
         
+        /* This may also create new tokens */
         expandVerbAbbreviations(sentence);
     }
     
+    /*
+     * Remove all initial and final angular brackets from the token. The token may result empty
+     * if it consisted only of that character (depending on the tokenization, this could be common).
+     */
     private POSTaggedToken stripAngularBrackets(POSTaggedToken tt)
     {
         String token = tt.token;
@@ -242,7 +223,7 @@ public class SentencePair
         tt.token = token;
         return tt;
     }
-        
+    
     private POSTaggedToken removeHyphensSlashes(POSTaggedToken tt)
     {
         String s = tt.token;
@@ -254,9 +235,14 @@ public class SentencePair
         return tt;
     }
 
+    /*
+     * Stopwords are words that are so common in the English language that they are not
+     * considered in the feature collection, because they add no information about
+     * the meaning of the sentence.
+     */
     private POSTaggedToken removeStopWords(POSTaggedToken tt)
     {
-        String[] stopWords = Defines.getStopWords();
+        String[] stopWords = Constants.getStopWords();
 
         for (int i = 0; i < stopWords.length; i++) {
             if (stopWords[i].equals( tt.token.toLowerCase() )) {
@@ -268,6 +254,9 @@ public class SentencePair
         return tt;
     }
     
+    /*
+     * Here we expand "n't" in "not" ("don't" -> "do not") and "'m" in "am"
+     */
     private void expandVerbAbbreviations(List<POSTaggedToken> sentence)
     {
         for (ListIterator<POSTaggedToken> it = sentence.listIterator(); it.hasNext();) {
@@ -278,7 +267,7 @@ public class SentencePair
                 int index = string.lastIndexOf("n");
                 string = string.substring(0, index);
 
-                if (!string.isEmpty()) {
+                if (!string.isEmpty()) { /* this should always be true */
                     tt.token = string;
                     it.set(tt);
                 }
@@ -300,6 +289,10 @@ public class SentencePair
         }
     }
     
+    /*
+     * If a compound word appears as two consecutive tokens in one sentence, but as one token in the other,
+     * we merge it in a single token in the first sentence too.
+     */
     private void mergeCompounds(List<POSTaggedToken> sentence1, List<POSTaggedToken> sentence2)
     {
         for (ListIterator<POSTaggedToken> it = sentence1.listIterator(); it.hasNext();) {
@@ -323,7 +316,7 @@ public class SentencePair
             }
         }
     }
-    
+
     private String containsTokenWithTag(List<POSTaggedToken> list, String s)
     {
         for (POSTaggedToken tt : list) {

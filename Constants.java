@@ -3,14 +3,13 @@
  * and open the template in the editor.
  */
 
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import libsvm.svm_parameter;
 
 /**
  *
  * @author shainer
  */
-public class Defines
+public class Constants
 {
     private static final int FEATURE_SIZE = 19;
     private static final int LSA_VECTOR_SIZE = 100;
@@ -31,9 +30,7 @@ public class Defines
     private static final double C = 1;
     private static final double P = 0.02;
     private static final double G = 2;
-    
-    private static StanfordCoreNLP nlp;
-    
+        
     public static int getFeatureNumber()
     {
         return FEATURE_SIZE;
@@ -109,15 +106,5 @@ public class Defines
     public static double getBestGamma()
     {
         return G;
-    }
-    
-    public static void setStanford(StanfordCoreNLP n)
-    {
-        nlp = n;
-    }
-    
-    public static StanfordCoreNLP getStanford()
-    {
-        return nlp;
     }
 }

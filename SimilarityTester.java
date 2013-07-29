@@ -1,43 +1,36 @@
-import cmu.arktweetnlp.Tagger;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import libsvm.*;
 
-/**
- * NOTE: use printSimilaritiesFromFile, it's quicker
- */
 public class SimilarityTester
 {
     private FeatureCollector fc;
-    private Tagger tagger;
     private svm_model model;
+    private StanfordCoreNLP nlp;
     
-    public SimilarityTester()
+    public SimilarityTester(StanfordCoreNLP nlp)
     {        
         System.out.print(":: Initializing feature collector with LSA... ");
         this.fc = new FeatureCollector();
         System.out.println("OK.");
         
-        System.out.print(":: Initializing tokenizer and POS tagger... ");
-        this.tagger = new Tagger();
+        this.nlp = nlp;
         
-        try {
-            this.tagger.loadModel( Defines.getTaggerModelPath() );
-            System.out.println("OK.");
-            
+        try {            
             System.out.print(":: Loading similarity model from file... ");
-            this.model = svm.svm_load_model( Defines.getSimilarityModelPath() );
+            this.model = svm.svm_load_model( Constants.getSimilarityModelPath() );
             System.out.println("OK.");
         } catch (IOException e) {
-            System.err.println("Error loading models: " + e.getLocalizedMessage());
+            System.err.println("Error loading model: " + e.getLocalizedMessage());
         }        
     }
     
     public double getSimilarity(SentencePair sp)
     {
         double[] features = fc.features(sp);
-        svm_node[] node = new svm_node[ Defines.getFeatureNumber() ];
+        svm_node[] node = new svm_node[ Constants.getFeatureNumber() ];
         
         for (int i = 0; i < features.length; i++) {
             node[i] = new svm_node();
@@ -89,7 +82,7 @@ public class SimilarityTester
             for (String line : IOUtils.readlines(filepath)) {
                 String[] fields = line.split("\t");
 
-                SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
+                SentencePair sp = new SentencePair(fields[0], fields[1], nlp);
                 double rightAnswer = Double.parseDouble(fields[2]);
                 double answer = getSimilarity(sp);
 
