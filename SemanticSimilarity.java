@@ -17,15 +17,14 @@ public class SemanticSimilarity
         
         int paramIndex;
         
-        System.out.print(":: Initializing Stanford NLP for processing sentences... ");
         Properties prop = new Properties();
         prop.put("annotators", "tokenize, ssplit, pos, lemma");
         StanfordCoreNLP pipeline = new StanfordCoreNLP(prop);
-        System.out.println("OK.");
+        System.out.println(":: Stanford NLP pipeline initialized correctly.");
         
         if ((paramIndex = findParameter(args, "--training")) != -1) {
             trainSystem(args, paramIndex, pipeline);
-        } else { /* otherwise, proceed with testing the system */
+        } else { /* proceed with testing the system */
             SimilarityTest m = new SimilarityTest(pipeline);
             m.correlationsFromFiles(args);
         }

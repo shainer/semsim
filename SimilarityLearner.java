@@ -1,26 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import libsvm.*;
 import java.io.*;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
 
-import cmu.arktweetnlp.Tagger;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.util.Arrays;
 
 /**
- * Class to extract features in order to train a similarity model
+ * Trains a semantic similarity model from sample files
  */
 public class SimilarityLearner
 {
     private FeatureCollector fc;
-    private Tagger tagger;
-    private svm svr;
     private StanfordCoreNLP nlp;
     
     public SimilarityLearner(StanfordCoreNLP nlp)
@@ -35,7 +27,7 @@ public class SimilarityLearner
     /* Returns a list of samples (features + target) for each line in the supplied training files */
     public List<TrainingSample> extractFeatures(String[] trainingFiles)
     {
-        System.out.println(":: Extracting features from files (this may take a lot of time!)... ");
+        System.out.println(":: Extracting features from files (this may take some time!)... ");
         List<TrainingSample> features = new LinkedList<>();
         
         try {
@@ -44,6 +36,7 @@ public class SimilarityLearner
             }
         } catch (IOException e) {
             System.err.println("Error reading sample files: " + e.getMessage());
+            return new LinkedList<>();
         }
         
         System.out.println("DONE.");
@@ -108,12 +101,10 @@ public class SimilarityLearner
     {
         System.out.println("\nLearning process begins!");
         
-//        System.out.print(":: Scaling features... ");
-//        scale(features);
-//        System.out.println("OK.");
-        
         svm_problem problem = buildSVMProblem(features);
         svm_parameter parameter = Constants.getSVMParameters();
+        
+        /* Explicitly setting variable parameters to the optimal values found through cross validation */
         parameter.C = Constants.getBestC();
         parameter.gamma = Constants.getBestGamma();
         parameter.p = Constants.getBestP();
@@ -134,6 +125,7 @@ public class SimilarityLearner
         System.out.println("OK.");
     }
     
+    /* Builds a svm_problem instance from samples */
     public svm_problem buildSVMProblem(List<TrainingSample> samples)
     {
         svm_problem problem = new svm_problem();
@@ -146,7 +138,7 @@ public class SimilarityLearner
             
             for (int j = 0; j < Constants.getFeatureNumber(); j++) {
                 featureMatrix[sampleIndex][j] = new svm_node();
-                featureMatrix[sampleIndex][j].index = j+1;
+                featureMatrix[sampleIndex][j].index = j+1; /* each feature has an index from 1 */
                 featureMatrix[sampleIndex][j].value = sample.features[j];
             }
             
@@ -162,22 +154,6 @@ public class SimilarityLearner
         }
         
         return problem;
-    }
-    
-    private void scale(List<TrainingSample> features)
-    {
-        double[] featureMaxs = new double[ Constants.getFeatureNumber() ];
-        int i = 0;
-        
-        for (String line : IOUtils.readlines("train/maxs.txt")) {
-            featureMaxs[i++] = Double.parseDouble(line);
-        }
-        
-        for (TrainingSample sample: features) {
-            for (int j = 0; j < Constants.getFeatureNumber(); j++) {
-                sample.features[j] /= featureMaxs[j];
-            }
-        }
     }
     
     /* Utility method: gets samples from file lines */

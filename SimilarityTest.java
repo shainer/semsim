@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import libsvm.*;
 
+/*
+ * Tests the system on new samples
+ */
 public class SimilarityTest
 {
     private FeatureCollector fc;
@@ -23,7 +26,7 @@ public class SimilarityTest
             this.model = svm.svm_load_model( Constants.getSimilarityModelPath() );
             System.out.println("OK.");
         } catch (IOException e) {
-            System.err.println("Error loading model: " + e.getLocalizedMessage());
+            System.err.println("\nError loading model: " + e.getLocalizedMessage());
         }        
     }
     
@@ -38,11 +41,9 @@ public class SimilarityTest
             node[i].value = features[i];
         }
         
-        /* Scaling similarity ? */
         double sim = svm.svm_predict(model, node);
-        //sim *= (5.0 / 8.0);
-        //sim = (5.0 * (sim + 1.0)) / 8.0;
 
+        /* Corner cases, they should happen rarely */
         if (sim < 0.0) {
             sim = 0.0;
         } else if (sim > 5.0) {
@@ -54,7 +55,6 @@ public class SimilarityTest
     
     public double[] getSimilarities(List<SentencePair> sps)
     {
-        //System.out.println(":: Getting similarities for " + sps.size() + " pairs");
         double[] sims = new double[ sps.size() ];
         int simIndex = 0;
         

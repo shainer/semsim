@@ -1,11 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author shainer
+ * Training sample: array of features and target score
  */
 public class TrainingSample
 {
