@@ -26,7 +26,7 @@ public class SemanticSimilarity
         if ((paramIndex = findParameter(args, "--training")) != -1) {
             trainSystem(args, paramIndex, pipeline);
         } else { /* otherwise, proceed with testing the system */
-            SimilarityTester m = new SimilarityTester(pipeline);
+            SimilarityTest m = new SimilarityTest(pipeline);
             m.correlationsFromFiles(args);
         }
     }

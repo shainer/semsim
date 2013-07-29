@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import libsvm.*;
 
-public class SimilarityTester
+public class SimilarityTest
 {
     private FeatureCollector fc;
     private svm_model model;
     private StanfordCoreNLP nlp;
     
-    public SimilarityTester(StanfordCoreNLP nlp)
-    {        
+    public SimilarityTest(StanfordCoreNLP nlp)
+    {
         System.out.print(":: Initializing feature collector with LSA... ");
         this.fc = new FeatureCollector();
         System.out.println("OK.");
