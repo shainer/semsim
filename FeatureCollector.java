@@ -8,16 +8,10 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ListIterator;
 import edu.cmu.lti.ws4j.WS4J;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.util.*;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Properties;
 
 /**
  * @author shainer
@@ -190,15 +184,7 @@ public class FeatureCollector
     }
     
     private double informationContent(POSTaggedToken tt)
-    {
-        char[] uselessTags = {'#', '@', '~', 'U', 'E', '$', ',', 'G'};
-        
-        for (int i = 0; i < uselessTags.length; i++) {
-            if (tt.tag.charAt(0) == uselessTags[i]) {
-                return 0.0;
-            }
-        }
-        
+    {        
         if (icwMap.containsKey(tt)) {
             return icwMap.get(tt);
         }
@@ -235,7 +221,7 @@ public class FeatureCollector
         double res = 0.0;
         
         for (POSTaggedToken tt : s1) {
-            if (tt.tag.equals(",") || tt.tag.equals("$")) {
+            if (tt.tag.equals("$")) {
                 continue;
             }
 
