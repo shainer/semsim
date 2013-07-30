@@ -69,6 +69,7 @@ public class SimilarityTest
     {
         /* Used to compute the mean of all the correlations */
         double[] correlations = new double[filepaths.length];
+        int[] sampleNumbers = new int[filepaths.length];
         
         /* Used to compute the total Pearson correlation */
         ArrayList<Double> allAnswers = new ArrayList<>();
@@ -88,6 +89,8 @@ public class SimilarityTest
 
                 answers.add(answer);
                 gsAnswers.add(rightAnswer);
+                
+                sampleNumbers[p]++;
             }
 
             allAnswers.addAll(answers);
@@ -105,19 +108,25 @@ public class SimilarityTest
         Double[] scores2 = allGsAnswers.toArray( new Double[allGsAnswers.size()] );
         double totCorr = Correlation.getPearsonCorrelation(scores1, scores2);
         
-        System.out.println("Mean Pearson correlation: " + average(correlations));
+        System.out.println("Mean Pearson correlation: " + average(correlations, sampleNumbers));
         System.out.println("Total Pearson correlation: " + totCorr);
     }
     
     /* Simple unweighted average */
-    private double average(double[] values)
+    private double average(double[] values, int[] weights)
     {
         double av = 0.0;
         
         for (int i = 0; i < values.length; i++) {
-            av += values[i];
+            av += (values[i] * weights[i]);
         }
         
-        return (av / (double)values.length);
+        double sum = 0.0;
+        
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i];
+        }
+        
+        return (av / sum);
     }
 }
