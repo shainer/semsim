@@ -55,7 +55,7 @@ public class FeatureCollector
         this.sp = sp;
         featureIndex = 0;
         features = new double[ Constants.getFeatureNumber() ];
-        
+                
         /* Feature 1, 2 */
         capitalizedOverlap();
         /* Feature 3, 4 */

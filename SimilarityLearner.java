@@ -108,11 +108,9 @@ public class SimilarityLearner
         parameter.C = Constants.getBestC();
         parameter.gamma = Constants.getBestGamma();
         parameter.p = Constants.getBestP();
-        
-        svm_model model;
-        
+                
         System.out.print(":: Training model with optimal parameters... ");
-        model = svm.svm_train(problem, parameter);
+        svm_model model = svm.svm_train(problem, parameter);
         System.out.println("OK.");
         
         try {
@@ -165,7 +163,7 @@ public class SimilarityLearner
             
         for (String line : IOUtils.readlines(sampleFile)) {
             String[] fields = line.split("\t");
-
+            
             SentencePair sp = new SentencePair(fields[0], fields[1], nlp);            
             double target = Double.parseDouble(fields[2]);
             pairs.add(sp);
