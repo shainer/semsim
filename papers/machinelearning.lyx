@@ -28,7 +28,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_amsmath 1
 \use_esint 1
 \use_mhchem 1
@@ -43,6 +43,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 3cm
+\bottommargin 3cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -208,6 +212,16 @@ Looking at the performance measures for the entire test set provided for
 \end_layout
 
 \begin_layout Subsection
+Similarity scores
+\end_layout
+
+\begin_layout Standard
+A brief note: similarity scores range from 0 (totally different sentences)
+ to 5 (the same sentence in different words).
+ This is maintained in my implementation too.
+\end_layout
+
+\begin_layout Subsection
 Preprocessing steps
 \end_layout
 
@@ -262,19 +276,12 @@ if a compound word appears as a single token in one sentence, but as two
 \end_layout
 
 \begin_layout Itemize
-stopwords
-\begin_inset Foot
-status open
-
-\begin_layout Plain Layout
-Stopwords are words that are so common in the language that they bear no
+stopwords are removed using a small list.
+ Stopwords are words that are so common in the language that they bear no
  additional information about the semantics, and so can be ignored completely
  without loss of generality.
-\end_layout
-
-\end_inset
-
- are removed using a small list.
+ Additionally, if two sentences have a lot of stopwords in common, this
+ doesn't increase much their probability of being similar.
 \end_layout
 
 \begin_layout Subsection
@@ -282,8 +289,7 @@ Features
 \end_layout
 
 \begin_layout Standard
-Here I provide a quick discussion of all the features implemented in my
- system.
+Here I provide a quick overview of all the features implemented in my system.
  Practical issues and details are covered in the Implementation section.
 \end_layout
 
@@ -295,8 +301,8 @@ Here I provide a quick discussion of all the features implemented in my
 \end_layout
 
 \begin_layout Standard
-Introduction: the overlap between two generic sets is a measure of how much
- elements they have in common.
+An introductive node: the overlap between two generic sets is a measure
+ of how much elements they have in common.
  It ranges from 0 (no common element) to 1 (identical sets).
 \end_layout
 
@@ -313,7 +319,7 @@ Here we build two sets, one for each sentence, containing all the unigrams
 
 \begin_layout Standard
 Then we repeat the procedure for (consecutive) bigrams and (consecutive)
- trigrams, that is sequences or 2 and 3 tokens.
+ trigrams, that is sequences of 2 and 3 tokens.
 \end_layout
 
 \begin_layout Standard
@@ -327,7 +333,7 @@ Then we repeat the procedure for (consecutive) bigrams and (consecutive)
 Three additional features are obtained from the same overlaps, but instead
  of using tokens as they are found in the sentences we use their lemmatization.
  This is not present in the original Takelab implementation, but it was
- likely added later as an improvement.
+ added later as an improvement.
 \end_layout
 
 \begin_layout Subsubsection
@@ -376,29 +382,1016 @@ So it's a measure of how frequent the token appears, compared with the total
  of books written in English over a span of several decades.
 \end_layout
 
-\begin_layout Standard
-Descrizione della Cross-validation
+\begin_layout Subsubsection
+Vector space sentence similarity
 \end_layout
 
 \begin_layout Standard
-Descrizione di un SVR un po' in dettaglio
+Each sentence is represented by a vector obtained summing up the LSA vectors
+ of its tokens.
+ The LSA vectors measure how much a word is found in several contexts: the
+ possible contexts are represented by a set of documents.
 \end_layout
 
 \begin_layout Standard
-Implementazione (spiega le varie classi, i formati dei file, le dipendenze,
- i dati esterni usati)
+A feature is then the cosine similarity between the vectors of the two sentences.
+ A second feature weights the LSA vectors with the information content of
+ the token before computing the cosine similarity.
+\end_layout
+
+\begin_layout Subsubsection
+Normalized differences
 \end_layout
 
 \begin_layout Standard
-Risultati con relativo confronto
+Two normalized differences between the sentences are added as features:
+ sentence length and aggregate word information content.
+\end_layout
+
+\begin_layout Subsubsection
+Number overlaps
 \end_layout
 
 \begin_layout Standard
-Problemi?
+This describes three features dealing entirely with numeral tokens, on the
+ basis that the human annotators for the test set often gave low similarity
+ scores to sentence pairs where the numbers differed a lot.
+\end_layout
+
+\begin_layout Subsubsection
+Named Entity
 \end_layout
 
 \begin_layout Standard
-Bibliografia
+Two types of Named Entity have been considered: words starting with a capital
+ letter, and stock index symbols.
+ In the first case of course there is a loss of precision due to the fact
+ that not all words starting with a capital letter are actually named entities,
+ but perhaps the authors thought it was a good tradeoff with respect to
+ using an external recognizer.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Data section reports some information on the training and test sets
+ used for this similarity system, which are the sets published for the Semeval
+ 2012 Task 6.
+ One training set reports sentences derived from discussions that took place
+ in the European parliament.
+ Global economics is a recurring topic, and thus stock index symbols are
+ mentioned.
+\end_layout
+
+\begin_layout Subsection
+10-fold cross-validation
+\end_layout
+
+\begin_layout Standard
+The Support Vector Regressor needs some parameters that control its internal
+ behaviour, depending on which kernel is used.
+ Next subsection will describe the SVR theory and its internal parameters
+ in more details.
+ Here we explain how the best set of parameters is found among a span of
+ possible choices.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Choosing the wrong parameters can affect the system performances a lot:
+ we want our system to be able to generalize well to a test set that may
+ be quite different from the training set.
+ Indeed, cross-validation has been proved an efficient method in reducing
+ the common issue of overfitting.
+\end_layout
+
+\begin_layout Standard
+In the Results, we show how training with parameter that slightly different
+ from the optimal one can lower the mean Pearson correlation by several
+ decimal points.
+\end_layout
+
+\begin_layout Standard
+There is no standard technique to identify the best choice of parameters,
+ and so both the original TakeLab and my implementation use 10-fold cross-valida
+tion.
+ I performed cross-validation on an union of all the training sets.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A k-fold cross validation starts by randomly partitioning the data into
+ k subsets.
+ k-1 subsets are used to train a model with the current combination of parameter
+s, while the remaining one is kept aside for validating it.
+ The training is repeated so that every subset plays the role of the validation
+ set once; this way, the cross validation ensures that the performance doesn't
+ depend too much on the initial random partition.
+ Furthermore, the cross validation tries to create subsets composed of sentence
+ pairs that vary as much as possible in their target scores.
+\end_layout
+
+\begin_layout Standard
+The mean of the results obtained on the k validation sets (usually measured
+ in term of correlation) is the performance measure for that particular
+ combination of parameters.
+\end_layout
+
+\begin_layout Standard
+This is repeated for all the possible choice of parameters we consider as
+ options.
+\end_layout
+
+\begin_layout Subsection
+Support Vector Regression
+\end_layout
+
+\begin_layout Standard
+TODO
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Subsection
+Directory layout
+\end_layout
+
+\begin_layout Standard
+Once the project archive has been uncompressed, enter the 
+\begin_inset Quotes eld
+\end_inset
+
+semanticsimilarity
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
+ This is the project root directory and contains everything you need to
+ launch the program.
+\end_layout
+
+\begin_layout Itemize
+lib/ : a directory containing JAR files for the external libraries used
+ in the application;
+\end_layout
+
+\begin_layout Itemize
+src/: contains the Java source codes;
+\end_layout
+
+\begin_layout Itemize
+src/scripts: several Python scripts I've found useful while developing the
+ application;
+\end_layout
+
+\begin_layout Itemize
+googlebooks/: contains the Google NGram corpus;
+\end_layout
+
+\begin_layout Itemize
+train/: training files;
+\end_layout
+
+\begin_layout Itemize
+test/: test files;
+\end_layout
+
+\begin_layout Itemize
+lsa_matrix.txt: huge text file with the LSA vectors used for distributional
+ semantics features;
+\end_layout
+
+\begin_layout Itemize
+README: contains a quick usage tutorial for the application;
+\end_layout
+
+\begin_layout Itemize
+similarityModel.txt: an already trained semantic similarity model that can
+ be immediately used for testing;
+\end_layout
+
+\begin_layout Itemize
+word-frequencies.txt: a subset of the Google NGram corpus used to speed up
+ lookups during training.
+\end_layout
+
+\begin_layout Standard
+The application expects most of the data (such as the similarity model,
+ or the LSA matrix) to be found at exactly these locations while running.
+ Moving or renaming files will most likely result in runtime errors and
+ malfunctioning of the program.
+\end_layout
+
+\begin_layout Subsection
+Dependencies
+\end_layout
+
+\begin_layout Standard
+My TakeLab implementation uses the following external libraries:
+\end_layout
+
+\begin_layout Itemize
+Stanford Core NLP, for tokenization, Part-of-Speech tagging, and lemmatization;
+\end_layout
+
+\begin_layout Itemize
+WS4j, a library for computing WordNet 3.0 similarity scores using an internal
+ copy of the database;
+\end_layout
+
+\begin_layout Itemize
+LibSVM for an implementation of the Support Vector Regression (LINKS).
+\end_layout
+
+\begin_layout Standard
+the lib/ subdirectory in the project root contains the JAR files for these
+ libraries.
+ The stanford-corenlp-models.jar file is needed to load the machine learning
+ models used by the NLP pipeline.
+\end_layout
+
+\begin_layout Subsection
+Sample files
+\end_layout
+
+\begin_layout Standard
+Training and test files were provided by the Semeval 2012 Task 6, so that
+ all systems could be evaluated on the same samples.
+ Each sample file is actually split in two: one text file for the sentence
+ pairs, called STS.input.<name>.txt, and another with the annotated similarity
+ scores, named STS.gs.<name>.txt.
+\end_layout
+
+\begin_layout Standard
+In order to simplify command line arguments and I/O operations, my application
+ recognizes sample files organized this way
+\end_layout
+
+\begin_layout Standard
+<sentence1>TAB<sentence2>TAB<similarity score>
+\end_layout
+
+\begin_layout Standard
+All the sample files you see in the subdirectories are already in this format.
+ However, the Python script putOutput.py can be used to convert new files
+ from the Semeval format to mine.
+\end_layout
+
+\begin_layout Subsection
+The Google NGram Corpus
+\end_layout
+
+\begin_layout Standard
+The Google NGram corpus v2 is a huge resource, collecting frequency counts
+ for English tokens spanning across several decades.
+ Unfortunately it is not really optimized for a huge sequences of queries,
+ so I applied some processing steps in order to reduce its volume to a manageabl
+e size, also in terms of occupied disk space:
+\end_layout
+
+\begin_layout Itemize
+the frequency counts for punctuaction characters were not downloaded, since
+ their information content is not really relevant for this semantic task;
+\end_layout
+
+\begin_layout Itemize
+all the counts for the same token, but different year, were summed together.
+\end_layout
+
+\begin_layout Itemize
+each row contains only the token, the POS tag, and the frequency count;
+ additional information about where the occurrences were found were deleted
+ .
+\end_layout
+
+\begin_layout Itemize
+counts have been 
+\begin_inset Quotes eld
+\end_inset
+
+indexed
+\begin_inset Quotes erd
+\end_inset
+
+ by the first two initials.
+ The googlebooks/ directory contains a subdirectory for each initial letter;
+ these subdirectories contain in turn a text file for each pair of initial
+ letters.
+ So for instance 
+\begin_inset Quotes eld
+\end_inset
+
+a
+\begin_inset Quotes erd
+\end_inset
+
+ contains 
+\begin_inset Quotes eld
+\end_inset
+
+aa
+\begin_inset Quotes erd
+\end_inset
+
+ for all the tokens starting with 
+\begin_inset Quotes eld
+\end_inset
+
+aa
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+ab
+\begin_inset Quotes erd
+\end_inset
+
+, etc....
+ A special file oneLetter groups together 1-character tokens .
+\end_layout
+
+\begin_layout Itemize
+All the tokens not appearing in an online English dictionary, stored in
+ the dictionary/ folder, have been ignored.
+ The comparison was case insensitive.
+ The dictionary is the Ispell English Word Lists, chosen because it includes
+ inflected forms of verbs and nouns (e.g.
+ plurals).
+ It can be downloaded here http://wordlist.sourceforge.net/.
+\end_layout
+
+\begin_layout Standard
+All these steps were applied using the mergeYears.py and divideByInitials.py
+ scripts.
+\end_layout
+
+\begin_layout Standard
+Thanks to this, plus some internal caching, lookups inside the corpus don't
+ add much overhead to the execution time.
+\end_layout
+
+\begin_layout Subsection
+Compiling and using the application
+\end_layout
+
+\begin_layout Standard
+Open a shell in the project root directory.
+ The first step is setting the classpath so that both our source codes and
+ the JAR files are visible to the Java Virtual Machine.
+ On a GNU/Linux system you can for example set the environment variable
+ with:
+\end_layout
+
+\begin_layout Standard
+$ export CLASSPATH=lib/stanford-corenlp-3.2.0.jar:lib/stanford-corenlp-3.2.0-models.ja
+r:lib/libsvm.jar:lib/ws4j-1.0.1.jar:src/
+\end_layout
+
+\begin_layout Standard
+So the paths you need to insert are those to the four JAR files in lib/,
+ and src/ for our sources.
+\end_layout
+
+\begin_layout Standard
+Keep in mind this variable exists only until the shell is open.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we compile the application with
+\end_layout
+
+\begin_layout Standard
+$ javac src/SemanticSimilarity.java
+\end_layout
+
+\begin_layout Standard
+And run it with
+\end_layout
+
+\begin_layout Standard
+$ java SemanticSimilarity
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Running it without command-line arguments results in a small error printed
+ on standard output.
+ The application accepts arguments for training a new system, or for testing
+ an existing one.
+ The command
+\end_layout
+
+\begin_layout Standard
+$ java SemanticSimilarity --training <list of training files>
+\end_layout
+
+\begin_layout Standard
+performs feature extraction and training on the given sample files (at least
+ one).
+ The output is a SVR model, stored in similarityModel.txt by libsvm.
+ An example is:
+\end_layout
+
+\begin_layout Standard
+$ java SemanticSimilarity --training train/MSRvid.txt train/MSRpar.txt train/SMTeu
+roparl.txt
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Testing the stored model:
+\end_layout
+
+\begin_layout Standard
+$ java SemanticSimilarity <list of test files>
+\end_layout
+
+\begin_layout Standard
+For instance:
+\end_layout
+
+\begin_layout Standard
+$ java SemanticSimilarity test/OnWN test/MSRpar.txt test/MSRvid.txt test/SMTeuropa
+rl.txt test/SMTnews.txt
+\end_layout
+
+\begin_layout Standard
+This prints some correlation values that were picked as valuable performance
+ measures in [reference].
+ See [section] for an explanation of each of them.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As mentioned, the parameters for the SVR have been computed in advance using
+ cross validation, and they are accessible inside the application as simple
+ constants.
+ However, the project also includes a small Java class that performs cross
+ validation.
+ It has the same requirements as SemanticSimilarity, so after setting up
+ the classpath as above it is compiled and run:
+\end_layout
+
+\begin_layout Standard
+$ javac src/CrossValidation.java
+\end_layout
+
+\begin_layout Standard
+$ java CrossValidation <list of sample files>
+\end_layout
+
+\begin_layout Standard
+At the end it will output the best choice, complete with the Pearson correlation
+ it obtained on the samples.
+ It is recommended that you cross validate on all the training files found
+ in the train/ subdirectory for the most accurate results.
+\end_layout
+
+\begin_layout Standard
+Keep in mind that the task is quite computationally expensive, due, among
+ other things, to the huge number of parameter combinations we evaluate
+ (700).
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Subsection
+Performance measures
+\end_layout
+
+\begin_layout Standard
+As mentioned before, the Pearson correlation <insert link to explanation
+ or paper> is used to measure the accuracy of the semantic similarity system
+ with respect to the gold standard annotations.
+ I compute the correlation for each test file, plus two of the three aggregate
+ measures described [here]: the ALL correlation is simply the correlation
+ of all the test samples concatenated together.
+ The Mean correlation is an average weighted with the number of samples
+ in each test file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the following table, my results are compared with the original Takelab
+ results, found in their presentation paper, and with the baseline for the
+ Semeval task.
+ The baseline scores are produced using just one feature, a simple word
+ overlap.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+My implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSRpar.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSRvid.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SMTeuroparl.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SMTnews.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OnWN.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It appears that the low results obtained for the SMTeuroparl and SMTnews
+ set are somewhat expected keeping in mind that systems for such complex
+ tasks tend to overfit on the format of the training data.
+ The Takelab authors state that the SMTeuroparl training set differs a lot
+ from the corresponding test set: the test set tends towards significantly
+ shortest sentences, and many short identical sentences are repeated multiple
+ times.
+ SMTnews was one of the 
+\begin_inset Quotes eld
+\end_inset
+
+surprise
+\begin_inset Quotes erd
+\end_inset
+
+ test sets, so no related training data exists.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+F.
+ Šarić, G.
+ Glavaš, M.
+ Karan, J.
+ Šnajder, B.D.
+ Bašić.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+TakeLab: systems for measuring semantic textual similarity
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+E.
+ Agirre, D.
+ Cer, M.
+ Diab, A.
+ Gonzalez-Agirre.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+SemEval-2012 Task 6: a Pilot on Semantic Textual Similarity
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-3"
+
+\end_inset
+
+C.W.
+ Hsu, C.C.
+ Chang, C.J.
+ Lin.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+A practical guide to support vector classification.
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \end_body
