@@ -5,7 +5,7 @@
 \textclass article
 \use_default_options true
 \maintain_unincluded_children false
-\language italian
+\language british
 \language_package default
 \inputencoding auto
 \fontencoding global
@@ -72,18 +72,38 @@ Machine learning project: TakeLab implementation
 Lisa Vitolo, 1311230
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Semantic Textual Similarity
 \end_layout
 
 \begin_layout Standard
-The aim of the STS problem is assigning a degree of semantic similarity
- between two sentences.
+The aim of the STS problem is to assign a degree of semantic similarity
+ to two sentences.
  This is a problem that has many applications in the Natural Language field,
  and has been presented for the first time as a pilot task in the Semeval
  2012 (Task 6).
- You can find a more detailed theoretical discussion, as well as data used
- in the task, in their official page.
+ You can find a list of submitted systems, data and proceedings, in their
+ official page: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.cs.york.ac.uk/semeval-2012/task6/
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -110,12 +130,11 @@ f\,:\, X\rightarrow\mathbb{R}
 \end_layout
 
 \begin_layout Standard
-where X is the sample space: in our case it's the infinite space of all
- the possible sentence pairs written in English, with no limits on their
- length.
+where X is the sample space, in our case the infinite space of all the possible
+ sentence pairs written in English.
  The values of this function are in the real domain.
- In this problem not the whole domain is accepted, but it's restricted in
- the range [0, 5].
+ In this problem we actually talk about a restricted domain, lying in the
+ range [0, 5].
  This, however, doesn't affect the nature and solution of the problem.
 \end_layout
 
@@ -124,10 +143,23 @@ TakeLab
 \end_layout
 
 \begin_layout Standard
-TakeLab is the name of one of the STS systems presented for solving the
- Semeval 2012 task.
- Using the evaluation measures proposed in the presentation paper (discussed
- in the Results section), it ranked among the top fifth.
+TakeLab 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+
+\end_inset
+
+ is the name of one of the STS systems presented for solving the Semeval
+ 2012 task.
+ Using the evaluation measures proposed in the presentation paper 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+, and discussed in the Results section, it ranked among the top fifth.
 \end_layout
 
 \begin_layout Standard
@@ -141,7 +173,8 @@ TakeLab is the name of one of the STS systems presented for solving the
 As mentioned above, solving the STS problem can be seen as solving a regression
  task.
  TakeLab - like many other systems presented for the contest - embraced
- the machine learning approach, so here is a quick scheme of its organization.
+ the machine learning approach, so Figure 1 shows a quick scheme of its
+ organization.
 \end_layout
 
 \begin_layout Standard
@@ -166,6 +199,13 @@ status open
 
 \begin_layout Plain Layout
 Organization of TakeLab
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Organization-of-TakeLab"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -183,17 +223,13 @@ Organization of TakeLab
 \end_layout
 
 \begin_layout Standard
-Each step is explained in more details in the next chapters.
-\end_layout
-
-\begin_layout Standard
 TakeLab actually presented two systems, called simple and syntax.
  Their difference lies in the set of features they use, although some basic
  features are shared.
  The syntax system tries to exploit more syntactic dependencies and similarities
  (for instance looking at the dependency parse trees) in order to infer
  a semantic relation between the two sentences.
- The simple system is more focused on numeric values coming directly from
+ The simple system is more focused on numerical values coming directly from
  
 \begin_inset Quotes eld
 \end_inset
@@ -206,8 +242,7 @@ bag of words
 \end_layout
 
 \begin_layout Standard
-Looking at the performance measures for the entire test set provided for
- the task, the simple system slighly outperformed syntax, so I decided to
+On average the simple system slighly outperformed syntax, so I decided to
  implement this one for the project.
 \end_layout
 
@@ -217,7 +252,7 @@ Similarity scores
 
 \begin_layout Standard
 A brief note: similarity scores range from 0 (totally different sentences)
- to 5 (the same sentence in different words).
+ to 5 (the same sentence, even if in different words).
  This is maintained in my implementation too.
 \end_layout
 
@@ -267,7 +302,7 @@ n't
 \begin_inset Quotes erd
 \end_inset
 
-, are expanded in their non-abbreviated form;
+, are expanded to their non-abbreviated form;
 \end_layout
 
 \begin_layout Itemize
@@ -524,7 +559,144 @@ Support Vector Regression
 \end_layout
 
 \begin_layout Standard
-TODO
+A SVR is an extension of a Support Vector Machine.
+\end_layout
+
+\begin_layout Subsubsection
+Support Vector Machines
+\end_layout
+
+\begin_layout Standard
+A support vector machine implements a linear binary classifier.
+ Consider a set of labeled samples
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D=\left\{ (x_{1},y_{1})...(x_{n},y_{n})\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y_{i}\in\left\{ -1,+1\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+D is linearly separable if there exists a vector w and a scalar b such that
+ for each sample:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+y_{i}(w\cdot x_{i}+b)\geq1
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The optimal separation hyperplane (
+\begin_inset Formula $w_{0},b_{0})$
+\end_inset
+
+ separates the data leaving the maximal margin (i.e.
+ orthogonal distance from the closest samples in both directions).
+ This optimal hyperplane can be expressed by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w_{0}=\sum_{i=1}^{n}y_{i}\alpha_{i}x_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where the 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ vector is found by quadratic programming.
+ The classification of a new instance is given by the sign of:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w_{0}\cdot x+b=\sum_{i=1}^{n}y_{i}\alpha_{i}x\cdot x_{i}+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the data set is not linearly separable, we need to apply a transformation
+ 
+\begin_inset Formula $\phi$
+\end_inset
+
+ to the input vectors in order to make it so.
+ So the above formula for classification becomes:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w_{0}\cdot\phi(x)+b=\sum_{i=1}^{n}y_{i}\alpha_{i}\phi(x)\cdot\phi(x_{i})+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+More generally:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sum_{i=1}^{n}y_{i}\alpha_{i}K(x,x_{i})+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+K is called a kernel function.
+ The kernel is usually chosen among a standardized set: few problems require
+ a customized kernel function.
+\end_layout
+
+\begin_layout Standard
+A SVM is easily generalized in order to solve a classification problem with
+ an arbitrary number of classes: more SVMs are used together to separate
+ the data, and they create multiple rules to decide which class a specific
+ sample belongs to.
 \end_layout
 
 \begin_layout Section
@@ -555,38 +727,37 @@ lib/ : a directory containing JAR files for the external libraries used
 \end_layout
 
 \begin_layout Itemize
-src/: contains the Java source codes;
+src/ : contains the Java source codes;
 \end_layout
 
 \begin_layout Itemize
-src/scripts: several Python scripts I've found useful while developing the
- application;
+src/scripts/ : several Python scripts I've found useful while developing
+ the application;
 \end_layout
 
 \begin_layout Itemize
-googlebooks/: contains the Google NGram corpus;
+googlebooks/ : contains the Google NGram corpus;
 \end_layout
 
 \begin_layout Itemize
-train/: training files;
+train/ : training files;
 \end_layout
 
 \begin_layout Itemize
-test/: test files;
+test/ : test files;
 \end_layout
 
 \begin_layout Itemize
-lsa_matrix.txt: huge text file with the LSA vectors used for distributional
- semantics features;
+lsa_matrix.txt: text file with the LSA vectors;
 \end_layout
 
 \begin_layout Itemize
-README: contains a quick usage tutorial for the application;
+README: a quick usage tutorial for the application;
 \end_layout
 
 \begin_layout Itemize
-similarityModel.txt: an already trained semantic similarity model that can
- be immediately used for testing;
+similarityModel.txt: a trained semantic similarity model that can be immediately
+ used for testing;
 \end_layout
 
 \begin_layout Itemize
@@ -619,7 +790,18 @@ WS4j, a library for computing WordNet 3.0 similarity scores using an internal
 \end_layout
 
 \begin_layout Itemize
-LibSVM for an implementation of the Support Vector Regression (LINKS).
+LibSVM is an implementation of the Support Vector Regression, found at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -642,18 +824,19 @@ Training and test files were provided by the Semeval 2012 Task 6, so that
 \end_layout
 
 \begin_layout Standard
-In order to simplify command line arguments and I/O operations, my application
- recognizes sample files organized this way
+In order to simplify command line arguments and I/O operations, the putOutput.py
+ script merged the two of them into one text file organized this way:
 \end_layout
 
 \begin_layout Standard
-<sentence1>TAB<sentence2>TAB<similarity score>
+<sentence 1>TAB<sentence 2>TAB<similarity score>
 \end_layout
 
 \begin_layout Standard
-All the sample files you see in the subdirectories are already in this format.
- However, the Python script putOutput.py can be used to convert new files
- from the Semeval format to mine.
+This is also the only format recognized by my application.
+ All the sample files you see in the subdirectories are already in this
+ format, but putOutput.py is available in the src/scripts/ folder should
+ you need to convert new samples.
 \end_layout
 
 \begin_layout Subsection
@@ -661,7 +844,7 @@ The Google NGram Corpus
 \end_layout
 
 \begin_layout Standard
-The Google NGram corpus v2 is a huge resource, collecting frequency counts
+The Google NGram corpus is a huge resource, collecting frequency counts
  for English tokens spanning across several decades.
  Unfortunately it is not really optimized for a huge sequences of queries,
  so I applied some processing steps in order to reduce its volume to a manageabl
@@ -678,9 +861,8 @@ all the counts for the same token, but different year, were summed together.
 \end_layout
 
 \begin_layout Itemize
-each row contains only the token, the POS tag, and the frequency count;
- additional information about where the occurrences were found were deleted
- .
+each row contains only the token, its POS tag, and the frequency count;
+ additional information about where the occurrences were found were deleted.
 \end_layout
 
 \begin_layout Itemize
@@ -696,15 +878,7 @@ indexed
  The googlebooks/ directory contains a subdirectory for each initial letter;
  these subdirectories contain in turn a text file for each pair of initial
  letters.
- So for instance 
-\begin_inset Quotes eld
-\end_inset
-
-a
-\begin_inset Quotes erd
-\end_inset
-
- contains 
+ So for instance the a/ folder contains 
 \begin_inset Quotes eld
 \end_inset
 
@@ -728,8 +902,8 @@ ab
 \begin_inset Quotes erd
 \end_inset
 
-, etc....
- A special file oneLetter groups together 1-character tokens .
+, and so on.
+ A special file oneLetter groups together 1-character tokens.
 \end_layout
 
 \begin_layout Itemize
@@ -739,11 +913,22 @@ All the tokens not appearing in an online English dictionary, stored in
  The dictionary is the Ispell English Word Lists, chosen because it includes
  inflected forms of verbs and nouns (e.g.
  plurals).
- It can be downloaded here http://wordlist.sourceforge.net/.
+ It can be downloaded from 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://wordlist.sourceforge.net/
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-All these steps were applied using the mergeYears.py and divideByInitials.py
+These steps were applied using the mergeYears.py and divideByInitials.py Python
  scripts.
 \end_layout
 
@@ -786,7 +971,7 @@ Keep in mind this variable exists only until the shell is open.
 \end_layout
 
 \begin_layout Standard
-Now we compile the application with
+Now compile the application with
 \end_layout
 
 \begin_layout Standard
@@ -840,7 +1025,7 @@ roparl.txt
 \end_layout
 
 \begin_layout Standard
-Testing the stored model:
+Testing a model model:
 \end_layout
 
 \begin_layout Standard
@@ -858,8 +1043,15 @@ rl.txt test/SMTnews.txt
 
 \begin_layout Standard
 This prints some correlation values that were picked as valuable performance
- measures in [reference].
- See [section] for an explanation of each of them.
+ measures in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+.
+ See the Results section for an explanation.
 \end_layout
 
 \begin_layout Standard
@@ -876,7 +1068,7 @@ As mentioned, the parameters for the SVR have been computed in advance using
  However, the project also includes a small Java class that performs cross
  validation.
  It has the same requirements as SemanticSimilarity, so after setting up
- the classpath as above it is compiled and run:
+ the classpath as above you can compile and run it:
 \end_layout
 
 \begin_layout Standard
@@ -904,17 +1096,19 @@ Keep in mind that the task is quite computationally expensive, due, among
 Results
 \end_layout
 
-\begin_layout Subsection
-Performance measures
-\end_layout
-
 \begin_layout Standard
-As mentioned before, the Pearson correlation <insert link to explanation
- or paper> is used to measure the accuracy of the semantic similarity system
- with respect to the gold standard annotations.
+As mentioned before, the Pearson correlation is used to measure the accuracy
+ of the semantic similarity system with respect to the Gold Standard annotations.
  I compute the correlation for each test file, plus two of the three aggregate
- measures described [here]: the ALL correlation is simply the correlation
- of all the test samples concatenated together.
+ measures described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+: the ALL correlation is simply the correlation of all the test samples
+ concatenated together.
  The Mean correlation is an average weighted with the number of samples
  in each test file.
 \end_layout
@@ -947,7 +1141,7 @@ In the following table, my results are compared with the original Takelab
 <lyxtabular version="3" rows="9" columns="4">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0pt">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -988,7 +1182,7 @@ Baseline
 \end_inset
 </cell>
 </row>
-<row>
+<row topspace="default" bottomspace="default">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -1002,7 +1196,7 @@ MSRpar.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.64
 \end_layout
 
 \end_inset
@@ -1011,7 +1205,7 @@ MSRpar.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.73
 \end_layout
 
 \end_inset
@@ -1020,7 +1214,7 @@ MSRpar.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.43
 \end_layout
 
 \end_inset
@@ -1040,7 +1234,7 @@ MSRvid.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.77
 \end_layout
 
 \end_inset
@@ -1049,7 +1243,7 @@ MSRvid.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.88
 \end_layout
 
 \end_inset
@@ -1058,7 +1252,7 @@ MSRvid.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.30
 \end_layout
 
 \end_inset
@@ -1078,7 +1272,7 @@ SMTeuroparl.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.39
 \end_layout
 
 \end_inset
@@ -1087,7 +1281,7 @@ SMTeuroparl.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.47
 \end_layout
 
 \end_inset
@@ -1096,7 +1290,7 @@ SMTeuroparl.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.45
 \end_layout
 
 \end_inset
@@ -1116,7 +1310,7 @@ SMTnews.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.40
 \end_layout
 
 \end_inset
@@ -1125,7 +1319,7 @@ SMTnews.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.40
 \end_layout
 
 \end_inset
@@ -1134,7 +1328,7 @@ SMTnews.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.39
 \end_layout
 
 \end_inset
@@ -1154,7 +1348,7 @@ OnWN.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.61
 \end_layout
 
 \end_inset
@@ -1163,7 +1357,7 @@ OnWN.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.68
 \end_layout
 
 \end_inset
@@ -1172,7 +1366,7 @@ OnWN.txt
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.58
 \end_layout
 
 \end_inset
@@ -1230,7 +1424,7 @@ ALL
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.71
 \end_layout
 
 \end_inset
@@ -1239,7 +1433,7 @@ ALL
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.81
 \end_layout
 
 \end_inset
@@ -1248,7 +1442,7 @@ ALL
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.31
 \end_layout
 
 \end_inset
@@ -1268,7 +1462,7 @@ Mean
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.60
 \end_layout
 
 \end_inset
@@ -1277,7 +1471,7 @@ Mean
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.67
 \end_layout
 
 \end_inset
@@ -1286,7 +1480,7 @@ Mean
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.43
 \end_layout
 
 \end_inset
@@ -1307,22 +1501,13 @@ Mean
 \end_layout
 
 \begin_layout Standard
-It appears that the low results obtained for the SMTeuroparl and SMTnews
- set are somewhat expected keeping in mind that systems for such complex
- tasks tend to overfit on the format of the training data.
+It appears that the low results obtained for the SMTeuroparl set are somewhat
+ expected keeping in mind that systems for such complex tasks tend to overfit
+ on the format of the training data.
  The Takelab authors state that the SMTeuroparl training set differs a lot
- from the corresponding test set: the test set tends towards significantly
+ from the corresponding test set: the latter tends towards significantly
  shortest sentences, and many short identical sentences are repeated multiple
  times.
- SMTnews was one of the 
-\begin_inset Quotes eld
-\end_inset
-
-surprise
-\begin_inset Quotes erd
-\end_inset
-
- test sets, so no related training data exists.
 \end_layout
 
 \begin_layout Bibliography
