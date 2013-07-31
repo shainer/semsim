@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+#####################################################################
+#                                                                   #
+# Script that merges together frequency counts for different years, #
+# and deletes useless columns from the corpus.                      #
+#                                                                   #
+#####################################################################
+
 import sys
 
 def printUsage():
@@ -15,7 +22,7 @@ def mergeYears(inputFile, outputFile):
 
 	for line in inputFile:
 		lineCount += 1
-		if lineCount % 100 == 0:
+		if lineCount % 10000 == 0:
 			print ":: Current line " + str(lineCount)
 
 		fields = line.split('\t');

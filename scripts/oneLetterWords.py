@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+#####################################################################
+#                                                                   #
+# Script to deal with one-letter words in the corpus, ignored by    #
+# the indexing provided by divideByInitials.py                      #
+#                                                                   #
+#####################################################################
+
 import sys
 
 def findOneLetterWords(path, oneLetterFile):

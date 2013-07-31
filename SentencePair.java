@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -13,9 +8,11 @@ import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 
-/**
- *
- * @author shainer
+/*
+ * A pair of sentences, i.e. an input sample for the problem (without target value).
+ * Sentences are represented as ordered list of token with a Part-Of-Speech tag.
+ * 
+ * All the preprocessing takes place when the pair is created.
  */
 public class SentencePair
 {

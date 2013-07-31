@@ -1,5 +1,13 @@
 #!/usr/bin/python
 
+#####################################################################
+#                                                                   #
+# Script to index a Google Corpus file, preprocessed with the       #
+# mergeYears.py script, by its two initials, removing words not     #
+# appearing in an English dictionary.                               #
+#                                                                   #
+#####################################################################
+
 import os
 import sys
 
@@ -57,7 +65,7 @@ def divideByInitials(fileName):
 			continue
 
 		try:
-			currentWriteFile.write(actualWord + "\t" + fields[1])
+			currentWriteFile.write(word + "\t" + fields[1])
 		except IOError as io:
 			print ":: Error writing on file \"" + currentInitials + "\": " + io.strerror
 			exit(-1)

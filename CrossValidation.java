@@ -1,6 +1,5 @@
 
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +15,7 @@ public class CrossValidation
             System.exit(-1);
         }
         
+        /* Suppress all output from libsvm */
         svm_print_interface iface = new svm_print_interface() {
             @Override public void print(String string) {}
         };
@@ -43,7 +43,7 @@ public class CrossValidation
         double bestGamma = 0.0;
         
         double[] targets = new double[ samples.size() ];
-        double[] gs = new double[ samples.size() ];        
+        double[] gs = new double[ samples.size() ]; /* gold standard scores provided with the samples */     
         int i = 0;
         
         for (Iterator<TrainingSample> it = samples.iterator(); it.hasNext(); ) {

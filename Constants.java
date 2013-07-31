@@ -1,4 +1,3 @@
-
 import libsvm.svm_parameter;
 
 public class Constants
