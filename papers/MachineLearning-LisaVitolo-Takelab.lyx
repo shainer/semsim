@@ -1,0 +1,2994 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language british
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Indice
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 3cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation 0cm
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Machine learning project: TakeLab implementation
+\end_layout
+
+\begin_layout Author
+Lisa Vitolo, 1311230
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Semantic Textual Similarity
+\end_layout
+
+\begin_layout Standard
+The aim of the STS problem is to assign a degree of semantic similarity
+ to two sentences.
+ This is a problem that has many applications in the Natural Language field,
+ and has been presented for the first time as a pilot task in the Semeval
+ 2012 (Task 6).
+ You can find a list of submitted systems, data and proceedings, in their
+ official page: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.cs.york.ac.uk/semeval-2012/task6/
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Semantic similarity can be easily seen as a regression problem.
+ With regression we try to learn a function 
+\begin_inset Formula $f\,:\, X\rightarrow\mathbb{R}$
+\end_inset
+
+ where X is the sample space, in our case the infinite space of all the
+ possible sentence pairs written in English.
+ The values of this function are in the real domain.
+ In this problem we actually talk about a restricted domain, lying in the
+ range [0, 5].
+ This, however, doesn't affect the nature and solution of the problem.
+\end_layout
+
+\begin_layout Section
+TakeLab
+\end_layout
+
+\begin_layout Standard
+TakeLab 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+
+\end_inset
+
+ is one of the STS systems presented for solving the Semeval 2012 task.
+ Using the evaluation measures proposed in the presentation paper 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+, and discussed in the Results section, it ranked among the top fifth.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As mentioned above, solving the STS problem can be seen as solving a regression
+ task.
+ TakeLab - like many other systems presented for the contest - embraced
+ the machine learning approach, and Figure 1 shows a quick scheme of its
+ organization.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename takelab.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Organization of TakeLab
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Organization-of-TakeLab"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TakeLab actually presented two systems, called simple and syntax.
+ Their difference lies in the set of features they use, although some basic
+ features are shared.
+ The syntax system tries to exploit more syntactic dependencies and similarities
+ (for instance looking at the dependency parse trees).
+ The simple system is more focused on numerical values coming directly from
+ 
+\begin_inset Quotes eld
+\end_inset
+
+bag of words
+\begin_inset Quotes erd
+\end_inset
+
+ features, or from semantic-related tools such as WordNet.
+\end_layout
+
+\begin_layout Standard
+On average the simple system slighly outperformed syntax, so I decided to
+ implement this one for the project.
+\end_layout
+
+\begin_layout Subsection
+Similarity scores
+\end_layout
+
+\begin_layout Standard
+A brief note: similarity scores range from 0 (totally different sentences)
+ to 5 (the same sentence, even if in different words).
+ This is maintained in my implementation too.
+\end_layout
+
+\begin_layout Subsection
+Preprocessing steps
+\end_layout
+
+\begin_layout Standard
+Before features are extracted, sentence pairs are briefly preprocessed with
+ the following rules:
+\end_layout
+
+\begin_layout Itemize
+tokenization and Part-Of-Speech tagging;
+\end_layout
+
+\begin_layout Itemize
+hyphens and slashes are removed;
+\end_layout
+
+\begin_layout Itemize
+angular brackets 
+\begin_inset Quotes eld
+\end_inset
+
+<
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+>
+\begin_inset Quotes erd
+\end_inset
+
+ appearing at the beginning or at the end of tokens are removed;
+\end_layout
+
+\begin_layout Itemize
+some verb abbreviations typical of the English language, such as 
+\begin_inset Quotes eld
+\end_inset
+
+n't
+\begin_inset Quotes erd
+\end_inset
+
+, are expanded to their non-abbreviated form;
+\end_layout
+
+\begin_layout Itemize
+if a compound word appears as a single token in one sentence, but as two
+ consecutive tokens in the other, then it is replaced by one token in both;
+\end_layout
+
+\begin_layout Itemize
+stopwords are removed using a small list.
+ Stopwords are words that are so common in the language that they bear no
+ additional information about the semantics, and so can be ignored completely
+ without loss of generality.
+ Additionally, if two sentences have a lot of stopwords in common, this
+ doesn't increase much their probability of being similar.
+\end_layout
+
+\begin_layout Subsection
+Features
+\end_layout
+
+\begin_layout Standard
+Here I provide a quick overview of all the features implemented in the simple
+ system and in my implementation.
+ Detailed explanations and formulae can be found either in the Takelab paper,
+ or by reading my code.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An introductive node: the overlap between two generic sets is a measure
+ of how much elements they have in common.
+ It ranges from 0 (no common element) to 1 (identical sets).
+\end_layout
+
+\begin_layout Subsubsection
+NGram overlap
+\end_layout
+
+\begin_layout Standard
+Here we build two sets, one for each sentence, containing all the unigrams
+ (i.e.
+ tokens) from that sentence.
+ The first feature is the overlap degree between these two sets.
+\end_layout
+
+\begin_layout Standard
+Then we repeat the procedure for (consecutive) bigrams and (consecutive)
+ trigrams, that is sequences of 2 and 3 tokens.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Three additional features are obtained from the same overlaps, but instead
+ of using tokens as they are found in the sentences we use their lemmatization.
+ This is not present in the original Takelab implementation, but it was
+ added later as an improvement.
+\end_layout
+
+\begin_layout Subsubsection
+Wordnet-augmented word overlap
+\end_layout
+
+\begin_layout Standard
+Here we try to take into account different words that have however a quite
+ close meaning.
+ Such 
+\begin_inset Quotes eld
+\end_inset
+
+closeness
+\begin_inset Quotes erd
+\end_inset
+
+ is measured
+\end_layout
+
+\begin_layout Standard
+using the path length similarity in WordNet.
+\end_layout
+
+\begin_layout Subsubsection
+Weighted Word overlap
+\end_layout
+
+\begin_layout Standard
+Here we assign more importance to words bearing more content inside a sentence.
+ We define the information content of a token as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+ic(w)=\ln\frac{\sum_{w'}freq(w')}{freq(w)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So it's a measure of how frequently the token appears, compared with the
+ total frequency of all the possible tokens.
+ In order to obtain the frequency counts a corpus is needed.
+ The Google NGram Corpus collects and counts tokens from millions of books
+ written in English over a span of several decades.
+\end_layout
+
+\begin_layout Subsubsection
+Vector space sentence similarity
+\end_layout
+
+\begin_layout Standard
+Each sentence is represented by a vector obtained summing up the LSA vectors
+ of its tokens.
+ A first feature is the cosine similarity between the vectors of the two
+ sentences.
+ A second feature weights the LSA vectors with the information content of
+ the token before computing the cosine similarity.
+\end_layout
+
+\begin_layout Standard
+A LSA vector measures how frequently a word is found in several contexts,
+ with contexts represented by specific documents.
+ It has been proved that sentence pairs whose words often appear in the
+ same contexts are often assigned high similarity scores by annotators:
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-3"
+
+\end_inset
+
+ contains a more detailed discussion about this, as well as many other technique
+s for combining word vectors into sentence vectors.
+\end_layout
+
+\begin_layout Subsubsection
+Normalized differences
+\end_layout
+
+\begin_layout Standard
+Two normalized differences between the sentences are added as features:
+ sentence length and aggregate word information content.
+\end_layout
+
+\begin_layout Subsubsection
+Number overlaps
+\end_layout
+
+\begin_layout Standard
+This describes three features dealing entirely with numeric tokens, on the
+ basis that the human annotators for the training set often gave low similarity
+ scores to sentence pairs where the numbers differed a lot.
+\end_layout
+
+\begin_layout Subsubsection
+Named Entity
+\end_layout
+
+\begin_layout Standard
+Two types of Named Entity have been considered: words starting with a capital
+ letter, and stock index symbols.
+ In the first case of course there is a loss of precision due to the fact
+ that not all words starting with a capital letter are actually named entities,
+ but perhaps the authors thought it was a good tradeoff with respect to
+ using an external recognizer.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Among the training sets provided for the contest, economics seems to be
+ a recurring topic, and thus stock index symbols are mentioned in the sentences.
+ Another overlap feature in the system is dedicated to them.
+\end_layout
+
+\begin_layout Subsection
+10-fold cross-validation
+\end_layout
+
+\begin_layout Standard
+The Support Vector Regressor needs some parameters that control its internal
+ behaviour, depending on which kernel is used.
+ Let's see how the best set of parameters is found among a span of possible
+ choices.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Choosing the wrong parameters can affect the system performances a lot:
+ we want our system to be able to generalize well to a test set that may
+ be quite different from the training set.
+ Indeed, cross-validation has been proved an efficient method in reducing
+ the common issue of overfitting.
+\end_layout
+
+\begin_layout Standard
+Both the original TakeLab and my implementation use 10-fold cross-validation.
+ I performed cross-validation on an union of all the training files.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A k-fold cross validation starts by randomly partitioning the data into
+ k subsets.
+ k-1 subsets are used to train a model with the current combination of parameter
+s, while the remaining one is kept aside for validating it.
+ The training is repeated so that every subset plays the role of the validation
+ set once; this way, the cross validation ensures that the performance doesn't
+ depend too much on the initial random partition.
+ Furthermore, the cross validation tries to create subsets composed of sentence
+ pairs that vary as much as possible in their target scores.
+\end_layout
+
+\begin_layout Standard
+The mean of the results obtained on the k validation sets (usually measured
+ in terms of correlation) is the performance measure for that particular
+ combination of parameters.
+\end_layout
+
+\begin_layout Standard
+This is repeated for all the possible choice of parameters we consider as
+ options.
+ The final choice used in the application is
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\left(\begin{array}{c}
+C\\
+p\\
+\gamma
+\end{array}\right)=\left(\begin{array}{c}
+1\\
+0.02\\
+2
+\end{array}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Support Vector Regression
+\end_layout
+
+\begin_layout Standard
+Support Vector Regression is a supervised learning technique which was developed
+ as an extension of support vector machines for regression problems.
+ Since it's supervised, we assume a given dataset 
+\begin_inset Formula $D=\left\{ (x_{1},y_{1}),...,(x_{n},y_{n})\right\} $
+\end_inset
+
+ with n input samples drawn from an input space X, and target values belonging
+ to the real domain.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The goal of 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+-SV regression (the one used in my system) is finding a function f(x) that
+ has at most 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ deviation from the real targets 
+\begin_inset Formula $y_{i}$
+\end_inset
+
+ for all the training data, while at the same time being as flat as possible.
+ So 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the maximum error the function is allowed to make while giving answers.
+\end_layout
+
+\begin_layout Standard
+Let's start with a linear function f, described as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x)=w\cdot x+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula $w\in X$
+\end_inset
+
+, 
+\begin_inset Formula $b\in\mathbb{R}$
+\end_inset
+
+.
+ Flatness means that we define the following minimization problem on w:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\min\frac{1}{2}\Vert w\Vert^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+subject to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+|y_{i}-w\cdot x_{i}-b|\leq\varepsilon
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(the constraint on the allowed error).
+ We are assuming that a function exists that solves this problem, but this
+ is not always the case, and we may allow some variations for the norm.
+ Introducing slack variables, the new problem formulation is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\min\frac{1}{2}\Vert w\Vert^{2}+C\sum_{i=1}^{n}\left(\xi_{i}+\xi_{i}^{*}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where C describes the tradeoff between the flatness of f and how much we
+ tolerate errors above the threshold 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using Lagrange multipliers it can be proved that:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w=\sum_{i=1}^{n}(\alpha_{i}-\alpha_{i}^{*})x_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x)=\sum_{i=1}^{n}(\alpha_{i}-\alpha_{i}^{*})(x_{i}\cdot x)+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ values are positive Lagrange multipliers.
+ Note how w is now completely described with a linear combination of the
+ training samples, and it's not needed to compute it explicitly.
+ Moreover, the complexity of the function is independent of the dimension
+ of the input space X.
+\end_layout
+
+\begin_layout Standard
+At this point we need to generalize the procedure to nonlinear functions.
+ This can be achieved by simply preprocessing the training inputs 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ with a function 
+\begin_inset Formula $\phi$
+\end_inset
+
+ that brings them into another feature space F.
+ Then the standard SV regression algorithm is applied.
+ The SVR equations are rewritten as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w=\sum_{i=1}^{n}(\alpha_{i}-\alpha_{i}^{*})\Phi(x_{i})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x)=\sum_{i=1}^{n}(\alpha_{i}-\alpha_{i}^{*})k(x_{i},x)+b
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where k is the kernel function; admissible kernel functions must correspond
+ to the dot product in some feature space F.
+ Note that now w must be computed separately.
+ My system uses the radial basis (RBF) kernel:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+K(x_{i},x_{j})=e^{(-\gamma\Vert x_{i}-x_{j}\Vert^{2})},\quad\gamma>0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+SVR parameters
+\end_layout
+
+\begin_layout Standard
+It is now immediate to explain the meaning of the parameters we considered
+ during cross-validation:
+\end_layout
+
+\begin_layout Itemize
+p is the threshold, or maximum allowed deviation, 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Itemize
+C is the tradeoff factor in the minimization problem;
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\gamma$
+\end_inset
+
+ is a parameter of the RBF kernel;
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Subsection
+Directory layout
+\end_layout
+
+\begin_layout Standard
+Once the project archive has been uncompressed, enter the 
+\begin_inset Quotes eld
+\end_inset
+
+semanticsimilarity
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
+ This is the project root directory and contains everything you need to
+ launch the program.
+\end_layout
+
+\begin_layout Itemize
+lib/ : a directory containing JAR files for the external libraries used
+ by the application;
+\end_layout
+
+\begin_layout Itemize
+src/ : contains the Java source codes;
+\end_layout
+
+\begin_layout Itemize
+src/scripts/ : several Python scripts I've found useful while developing
+ the application;
+\end_layout
+
+\begin_layout Itemize
+googlebooks/ : contains the Google NGram corpus;
+\end_layout
+
+\begin_layout Itemize
+train/ : training files;
+\end_layout
+
+\begin_layout Itemize
+test/ : test files;
+\end_layout
+
+\begin_layout Itemize
+lsa_matrix.txt: text file with the LSA vectors;
+\end_layout
+
+\begin_layout Itemize
+similarityModel.txt: a trained semantic similarity model that can be immediately
+ used for testing;
+\end_layout
+
+\begin_layout Itemize
+word-frequencies.txt: a subset of the Google NGram corpus used to speed up
+ lookups during training.
+\end_layout
+
+\begin_layout Standard
+The application expects most of the data (such as the similarity model,
+ or the LSA matrix) to be found at exactly these locations while running.
+ Moving or renaming files will most likely result in runtime errors and
+ malfunctioning of the program.
+\end_layout
+
+\begin_layout Subsection
+Dependencies
+\end_layout
+
+\begin_layout Standard
+My TakeLab implementation uses the following external libraries:
+\end_layout
+
+\begin_layout Itemize
+Stanford Core NLP, for tokenization, Part-of-Speech tagging, and lemmatization;
+\end_layout
+
+\begin_layout Itemize
+WS4j, a library for computing WordNet 3.0 similarity scores using an internal
+ copy of the database;
+\end_layout
+
+\begin_layout Itemize
+LibSVM is an implementation of the Support Vector Regression, found at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+the lib/ subdirectory in the project root contains the JAR files for these
+ libraries.
+ The stanford-corenlp-models.jar file is needed to load the machine learning
+ models used by the NLP pipeline.
+\end_layout
+
+\begin_layout Subsection
+Sample files
+\end_layout
+
+\begin_layout Standard
+Training and test files were provided by the Semeval 2012 Task 6, so that
+ all systems could be evaluated on the same samples.
+ Each sample file was actually split in two: one text file for the sentence
+ pairs, called STS.input.<name>.txt, and another with the annotated similarity
+ scores, named STS.gs.<name>.txt.
+\end_layout
+
+\begin_layout Standard
+In order to simplify command line arguments and I/O operations, the 
+\family typewriter
+\size small
+putOutput.py
+\family default
+\size default
+ script merged the two of them into one text file organized this way:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<sentence 1>TAB<sentence 2>TAB<similarity score>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is also the only format recognized by my application.
+ All the sample files you see in the subdirectories are already in this
+ format, but 
+\family typewriter
+\size small
+putOutput.py
+\family default
+\size default
+ is available in the src/scripts/ folder should you need to convert new
+ samples.
+\end_layout
+
+\begin_layout Subsection
+The Google NGram Corpus
+\end_layout
+
+\begin_layout Standard
+The Google NGram corpus is a huge resource, collecting frequency counts
+ for English tokens spanning across several decades.
+ Unfortunately it is not really optimized for a huge sequences of queries,
+ so I applied some processing steps in order to reduce its volume to a manageabl
+e size, also in terms of occupied disk space:
+\end_layout
+
+\begin_layout Itemize
+the frequency counts for punctuaction characters were not downloaded, since
+ their information content is not really relevant for this semantic task;
+\end_layout
+
+\begin_layout Itemize
+all the counts for the same token, but different year, were summed together.
+\end_layout
+
+\begin_layout Itemize
+each row contains only the token, its POS tag, and the frequency count;
+ additional information about where the occurrences were found were deleted.
+\end_layout
+
+\begin_layout Itemize
+counts have been 
+\begin_inset Quotes eld
+\end_inset
+
+indexed
+\begin_inset Quotes erd
+\end_inset
+
+ by the first two initials.
+ The googlebooks/ directory contains a subdirectory for each initial letter;
+ these subdirectories contain in turn a text file for each pair of initial
+ letters.
+ So for instance the a/ folder contains 
+\begin_inset Quotes eld
+\end_inset
+
+aa
+\begin_inset Quotes erd
+\end_inset
+
+ for all the tokens starting with 
+\begin_inset Quotes eld
+\end_inset
+
+aa
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+ab
+\begin_inset Quotes erd
+\end_inset
+
+, and so on.
+ A special file oneLetter groups together 1-character tokens.
+\end_layout
+
+\begin_layout Itemize
+All the tokens not appearing in an online English dictionary, stored in
+ the dictionary/ folder, have been ignored.
+ The comparison was case insensitive.
+ The dictionary is the Ispell English Word Lists, chosen because it includes
+ inflected forms of verbs and nouns (e.g.
+ plurals).
+ It can be downloaded from 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://wordlist.sourceforge.net/
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+These steps were applied using the 
+\family typewriter
+\size small
+mergeYears.py
+\family default
+\size default
+ and 
+\family typewriter
+\size small
+divideByInitials.py 
+\family default
+\size default
+Python scripts.
+\end_layout
+
+\begin_layout Standard
+Thanks to this, plus some internal caching, lookups inside the corpus don't
+ add much overhead to the execution time.
+\end_layout
+
+\begin_layout Subsection
+Compiling and using the application
+\end_layout
+
+\begin_layout Standard
+Open a shell in the project root directory.
+ The first step is setting the classpath so that both our source codes and
+ the JAR files are visible to the Java Virtual Machine.
+ On a GNU/Linux system you can for example set the environment variable
+ with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ export CLASSPATH=lib/stanford-corenlp.jar:lib/stanford-corenlp-models.jar:lib/li
+bsvm.jar:lib/ws4j.jar:src/
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Anyway, the paths you need to add are those to the four JAR files in lib/,
+ plus src/ for our sources.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now compile the application with
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ javac src/SemanticSimilarity.java
+\end_layout
+
+\begin_layout Standard
+And run it with
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ java SemanticSimilarity
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Running it without command-line arguments results in a small error printed
+ on standard output.
+ The application accepts arguments for training a new system, or for testing
+ an existing one.
+ The command
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ java SemanticSimilarity --training <list of training files>
+\end_layout
+
+\begin_layout Standard
+performs feature extraction and training on the given sample file(s).
+ The output is a SVR model, stored in 
+\family typewriter
+\size small
+similarityModel.txt
+\family default
+\size default
+.
+ An example is:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ java SemanticSimilarity --training train/MSRvid.txt train/MSRpar.txt train/SMTeu
+roparl.txt
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Testing a model:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ java SemanticSimilarity <list of test files>
+\end_layout
+
+\begin_layout Standard
+For instance:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ java SemanticSimilarity test/OnWN test/MSRpar.txt test/MSRvid.txt test/SMTeuropa
+rl.txt test/SMTnews.txt
+\end_layout
+
+\begin_layout Standard
+This prints some correlation values that were picked as valuable performance
+ measures in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+.
+ See the Results section for an explanation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As mentioned, the parameters for the SVR have been computed in advance using
+ cross validation, and they are accessible inside the application as simple
+ constants.
+ However, the project also includes a small Java class that performs cross
+ validation.
+ It has the same requirements as SemanticSimilarity, so after setting up
+ the classpath as above you can compile and run it:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ javac src/CrossValidation.java
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size small
+$ java CrossValidation <list of sample files>
+\end_layout
+
+\begin_layout Standard
+At the end it will output the best choice, complete with the Pearson correlation
+ it obtained on the samples.
+ It is recommended that you cross validate on all the training files found
+ in the train/ subdirectory for the most accurate results.
+\end_layout
+
+\begin_layout Standard
+Keep in mind that the task is quite computationally expensive, due, among
+ other things, to the huge number of parameter combinations we evaluate
+ (700).
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+The Pearson correlation is used to measure the accuracy of the semantic
+ similarity system with respect to the Gold Standard annotations.
+ I compute the correlation for each test file, plus two of the three aggregate
+ measures described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+: the ALL correlation is simply the correlation of all the test samples
+ concatenated together.
+ The Mean correlation is an average weighted with the number of samples
+ in each test file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In Table 1, my results are compared with the original Takelab results, found
+ in their presentation paper, and with the baseline for the Semeval task.
+ The baseline scores are produced using just one feature, a simple word
+ overlap.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+My implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topspace="default" bottomspace="default">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSRpar.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.64
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.73
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSRvid.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.77
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.88
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.30
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SMTeuroparl.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.39
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.47
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.45
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SMTnews.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.39
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OnWN.txt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.61
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.68
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.58
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It appears that the low results obtained for the SMTeuroparl set are somewhat
+ expected keeping in mind that systems for such complex tasks tend to overfit
+ on the format of the training data.
+ The Takelab authors state that the SMTeuroparl training set differs a lot
+ from the corresponding test set: the latter tends towards significantly
+ shortest sentences, and many short identical sentences are repeated multiple
+ times.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Next, I performed small changes on the system to understand how this affected
+ its performances.
+ For simplicity, only the new aggregated correlations were reported.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+New
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.58
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+C=1, P=1, G=2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Table 2 shows that a not-so-big variation of P doesn't have an important
+ influence on average.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+New
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.57
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+C=1, P=1, G=0.02
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From Table 3: as expected, if also G is changed, it starts to matter.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+New
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.46
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.35
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+C=1000, P=0.02, G=2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Table 4 shows the biggest variation: C was set to the maximum value possible.
+ Together with the terrible performances, it also resulted in a much slower
+ training process.
+ This is understandable looking at the value of P: the algorithm has to
+ make an effort in order to keep the error below a quite restrictive threshold
+ for almost all the training samples.
+ It is my guess that such a complicated task is eventually managed by overfittin
+g to the slightest details to the training set, hence the poor results on
+ the test set.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+New
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.56
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.42
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+C=1000, P=1, G=2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The idea presented in Table 4 is partially verified by the results of Table
+ 5.
+ Now P was set to the highest possible value too, allowing some more freedom
+ in the training process.
+ Indeed the training took place at the usual speed again, but still there
+ is too much overfitting for good performances.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+New
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.53
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+No information content features
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+New
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Default implementation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Takelab
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baseline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.47
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.37
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.67
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.43
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+No preprocessing steps apart from tokenization, POS tagging and lemmatization
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It must be noted, however, that results obtained from removing the preprocessing
+ steps and the features may not correspond entirely to reality.
+ For a completely accurate comparison I should have run the cross validation
+ on the new set of features, and trained the model with the new parameters.
+ This was avoided simply because the cross validation step is too much computati
+onally expensive.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+F.
+ Šarić, G.
+ Glavaš, M.
+ Karan, J.
+ Šnajder, B.D.
+ Bašić.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+TakeLab: systems for measuring semantic textual similarity
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+E.
+ Agirre, D.
+ Cer, M.
+ Diab, A.
+ Gonzalez-Agirre.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+SemEval-2012 Task 6: a Pilot on Semantic Textual Similarity
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-3"
+
+\end_inset
+
+C.W.
+ Hsu, C.C.
+ Chang, C.J.
+ Lin.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+A practical guide to support vector classification.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+A.J.
+ Smola, B.
+ Schölkopf.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+A tutorial on Support Vector Regression.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-3"
+
+\end_inset
+
+J.
+ Mitchell, M.
+ Lapata.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Vector-based models of semantic composition.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
