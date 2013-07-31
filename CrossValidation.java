@@ -1,41 +1,54 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import libsvm.*;
 
-/**
- *
- * @author shainer
- */
+
 public class CrossValidation
 {
     public static void main(String[] args)
     {
-        if (args.length != 1) {
-            System.out.println(":: Usage: java CrossValidation <sample file>");
+        if (args.length == 0) {
+            System.out.println("Usage: CrossValidation <sample files>");
             System.exit(-1);
         }
         
-        String[] files = { args[0] };
-        SimilarityLearner sl = new SimilarityLearner(true);
+        /* Suppress all output from libsvm */
+        svm_print_interface iface = new svm_print_interface() {
+            @Override public void print(String string) {}
+        };
+        svm.svm_set_print_string_function(iface);
         
+        Properties prop = new Properties();
+        prop.put("annotators", "tokenize, ssplit, pos, lemma");
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(prop);
+        System.out.println(":: Stanford NLP pipeline initialized correctly.");
+        
+        String[] files = { args[0] };
+        SimilarityLearner sl = new SimilarityLearner(pipeline);
+
         List<TrainingSample> samples = sl.extractFeatures(files);
         svm_problem problem = sl.buildSVMProblem(samples);
-        svm_parameter parameters = Defines.getSVMParameters();
-        double[] realTargets = problem.y;
-        double[] validatedTargets = new double[ realTargets.length ];
         
-        double[] C_values = Defines.getCValues();
-        double[] P_values = Defines.getPValues();
-        double[] G_values = Defines.getGammaValues();
-        
-        int best = 0;
+        svm_parameter parameters = Constants.getSVMParameters();
+        double[] C_values = Constants.getCValues();
+        double[] P_values = Constants.getPValues();
+        double[] G_values = Constants.getGammaValues();
+
+        double bestCorr = Double.MIN_VALUE;
         double bestC = 0.0;
         double bestP = 0.0;
         double bestGamma = 0.0;
+        
+        double[] targets = new double[ samples.size() ];
+        double[] gs = new double[ samples.size() ]; /* gold standard scores provided with the samples */     
+        int i = 0;
+        
+        for (Iterator<TrainingSample> it = samples.iterator(); it.hasNext(); ) {
+            gs[i++] = it.next().target;
+        }
         
         System.out.println(":: Starting cross validation.");
         
@@ -48,15 +61,18 @@ public class CrossValidation
                 for (int iG = 0; iG < G_values.length; iG++) {
                     parameters.gamma = G_values[iG];
                     
-                    svm.svm_cross_validation(problem, parameters, Defines.getValidationFold(), validatedTargets);
-                    int correctCount = compareResults(realTargets, validatedTargets);
+                    System.out.println("Trying C = " + parameters.C + ", P = " + parameters.p + ", G = " + parameters.gamma);
                     
-                    if (correctCount > best) {
+                    svm.svm_cross_validation(problem, parameters, Constants.getValidationFold(), targets);
+                    double corr = Correlation.getPearsonCorrelation(targets, gs);
+                    
+                    if (corr > bestCorr) {
+                        System.out.println(":: New best correlation is " + corr);
+                        bestCorr = corr;
                         bestC = C_values[iC];
                         bestP = P_values[iP];
                         bestGamma = G_values[iG];
                     }
-                    System.out.println("ROUND FINISHED.");
                 }
             }
         }
@@ -65,18 +81,6 @@ public class CrossValidation
         System.out.println("C: " + bestC);
         System.out.println("P: " + bestP);
         System.out.println("Gamma: " + bestGamma);
-    }
-    
-    public static int compareResults(double[] real, double[] cross)
-    {
-        int correct = 0;
-        
-        for (int i = 0; i < real.length; i++) {
-            if (real[i] - cross[i] <= Defines.getTolerance()) {
-                correct++;
-            }
-        }
-        
-        return correct;
+        System.out.println("Best correlation is " + bestCorr);
     }
 }

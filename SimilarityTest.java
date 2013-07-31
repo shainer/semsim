@@ -1,43 +1,39 @@
-import cmu.arktweetnlp.Tagger;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import libsvm.*;
 
-/**
- * NOTE: use printSimilaritiesFromFile, it's quicker
+/*
+ * Tests the system on new samples
  */
-public class SimilarityTester
+public class SimilarityTest
 {
     private FeatureCollector fc;
-    private Tagger tagger;
     private svm_model model;
+    private StanfordCoreNLP nlp;
     
-    public SimilarityTester()
-    {        
+    public SimilarityTest(StanfordCoreNLP nlp)
+    {
         System.out.print(":: Initializing feature collector with LSA... ");
         this.fc = new FeatureCollector();
         System.out.println("OK.");
         
-        System.out.print(":: Initializing tokenizer and POS tagger... ");
-        this.tagger = new Tagger();
+        this.nlp = nlp;
         
-        try {
-            this.tagger.loadModel( Defines.getTaggerModelPath() );
-            System.out.println("OK.");
-            
+        try {            
             System.out.print(":: Loading similarity model from file... ");
-            this.model = svm.svm_load_model( Defines.getSimilarityModelPath() );
+            this.model = svm.svm_load_model( Constants.getSimilarityModelPath() );
             System.out.println("OK.");
         } catch (IOException e) {
-            System.err.println("Error loading models: " + e.getLocalizedMessage());
+            System.err.println("\nError loading model: " + e.getLocalizedMessage());
         }        
     }
     
     public double getSimilarity(SentencePair sp)
     {
         double[] features = fc.features(sp);
-        svm_node[] node = new svm_node[ Defines.getFeatureNumber() ];
+        svm_node[] node = new svm_node[ Constants.getFeatureNumber() ];
         
         for (int i = 0; i < features.length; i++) {
             node[i] = new svm_node();
@@ -45,11 +41,9 @@ public class SimilarityTester
             node[i].value = features[i];
         }
         
-        /* Scaling similarity ? */
         double sim = svm.svm_predict(model, node);
-        //sim *= (5.0 / 8.0);
-        //sim = (5.0 * (sim + 1.0)) / 8.0;
 
+        /* Corner cases, they should happen rarely */
         if (sim < 0.0) {
             sim = 0.0;
         } else if (sim > 5.0) {
@@ -61,7 +55,6 @@ public class SimilarityTester
     
     public double[] getSimilarities(List<SentencePair> sps)
     {
-        //System.out.println(":: Getting similarities for " + sps.size() + " pairs");
         double[] sims = new double[ sps.size() ];
         int simIndex = 0;
         
@@ -76,6 +69,7 @@ public class SimilarityTester
     {
         /* Used to compute the mean of all the correlations */
         double[] correlations = new double[filepaths.length];
+        int[] sampleNumbers = new int[filepaths.length];
         
         /* Used to compute the total Pearson correlation */
         ArrayList<Double> allAnswers = new ArrayList<>();
@@ -89,12 +83,14 @@ public class SimilarityTester
             for (String line : IOUtils.readlines(filepath)) {
                 String[] fields = line.split("\t");
 
-                SentencePair sp = new SentencePair(fields[0], fields[1], tagger);
+                SentencePair sp = new SentencePair(fields[0], fields[1], nlp);
                 double rightAnswer = Double.parseDouble(fields[2]);
                 double answer = getSimilarity(sp);
 
                 answers.add(answer);
                 gsAnswers.add(rightAnswer);
+                
+                sampleNumbers[p]++;
             }
 
             allAnswers.addAll(answers);
@@ -112,19 +108,25 @@ public class SimilarityTester
         Double[] scores2 = allGsAnswers.toArray( new Double[allGsAnswers.size()] );
         double totCorr = Correlation.getPearsonCorrelation(scores1, scores2);
         
-        System.out.println("Mean Pearson correlation: " + average(correlations));
+        System.out.println("Mean Pearson correlation: " + average(correlations, sampleNumbers));
         System.out.println("Total Pearson correlation: " + totCorr);
     }
     
     /* Simple unweighted average */
-    private double average(double[] values)
+    private double average(double[] values, int[] weights)
     {
         double av = 0.0;
         
         for (int i = 0; i < values.length; i++) {
-            av += values[i];
+            av += (values[i] * weights[i]);
         }
         
-        return (av / (double)values.length);
+        double sum = 0.0;
+        
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i];
+        }
+        
+        return (av / sum);
     }
 }

@@ -1,18 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.math.BigInteger;
 
-/**
- *
- * @author shainer
+/*
+ * The Takelab authors have grouped together the frequency counts for all the words found in the
+ * training files in one text file. Here we read from that file in order to speed up things.
+ * 
+ * The frequency file doesn't use any POS tag.
  */
-public class FrequencyCounterFile extends FrequencyCounter
+public class FrequencyCounterFile implements FrequencyCounter
 {
     private Map<String, BigInteger> frequencyCounts;
     private BigInteger totalCount;
@@ -28,7 +25,7 @@ public class FrequencyCounterFile extends FrequencyCounter
             if (fields.length > 1) {
                 frequencyCounts.put(fields[0], new BigInteger(fields[1]));
             } else {
-                totalCount = new BigInteger(fields[0]);
+                totalCount = new BigInteger(fields[0]); /* the first row is the total */
             }
         }
     }
@@ -48,7 +45,4 @@ public class FrequencyCounterFile extends FrequencyCounter
     {
         return totalCount;
     }
-    
-    public @Override void createCache(List<SentencePair> sps) {}
-    public @Override void destroyCache() {}
 }

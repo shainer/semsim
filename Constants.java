@@ -1,39 +1,30 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import libsvm.svm_parameter;
 
-/**
- *
- * @author shainer
- */
-public class Defines
+public class Constants
 {
     private static final int FEATURE_SIZE = 19;
-    private static final int LSA_VECTOR_SIZE = 100;
     private static final String[] stopWords = {"i", "a", "about", "an", "are", "as", "at", "be", "by", "for", "from",
                                                "how", "in", "is", "it", "of", "on", "or", "that", "the", "this", "to",
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
                                                "have", "has", "had", "were", "'ll"};
-    private static final double tolerance = 0.6;
     
-    private static final String taggerModelPath = "taggerModel";
     private static final String similarityModelPath = "similarityModel.txt";
+
+    /* LSA constants */
+    private static final String lsaMatrixPath = "lsa_matrix.txt";
+    private static final int LSA_VECTOR_SIZE = 100;
     
+    /* Constants for CrossValidation.java */
     private static final int CROSS_VALIDATION_FOLD = 10;
     private static final double[] C_VALUES = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000};
     private static final double[] P_VALUES = {1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01};
     private static final double[] G_VALUES = {2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002};
     
+    /* Optimal parameters for the regressor */
     private static final double C = 1;
     private static final double P = 0.02;
     private static final double G = 2;
-    
-    private static StanfordCoreNLP nlp;
-    
+        
     public static int getFeatureNumber()
     {
         return FEATURE_SIZE;
@@ -44,14 +35,14 @@ public class Defines
         return stopWords;
     }
     
-    public static String getTaggerModelPath()
-    {
-        return taggerModelPath;
-    }
-    
     public static String getSimilarityModelPath()
     {
         return similarityModelPath;
+    }
+    
+    public static String getLSAMatrixPath()
+    {
+        return lsaMatrixPath;
     }
     
     public static int getLSAVectorSize()
@@ -59,15 +50,14 @@ public class Defines
         return LSA_VECTOR_SIZE;
     }
     
-    public static double getTolerance()
-    {
-        return tolerance;
-    }
-    
     public static svm_parameter getSVMParameters()
     {
         svm_parameter param = new svm_parameter();
         
+        /* 
+         * These parameters are taken from the Takelab suggestions.
+         * See report for an explanation of their meaning.
+         */
         param.svm_type = svm_parameter.EPSILON_SVR;
         param.kernel_type = svm_parameter.RBF;
         param.cache_size = 10.0;
@@ -109,15 +99,5 @@ public class Defines
     public static double getBestGamma()
     {
         return G;
-    }
-    
-    public static void setStanford(StanfordCoreNLP n)
-    {
-        nlp = n;
-    }
-    
-    public static StanfordCoreNLP getStanford()
-    {
-        return nlp;
     }
 }

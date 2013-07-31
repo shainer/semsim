@@ -1,20 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-import java.io.BufferedReader;
 import java.util.List;
 import java.util.LinkedList;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
-/**
- *
- * @author shainer
- */
 public class IOUtils
 {
     public static List<String> readlines(String input)
@@ -36,38 +25,5 @@ public class IOUtils
         }
         
         return lines;
-    }
-    
-    public static String readJSONFromStdin()
-    {
-        String content = "";
-        String tmp;
-        int parenCounter = 0;
-
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-            while (true) {
-                tmp = reader.readLine();
-                content += tmp + "\n";
-
-                if (tmp.contains("{")) {
-                    parenCounter++;
-                }
-                if (tmp.contains("}")) {
-                    parenCounter--;
-                    
-                    if (parenCounter == 0) {
-                        content += "\n";
-                        break;
-                    }
-                }
-            }
-        } catch (IOException ex) {
-            System.err.println(":: Error reading from stdin: " + ex.getMessage());
-            System.exit(-1);
-        }
-
-        return content;
     }
 }
