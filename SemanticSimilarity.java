@@ -21,7 +21,7 @@ public class SemanticSimilarity
         /* If a properties file is passed, it must contains options for training the system. */
         if ((paramIndex = findParameter(args, "--parameters")) != -1) {
             trainSystem(args, paramIndex, pipeline);
-        } else { /* otherwise, proceed with using the system */   
+        } else { /* otherwise, proceed with using the system */ 
             String inputFile = null;
             String outputFile = null;
             
@@ -34,7 +34,6 @@ public class SemanticSimilarity
             }
 
             /* Parses a JSON tweet */
-            
             System.out.print(":: Parsing input tweet... ");
             TweetParser tp = new TweetParser(inputFile, outputFile, pipeline);
             tp.parse();

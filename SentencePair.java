@@ -6,13 +6,12 @@
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ListIterator;
-
-import cmu.arktweetnlp.Tagger;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import java.util.Iterator;
 
 /**
  *
@@ -23,93 +22,74 @@ public class SentencePair
     public List<POSTaggedToken> s1;
     public List<POSTaggedToken> s2;
     
-    public List<POSTaggedToken> sLemma1;
-    public List<POSTaggedToken> sLemma2;
+    private StanfordCoreNLP nlp;
     
-    public SentencePair(List<String> s1Tokens, List<String> s1Tags, String s2, Tagger tagger)
+    public SentencePair(List<String> s1Tokens, List<String> s1Tags, List<String> s1Lemmas, String s2Text, StanfordCoreNLP nlp)
     {
+        this.nlp = nlp;
         this.s1 = new LinkedList<>();
         this.s2 = new LinkedList<>();
         
         for (int i = 0; i < s1Tokens.size(); i++) {
-            POSTaggedToken tt = new POSTaggedToken( (String)s1Tokens.get(i), (String)s1Tokens.get(i) );
+            POSTaggedToken tt = new POSTaggedToken( s1Tokens.get(i), s1Tags.get(i) );
             this.s1.add(tt);
         }
        
-        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
-            this.s2.add( new POSTaggedToken(tt) );
-        }
+        createSentence(s2Text, this.s2);
+        preprocess();
+        lemmatize(this.s2);
         
         preprocess();
     }
     
-    public SentencePair(String s1, String s2, Tagger tagger)
+    public SentencePair(String text1, String text2, StanfordCoreNLP nlp)
     {
         this.s1 = new LinkedList<>();
         this.s2 = new LinkedList<>();
-        this.sLemma1 = new LinkedList<>();
-        this.sLemma2 = new LinkedList<>();
+        this.nlp = nlp;
         
-        Annotation d1 = new Annotation(s1);
-        Annotation d2 = new Annotation(s2);
-        StanfordCoreNLP nlp = Defines.getStanford();
-        
-        nlp.annotate(d1);
-        for (CoreMap sentence : d1.get(CoreAnnotations.SentencesAnnotation.class)) {
-            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                POSTaggedToken tt = new POSTaggedToken();
-                tt.token = token.toString();
-                tt.tag = translateTag(token.tag());
-                this.s1.add(tt);
-            }
-        }
-        
-        nlp.annotate(d2);
-        
-        for (CoreMap sentence : d2.get(CoreAnnotations.SentencesAnnotation.class)) {
-            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                POSTaggedToken tt = new POSTaggedToken();
-                tt.token = token.toString();
-                tt.tag = translateTag(token.tag());
-                this.s2.add(tt);
-            }
-        }
-                
-//        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s1)) {
-//            this.s1.add( new POSTaggedToken(tt) );          
-//        }
-//        
-//        for (Tagger.TaggedToken tt : tagger.tokenizeAndTag(s2)) {
-//            this.s2.add( new POSTaggedToken(tt) );
-//        }
-        
+        createSentence(text1, this.s1);
+        createSentence(text2, this.s2);
         preprocess();
-        s1 = "";
-        s2 = "";
+        lemmatize(this.s1);
+        lemmatize(this.s2);        
+    }
+    
+    private void createSentence(String text, List<POSTaggedToken> sentence)
+    {
+        Annotation d = new Annotation(text);
+        nlp.annotate(d);
         
-        for (POSTaggedToken tt : this.s1) {
-            s1 += tt.token + " ";
-        }
-        for (POSTaggedToken tt : this.s2) {
-            s2 += tt.token + " ";
-        }
-        
-        d1 = new Annotation(s1);
-        nlp.annotate(d1);
-        for (CoreMap sentence : d1.get(CoreAnnotations.SentencesAnnotation.class)) {
-            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                this.sLemma1.add( new POSTaggedToken(token.lemma(), token.tag()) );
+        for (CoreMap ss : d.get(CoreAnnotations.SentencesAnnotation.class)) {
+            for (CoreLabel token : ss.get(CoreAnnotations.TokensAnnotation.class)) {
+                sentence.add( new POSTaggedToken(token.toString(), translateTag(token.tag())) );
             }
         }
+    }
+    
+    private void lemmatize(List<POSTaggedToken> sentence)
+    {
+        String text = "";
         
-        d2 = new Annotation(s2);
-        nlp.annotate(d2);
-        
-        for (CoreMap sentence : d2.get(CoreAnnotations.SentencesAnnotation.class)) {
-            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                this.sLemma2.add( new POSTaggedToken(token.lemma(), token.tag()));
-            }
+        for (POSTaggedToken tt : sentence) {
+            text += tt.token + " ";
         }
+        
+        Annotation d = new Annotation(text);
+        nlp.annotate(d);
+        
+        for (CoreMap ss : d.get(CoreAnnotations.SentencesAnnotation.class)) {
+            Iterator<CoreLabel> itToken = ss.get(CoreAnnotations.TokensAnnotation.class).iterator();
+            ListIterator<POSTaggedToken> itSentence = sentence.listIterator();
+            
+            while (itToken.hasNext() && itSentence.hasNext()) {
+                CoreLabel token = itToken.next();
+                POSTaggedToken tt = itSentence.next();
+                tt.lemma = token.lemma();
+                
+                itSentence.set(tt);
+            }
+        } 
     }
     
     private String translateTag(String tag)
@@ -166,6 +146,10 @@ public class SentencePair
             return "D";
         }
         
+        if (tag.equals("$") || tag.equals(",") || tag.equals("(") || tag.equals(")") || tag.equals(".") || tag.equals(":")) {
+            return ",";
+        }
+        
         return "G";
     }
     
@@ -182,19 +166,7 @@ public class SentencePair
         for (POSTaggedToken tt : s2) {
             p += tt + ", ";
         }
-        
-        p += "\n";
-        
-        for (POSTaggedToken tt: sLemma1) {
-            p += tt.token + " ";
-        }
-        
-        p += "\n";
-        
-        for (POSTaggedToken tt : sLemma2) {
-            p += tt.token + " ";
-        }
-        
+
         p += "\n";
         return p;
     }
@@ -256,7 +228,7 @@ public class SentencePair
 
     private POSTaggedToken removeStopWords(POSTaggedToken tt)
     {
-        String[] stopWords = Defines.getStopWords();
+        String[] stopWords = Constants.getStopWords();
 
         for (int i = 0; i < stopWords.length; i++) {
             if (stopWords[i].equals( tt.token.toLowerCase() )) {

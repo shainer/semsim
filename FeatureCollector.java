@@ -1,26 +1,16 @@
-/*
- * Feature extraction module.
- */
-
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ListIterator;
 import edu.cmu.lti.ws4j.WS4J;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.util.*;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Properties;
 
-/**
- * @author shainer
+/*
+ * Feature extraction.
  */
 public class FeatureCollector
 {
@@ -30,12 +20,12 @@ public class FeatureCollector
     private HashMap<POSTaggedToken, Double> icwMap;
     
     private double[] features;
-    private final int FEATURE_SIZE = Defines.getFeatureNumber();
+    private final int FEATURE_SIZE = Constants.getFeatureNumber();
     private int featureIndex = 0;
     
     /*
-     * When training using the SemCor samples, the frequency counts we need are all available
-     * in a (relatively) small file, so they are taken from there.
+     * When training using the Semeval-2012 samples, the frequency counts we need are all available
+     * in a (relatively) small text file, so they are taken from there.
      */
     public FeatureCollector(String frequencyFile)
     {
@@ -46,7 +36,7 @@ public class FeatureCollector
     }
     
     /*
-     * When extracting features for a generic sentence pair, we need to look into the Google
+     * When extracting features for a generic sentence pair, we need to look into the bigger Google
      * NGram corpus.
      */
     public FeatureCollector()
@@ -58,36 +48,20 @@ public class FeatureCollector
     }
     
     /*
-     * When extracting features for a huge number of sentence pairs, this builds a cache of
-     * the frequency counts that speeds up the lookup in the Google Corpus. For the "file" corpus,
-     * these methods do nothing.
-     * 
-     * NOTE: this is actually unused for now.
-     */
-    public void initialize(List<SentencePair> sps)
-    {
-        this.counter.createCache(sps);
-    } 
-    
-    public void deinitialize()
-    {
-        this.counter.destroyCache();
-    }
-    
-    /*
      * Actual feature extraction.
      */
     public double[] features(SentencePair sp)
     {
         this.sp = sp;
         featureIndex = 0;
-        features = new double[ Defines.getFeatureNumber() ];
-        
+        features = new double[ Constants.getFeatureNumber() ];
+                
         /* Feature 1, 2 */
         capitalizedOverlap();
         /* Feature 3, 4 */
         stockOverlap();
         
+        /* From now on, case ceases to matter, so we simply lower-case all tokens */
         for (ListIterator<POSTaggedToken> it = sp.s1.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
             tt.token = tt.token.toLowerCase();
@@ -100,15 +74,11 @@ public class FeatureCollector
             it.set(tt);
         }
         
-        /*
-         * Cross-validation su tutto il training set
-         */
-        
         /* Feature 5, 6, 7 */
-        ngramOverlaps(sp.s1, sp.s2);
+        ngramOverlaps(false);
         
         /* Feature 8, 9, 10 */
-        ngramOverlaps(sp.sLemma1, sp.sLemma2);
+        ngramOverlaps(true);
         
         /* Feature 11, 12, 13 */
         numberOverlaps();
@@ -123,14 +93,11 @@ public class FeatureCollector
         
         /* Rounds features values at their third decimal digit. */
         for (int i = 0; i < features.length; i++) {
-            if (!Double.isNaN(features[i]) && !Double.isInfinite(features[i])) {
-                BigDecimal bd = new BigDecimal( features[i] );
-                bd = bd.setScale(3, BigDecimal.ROUND_HALF_UP);
-                features[i] = bd.doubleValue();
-            }
+            BigDecimal bd = new BigDecimal( features[i] );
+            bd = bd.setScale(3, BigDecimal.ROUND_HALF_UP);
+            features[i] = bd.doubleValue();
         }
         
-        //printFeatures();
         return Arrays.copyOf(features, features.length);
     }
     
@@ -185,27 +152,21 @@ public class FeatureCollector
     
         double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
         features[featureIndex++] = wwo;
+        
         /* Normalized difference of aggregated word contents */
         features[featureIndex++] = Math.abs(s1TotalContent - s2TotalContent) / (Math.max(s2TotalContent, s1TotalContent) + Math.exp(-5));
     }
     
     private double informationContent(POSTaggedToken tt)
     {
-        char[] uselessTags = {'#', '@', '~', 'U', 'E', '$', ',', 'G'};
-        
-        for (int i = 0; i < uselessTags.length; i++) {
-            if (tt.tag.charAt(0) == uselessTags[i]) {
-                return 0.0;
-            }
-        }
-        
+        /* Hit in our little cache */
         if (icwMap.containsKey(tt)) {
             return icwMap.get(tt);
         }
         
         BigInteger totalFrequencyCount = counter.getTotalCount();
         
-        /* See the FrequencyCounter* files */
+        /* See the FrequencyCounter* classes */
         BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
                 
         if (frequency.doubleValue() == 0) {
@@ -235,7 +196,7 @@ public class FeatureCollector
         double res = 0.0;
         
         for (POSTaggedToken tt : s1) {
-            if (tt.tag.equals(",") || tt.tag.equals("$")) {
+            if (tt.tag.equals("$")) {
                 continue;
             }
 
@@ -258,7 +219,7 @@ public class FeatureCollector
         
         for (POSTaggedToken tt : sentence) {
             String otherWord = tt.token;
-            double score = WS4J.runPATH(word1, otherWord);
+            double score = WS4J.runPATH(word1, otherWord); /* path-len similarity in WordNet */
             
             if (score > maxScore) {
                 maxScore = score;
@@ -271,7 +232,7 @@ public class FeatureCollector
     /*
      * NGram Overlap(s)
      */
-    private void ngramOverlaps(List<POSTaggedToken> sentence1, List<POSTaggedToken> sentence2)
+    private void ngramOverlaps(boolean lemmatized)
     {
         Set<String> s1unigrams = new HashSet<>();
         Set<String> s1bigrams = new HashSet<>();
@@ -280,34 +241,34 @@ public class FeatureCollector
         Set<String> s2bigrams = new HashSet<>();
         Set<String> s2trigrams = new HashSet<>();
         
-        for (int i = 0; i < sentence1.size(); i++) {
-            String token1 = sentence1.get(i).token;
+        for (int i = 0; i < sp.s1.size(); i++) {
+            String token1 = (lemmatized) ? sp.s1.get(i).lemma : sp.s1.get(i).token;
             String token2 = "", token3;
             s1unigrams.add(token1);
             
-            if (i < sentence1.size() - 1) {
-                token2 = sentence1.get(i+1).token;
+            if (i < sp.s1.size() - 1) {
+                token2 = (lemmatized) ? sp.s1.get(i+1).lemma : sp.s1.get(i+1).token;;
                 s1bigrams.add(token1 + " " + token2);
             }
             
-            if (i < sentence1.size() - 2) {
-                token3 = sentence1.get(i+2).token;
+            if (i < sp.s1.size() - 2) {
+                token3 = (lemmatized) ? sp.s1.get(i+2).lemma : sp.s1.get(i+2).token;;
                 s1trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
         
-        for (int i = 0; i < sentence2.size(); i++) {
-            String token1 = sentence2.get(i).token;
+        for (int i = 0; i < sp.s2.size(); i++) {
+            String token1 = (lemmatized) ? sp.s2.get(i).lemma : sp.s2.get(i).token;
             String token2 = "", token3 = "";
             s2unigrams.add(token1);
             
-            if (i < sentence2.size() - 1) {
-                token2 = sentence2.get(i+1).token;
+            if (i < sp.s2.size() - 1) {
+                token2 = (lemmatized) ? sp.s2.get(i+1).lemma : sp.s2.get(i+1).token;;
                 s2bigrams.add(token1 + " " + token2);
             }
             
-            if (i < sentence2.size() - 2) {
-                token3 = sentence2.get(i+2).token;
+            if (i < sp.s2.size() - 2) {
+                token3 = (lemmatized) ? sp.s2.get(i+2).lemma : sp.s2.get(i+2).token;;
                 s2trigrams.add(token1 + " " + token2 + " " + token3);
             }
         }
@@ -365,6 +326,7 @@ public class FeatureCollector
 
             String number1 = d1.toString();
 
+            /* As specified in the paper, numbers like 6.23 and 6.2333 are considered equal */
             if (number1.startsWith(number) || number.startsWith(number1) ) {
                 return true;
             }
@@ -396,6 +358,8 @@ public class FeatureCollector
         Set<Double> n = new HashSet<>();
         
         for (POSTaggedToken t : sentence) {
+            
+            /* This tag is used also for tokens like "four", so we need to catch the exception */
             if (t.tag.equals("$")) {
                 try {
                     n.add( Double.parseDouble(t.token) );
@@ -428,6 +392,7 @@ public class FeatureCollector
         for (int i = 0; i < sentence.size(); i++) {
             String token = sentence.get(i).token;
             
+            /* Doesn't confuse a capitalized word with a stock item, treated by another feature */
             if (token.length() > 1 && Character.isUpperCase( token.charAt(0) ) &&
                     (i == 0 || !sentence.get(i-1).token.equals("."))) {
                 cap.add(token);
@@ -457,6 +422,7 @@ public class FeatureCollector
         for (int i = 0; i < sentence.size(); i++) {
             String token = sentence.get(i).token;
             
+            /* Here we pay attention to the fact that we are not sure the "." was placed in the same token */
             if (isUpper(token) && isWord(token)) {
                 if (token.startsWith(".") || (i > 0 && sentence.get(i-1).token.equals("."))) {
                     stockItems.add(token);
@@ -465,44 +431,6 @@ public class FeatureCollector
         }
         
         return stockItems;
-    }
-    
-    private boolean isUpper(String s)
-    {
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isLetter( s.charAt(i) ) && Character.isLowerCase( s.charAt(i) )) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
-    private boolean isWord(String s)
-    {
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isLetter( s.charAt(i) )) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    private <T> double setOverlap(Set<T> set1, Set<T> set2)
-    {
-        double overlap = (set1.size() + set2.size());
-        set1.retainAll(set2);
-
-        if (!set1.isEmpty()) {
-            overlap /= set1.size();
-            overlap = Math.pow(overlap, -1.0);
-            overlap *= 2;
-        } else {
-            overlap = 0;
-        }
-        
-        return overlap;
     }
     
     /*
@@ -521,10 +449,12 @@ public class FeatureCollector
     
     private double[] sentenceVector(List<POSTaggedToken> sentence, boolean weighted)
     {
-        double[] V = new double[ Defines.getLSAVectorSize() ];
+        double[] V = new double[ Constants.getLSAVectorSize() ];
         
         for (POSTaggedToken tt : sentence) {
             double[] word = lsa.getWordVector(tt);
+            
+            /* The information content is surely in cache, so no overhead added here */
             double icw = informationContent(tt);
             
             for (int i = 0; i < V.length; i++) {
@@ -548,5 +478,44 @@ public class FeatureCollector
         }
         
         return sum;
+    }
+    
+    /* An overlap is a measure between 0 and 1, where 1 indicates two identical sets */
+    private <T> double setOverlap(Set<T> set1, Set<T> set2)
+    {
+        double overlap = (set1.size() + set2.size());
+        set1.retainAll(set2);
+
+        if (!set1.isEmpty()) {
+            overlap /= set1.size();
+            overlap = Math.pow(overlap, -1.0);
+            overlap *= 2;
+        } else {
+            overlap = 0;
+        }
+        
+        return overlap;
+    }
+    
+    private boolean isUpper(String s)
+    {
+        for (int i = 0; i < s.length(); i++) {
+            if (Character.isLetter( s.charAt(i) ) && Character.isLowerCase( s.charAt(i) )) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private boolean isWord(String s)
+    {
+        for (int i = 0; i < s.length(); i++) {
+            if (Character.isLetter( s.charAt(i) )) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
