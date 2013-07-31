@@ -1,3 +1,15 @@
+/*
+ * Class for training a semantic similarity model from sample files.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
+
 import libsvm.*;
 import java.io.*;
 import java.util.List;
@@ -7,9 +19,6 @@ import java.util.Iterator;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.util.Arrays;
 
-/**
- * Trains a semantic similarity model from sample files
- */
 public class SimilarityLearner
 {
     private FeatureCollector fc;
@@ -43,7 +52,7 @@ public class SimilarityLearner
         return features;
     }
     
-    /* Writes features on an output file in our format */
+    /* Writes features on an output file in the application-specific format */
     public void writeFeatures(List<TrainingSample> samples, String featureFile)
     {
         System.out.print(":: Writing features on " + featureFile + " ... ");
@@ -96,7 +105,7 @@ public class SimilarityLearner
         return samples;
     }
     
-    /* Actual learning model */
+    /* Learning model */
     public void learnModel(List<TrainingSample> features)
     {
         System.out.println("\nLearning process begins!");

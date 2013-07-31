@@ -1,3 +1,15 @@
+/*
+ * Handles I/O with tweets expressed as JSON files.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
+
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,10 +24,6 @@ import org.json.simple.parser.ParseException;
 import java.io.PrintStream;
 import java.io.StringReader;
 
-/**
- *
- * @author shainer
- */
 public class TweetParser
 {
     private String inputFile;
@@ -31,6 +39,10 @@ public class TweetParser
         this.nlp = nlp;
     }
     
+    /*
+     * Creates sentence pairs from the input tweet. Each sentence pair contains the main question
+     * and one of the questions in the "qpairs" array.
+     */
     public void parse()
     {
         JSONParser json = new JSONParser();
@@ -52,6 +64,11 @@ public class TweetParser
             List<String> tweetLemmas = new LinkedList<>();
             JSONArray tweetTokens = (JSONArray)jsonObject.get("tokens");
             
+            /*
+             * For the user question, gets all the needed information at this stage,
+             * without having to use external tools. Normalized tokens are used to reduce the
+             * negative effects of misspelled words.
+             */
             for (Object t : tweetTokens) {
                 JSONObject token = (JSONObject)t;
                 tweetNormalizedTokens.add( (String)token.get("normalized") );
@@ -70,12 +87,16 @@ public class TweetParser
         } catch (IOException e) {
             System.err.println(":: IO Error: " + e);
             System.exit(-1);
-        } catch (ParseException e) {
+        } catch (ParseException e) { /* malformed JSON file */
             System.err.println(":: Parse error: " + e);
             System.exit(-1);
         }
     }
     
+    /*
+     * Writes similarity scores in the output JSON file. We add a new field "similarity" in each
+     * "qpairs" object with the score.
+     */
     public void writeSimilarities(double[] similarities)
     {        
         try {
@@ -98,6 +119,10 @@ public class TweetParser
                 writer = System.out;
             }
             
+            /*
+             * By default, the JSON string is compressed in one line, so I add some newlines for
+             * readability. The resulting string is still a valid JSON object.
+             */
             writer.println( goodJSONFormat(jsonObject.toJSONString()) );
             writer.close();
         } catch (IOException e) {
@@ -129,6 +154,11 @@ public class TweetParser
         return formatted;
     }
     
+    /*
+     * When no input file is supplied, reads a JSON string from stdin. The JSON object
+     * terminates when all the open parentheses "{" have been closed and an empty line is
+     * inserted.
+     */
     private static String readJSONFromStdin()
     {
         String content = "";

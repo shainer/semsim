@@ -58,14 +58,12 @@ public class SemanticSimilarity
 
         /* Load the pre-existing model from file */
         SimilarityTest m = new SimilarityTest(pipeline);
-        String[] p = {"test/MSRvid.txt", "test/MSRpar.txt", "test/SMTnews.txt", "test/OnWN.txt", "test/SMTeuroparl.txt"};
-        m.correlationsFromFiles(p);
 
         /* Gets the similarity scores and writes them on the JSON output file */
-//        System.out.print(":: Computing and writing similarities on output... ");
-//        double[] similarities = m.getSimilarities(pairs);
-//        tp.writeSimilarities(similarities);
-//        System.out.println("OK");
+        System.out.print(":: Computing and writing similarities on output... ");
+        double[] similarities = m.getSimilarities(pairs);
+        tp.writeSimilarities(similarities);
+        System.out.println("OK");
     }
     
     private static void parseProperties(String[] args, int paramIndex)

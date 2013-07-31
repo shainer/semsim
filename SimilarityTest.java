@@ -1,12 +1,21 @@
+/*
+ * Computes similarity scores for new sentence pairs.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
+
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import libsvm.*;
 
-/*
- * Tests the system on new samples
- */
 public class SimilarityTest
 {
     private FeatureCollector fc;
@@ -21,7 +30,8 @@ public class SimilarityTest
         
         this.nlp = nlp;
         
-        try {            
+        try {
+            /* Loads a pre-existing model to compute scores */
             System.out.print(":: Loading similarity model from file... ");
             this.model = svm.svm_load_model( Constants.getSimilarityModelPath() );
             System.out.println("OK.");
@@ -65,13 +75,17 @@ public class SimilarityTest
         return sims;
     }
     
+    /*
+     * This function tests and prints out the performances of the system, in terms of Pearson correlation.
+     * The filepaths should point to test files formatted as specified in the report.
+     */
     public void correlationsFromFiles(String[] filepaths)
     {
         /* Used to compute the mean of all the correlations */
         double[] correlations = new double[filepaths.length];
         int[] sampleNumbers = new int[filepaths.length];
         
-        /* Used to compute the total Pearson correlation */
+        /* Used to compute the ALL Pearson correlation */
         ArrayList<Double> allAnswers = new ArrayList<>();
         ArrayList<Double> allGsAnswers = new ArrayList<>();
         
@@ -112,7 +126,7 @@ public class SimilarityTest
         System.out.println("Total Pearson correlation: " + totCorr);
     }
     
-    /* Simple unweighted average */
+    /* Weighted average: the weights are the numbers of sentence pairs in each test file */
     private double average(double[] values, int[] weights)
     {
         double av = 0.0;

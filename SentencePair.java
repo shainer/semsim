@@ -27,9 +27,12 @@ public class SentencePair
     private StanfordCoreNLP nlp;
     
     /*
-     * This builds the sentence from partial information. For the tweet question we already have tokens,
+     * This builds the sentences from partial information. For the tweet question we already have tokens,
      * POS tags and lemmas, while we use the Stanford CoreNLP parser for the question extracted from
      * Q&A databases.
+     * 
+     * NOTE: lemmatization must be repeated after preprocessing the sentences, because preprocessing may
+     * add, remove or alter tokens in the sentence.
      */
     public SentencePair(List<String> s1Tokens, List<String> s1Tags, List<String> s1Lemmas, String s2Text, StanfordCoreNLP nlp)
     {
@@ -49,6 +52,10 @@ public class SentencePair
         preprocess();
     }
     
+    /*
+     * This builds the sentences from raw text. It is used during training, because no additional
+     * information is available from the training files.
+     */
     public SentencePair(String text1, String text2, StanfordCoreNLP nlp)
     {
         this.s1 = new LinkedList<>();
@@ -60,6 +67,24 @@ public class SentencePair
         preprocess();
         lemmatize(this.s1);
         lemmatize(this.s2);        
+    }
+    
+    @Override public String toString()
+    {
+        String p = "";
+        
+        for (POSTaggedToken tt : s1) {
+            p += tt + ", ";
+        }
+        
+        p += "\n";
+        
+        for (POSTaggedToken tt : s2) {
+            p += tt + ", ";
+        }
+
+        p += "\n";
+        return p;
     }
     
     private void createSentence(String text, List<POSTaggedToken> sentence)
@@ -78,6 +103,7 @@ public class SentencePair
     {
         String text = "";
         
+        /* Convert the sentence back to a single string */
         for (POSTaggedToken tt : sentence) {
             text += tt.token + " ";
         }
@@ -92,13 +118,18 @@ public class SentencePair
             while (itToken.hasNext() && itSentence.hasNext()) {
                 CoreLabel token = itToken.next();
                 POSTaggedToken tt = itSentence.next();
-                tt.lemma = token.lemma();
+                tt.lemma = token.lemma(); /* add a lemma to the POSTaggedToken */
                 
                 itSentence.set(tt);
             }
         }        
     }
     
+    /*
+     * The Stanford Core NLP uses the Penn Treebank tagset, while for Palmisano the tagset proposed
+     * by Gimpel et al. is used. Here is the transformation; of course there is a loss of precision due
+     * to Penn Treebank having a greater number of tags.     * 
+     */
     private String translateTag(String tag)
     {
         if (tag.equals("NN") || tag.equals("NNS")) {
@@ -153,31 +184,18 @@ public class SentencePair
             return "D";
         }
         
+        /* Punctuaction tags are all merged together */
         if (tag.equals("$") || tag.equals(",") || tag.equals("(") || tag.equals(")") || tag.equals(".") || tag.equals(":")) {
             return ",";
         }
         
+        /* Generic tag for foreign words or other unrecognizable tokens */
         return "G";
     }
     
-    @Override public String toString()
-    {
-        String p = "";
-        
-        for (POSTaggedToken tt : s1) {
-            p += tt + ", ";
-        }
-        
-        p += "\n";
-        
-        for (POSTaggedToken tt : s2) {
-            p += tt + ", ";
-        }
-
-        p += "\n";
-        return p;
-    }
-    
+    /*
+     * Read the report for a complete list of the preprocessing steps applied here.
+     */
     private void preprocess()
     {
         preprocessSentence(this.s1);
@@ -192,13 +210,19 @@ public class SentencePair
         for (ListIterator<POSTaggedToken> it = sentence.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
             
+            /* 
+             * All the preprocessing steps that are concerned with one token at a time are
+             * applied here, and they return the modified token, or an empty one if they decided
+             * to delete it.
+             */
             tt = stripAngularBrackets(tt);
             tt = removeHyphensSlashes(tt);
             tt = removeStopWords(tt);
             
+            /* One of the steps wants to delete the token */
             if (tt.token.isEmpty()) {
                 it.remove();
-            } else {
+            } else { /* we assume the token has been changed somehow */
                 it.set(tt);
             }
         }
