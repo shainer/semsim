@@ -1,3 +1,14 @@
+/*
+ * Central class for feature collection.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
@@ -48,7 +59,7 @@ public class FeatureCollector
     }
     
     /*
-     * Actual feature extraction.
+     * Extracts and returns features.
      */
     public double[] features(SentencePair sp)
     {
@@ -65,12 +76,14 @@ public class FeatureCollector
         for (ListIterator<POSTaggedToken> it = sp.s1.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
             tt.token = tt.token.toLowerCase();
+            tt.lemma = tt.lemma.toLowerCase();
             it.set(tt);
         }
         
         for (ListIterator<POSTaggedToken> it = sp.s2.listIterator(); it.hasNext();) {
             POSTaggedToken tt = it.next();
             tt.token = tt.token.toLowerCase();
+            tt.lemma = tt.lemma.toLowerCase();
             it.set(tt);
         }
         
@@ -91,7 +104,7 @@ public class FeatureCollector
         /* Feature 18, 19 */
         vectorSpaceSimilarity();
         
-        /* Rounds features values at their third decimal digit. */
+        /* Rounds all values at their third decimal digit. */
         for (int i = 0; i < features.length; i++) {
             BigDecimal bd = new BigDecimal( features[i] );
             bd = bd.setScale(3, BigDecimal.ROUND_HALF_UP);
@@ -101,132 +114,30 @@ public class FeatureCollector
         return Arrays.copyOf(features, features.length);
     }
     
-    private void printFeatures()
+    /*
+     * Named Entity Features: overlap of capitalized words
+     */
+    private void capitalizedOverlap()
     {
-        System.out.println(":: Features for sentences :: ");
-        System.out.println(sp);
+        Set<String> capTokens1 = findCapitalizedWords(sp.s1);
+        Set<String> capTokens2 = findCapitalizedWords(sp.s2);
+        double presence = (!capTokens1.isEmpty() || !capTokens2.isEmpty()) ? 1.0 : 0.0;
         
-        for (int i = 0; i < FEATURE_SIZE; i++) {
-            System.out.println(features[i]);
-        }
+        features[featureIndex++] = setOverlap(capTokens1, capTokens2);
+        features[featureIndex++] = presence;
     }
     
     /*
-     * Normalized differences, feature (A)
-     * Taken from Takelab implementation
+     * Named Entity Features: overlap of stock index symbols
      */
-    private void sentenceLength()
+    private void stockOverlap()
     {
-        int size1 = sp.s1.size();
-        int size2 = sp.s2.size();
-        features[featureIndex++] = Math.abs(size1 - size2) / (Math.max(size1, size2) + Math.exp(-5));
-    } 
-    
-    /*
-     * Weighted Word Overlap
-     * Normalized Differences, feature (C)
-     */
-    private void weightedWords()
-    {        
-        double s1TotalContent = 0.0;
-        double s2TotalContent = 0.0;
-        double sharedContent = 0.0;
+        Set<String> stockItems1 = findStockItems(sp.s1);
+        Set<String> stockItems2 = findStockItems(sp.s2);
+        double presence = (!stockItems1.isEmpty() || !stockItems2.isEmpty()) ? 1.0 : 0.0;
         
-        for (POSTaggedToken tt : sp.s1) {
-            double icw = informationContent(tt);
-            s1TotalContent += icw;
-            
-            if (sp.s2.contains(tt)) {
-                sharedContent += icw;
-            }
-        }
-        
-        for (POSTaggedToken tt : sp.s2) {
-            double icw = informationContent(tt);
-            s2TotalContent += icw;
-            
-            if (sp.s1.contains(tt)) {
-                sharedContent += icw;
-            }
-        }
-    
-        double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
-        features[featureIndex++] = wwo;
-        
-        /* Normalized difference of aggregated word contents */
-        features[featureIndex++] = Math.abs(s1TotalContent - s2TotalContent) / (Math.max(s2TotalContent, s1TotalContent) + Math.exp(-5));
-    }
-    
-    private double informationContent(POSTaggedToken tt)
-    {
-        /* Hit in our little cache */
-        if (icwMap.containsKey(tt)) {
-            return icwMap.get(tt);
-        }
-        
-        BigInteger totalFrequencyCount = counter.getTotalCount();
-        
-        /* See the FrequencyCounter* classes */
-        BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
-                
-        if (frequency.doubleValue() == 0) {
-            return 0;
-        }
-        
-        double icw = Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
-        icwMap.put(tt, icw);
-        return icw;
-    }
-    
-    /*
-     * WordNet-Augmented Word Overlap
-     */
-    private void wordnetOverlap()
-    {        
-        features[featureIndex++] = harmonicMean(pwn(sp.s1, sp.s2), pwn(sp.s2, sp.s1));
-    }
-    
-    private double harmonicMean(double d1, double d2)
-    {
-        return (d1 + d2 > 0 ) ? ((2 * d1 * d2) / (d1 + d2)) : 0.0;
-    }
-    
-    private double pwn(List<POSTaggedToken> s1, List<POSTaggedToken> s2)
-    {
-        double res = 0.0;
-        
-        for (POSTaggedToken tt : s1) {
-            if (tt.tag.equals("$")) {
-                continue;
-            }
-
-            res += wordnetScore(tt.token, s2);
-        }
-        
-        res /= (double)s2.size();
-        return res;
-    }
-    
-    private double wordnetScore(String word1, List<POSTaggedToken> sentence)
-    {
-        double maxScore = 0.0;
-        
-        for (POSTaggedToken tt : sentence) {
-            if (tt.token.equals(word1)) {
-                return 1.0;
-            }
-        }
-        
-        for (POSTaggedToken tt : sentence) {
-            String otherWord = tt.token;
-            double score = WS4J.runPATH(word1, otherWord); /* path-len similarity in WordNet */
-            
-            if (score > maxScore) {
-                maxScore = score;
-            }
-        }
-        
-        return maxScore;
+        features[featureIndex++] = setOverlap(stockItems1, stockItems2);
+        features[featureIndex++] = presence;
     }
     
     /*
@@ -277,7 +188,7 @@ public class FeatureCollector
         features[featureIndex++] = setOverlap(s1bigrams, s2bigrams);
         features[featureIndex++] = setOverlap(s1trigrams, s2trigrams);
     }
-
+    
     /*
      * Numbers Overlap
      */
@@ -313,44 +224,138 @@ public class FeatureCollector
         features[featureIndex++] = results[2];
     }
     
-    private boolean modifiedContains(Set<Double> n1, Double d)
-    {
-        String number = d.toString();
-        
-        for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
-            Double d1 = it.next();
-            
-            if (d1 == d) {
-                return true;
-            }
-
-            String number1 = d1.toString();
-
-            /* As specified in the paper, numbers like 6.23 and 6.2333 are considered equal */
-            if (number1.startsWith(number) || number.startsWith(number1) ) {
-                return true;
-            }
-
-        }
-        
-        return false;
+    /*
+     * WordNet-Augmented Word Overlap
+     */
+    private void wordnetOverlap()
+    {        
+        features[featureIndex++] = harmonicMean(pwn(sp.s1, sp.s2), pwn(sp.s2, sp.s1));
     }
     
-    private boolean modifiedContainsAll(Set<Double> n1, Set<Double> n2)
-    {
-        if (n1.isEmpty() || n2.isEmpty()) {
-            return false;
-        }
+    
+    /*
+     * Weighted Word Overlap
+     * Normalized Differences, feature (C)
+     */
+    private void weightedWords()
+    {        
+        double s1TotalContent = 0.0;
+        double s2TotalContent = 0.0;
+        double sharedContent = 0.0;
         
-        for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
-            Double d = it.next();
+        for (POSTaggedToken tt : sp.s1) {
+            double icw = informationContent(tt);
+            s1TotalContent += icw;
             
-            if (!modifiedContains(n2, d)) {
-                return false;
+            if (sp.s2.contains(tt)) {
+                sharedContent += icw;
             }
         }
         
-        return true;
+        for (POSTaggedToken tt : sp.s2) {
+            double icw = informationContent(tt);
+            s2TotalContent += icw;
+            
+            if (sp.s1.contains(tt)) {
+                sharedContent += icw;
+            }
+        }
+    
+        double wwo = harmonicMean(sharedContent / s1TotalContent, sharedContent / s2TotalContent);
+        features[featureIndex++] = wwo;
+        
+        /* Normalized difference of aggregated word contents */
+        features[featureIndex++] = Math.abs(s1TotalContent - s2TotalContent) / (Math.max(s2TotalContent, s1TotalContent) + Math.exp(-5));
+    }
+   
+    /*
+     * Normalized differences, feature (A)
+     * Taken from Takelab implementation
+     */
+    private void sentenceLength()
+    {
+        int size1 = sp.s1.size();
+        int size2 = sp.s2.size();
+        features[featureIndex++] = Math.abs(size1 - size2) / (Math.max(size1, size2) + Math.exp(-5));
+    }
+    
+    /*
+     * Vector Space Sentence Similarity
+     */
+    private void vectorSpaceSimilarity()
+    {
+        double[] U1 = sentenceVector(sp.s1, false);
+        double[] U2 = sentenceVector(sp.s2, false);
+        double[] U1Weighted = sentenceVector(sp.s1, true);
+        double[] U2Weighted = sentenceVector(sp.s2, true);
+        
+        features[featureIndex++] = dotProduct(U1, U2) / (double)(U1.length * U2.length);
+        features[featureIndex++] = dotProduct(U1Weighted, U2Weighted) / (double)(U1Weighted.length * U2Weighted.length);
+    }
+    
+    private double informationContent(POSTaggedToken tt)
+    {
+        /* Hit in our little cache */
+        if (icwMap.containsKey(tt)) {
+            return icwMap.get(tt);
+        }
+        
+        BigInteger totalFrequencyCount = counter.getTotalCount();
+        
+        /* See the FrequencyCounter* classes */
+        BigInteger frequency = counter.getFrequencyCount(tt.token, tt.tag);
+                
+        if (frequency.doubleValue() == 0) {
+            return 0;
+        }
+        
+        double icw = Math.log(totalFrequencyCount.doubleValue() / frequency.doubleValue());
+        icwMap.put(tt, icw);
+        return icw;
+    }
+    
+    private double pwn(List<POSTaggedToken> s1, List<POSTaggedToken> s2)
+    {
+        double res = 0.0;
+        
+        for (POSTaggedToken tt : s1) {
+            if (tt.tag.equals("$")) { /* numbers are ignored */
+                continue;
+            }
+
+            res += wordnetScore(tt.token, s2);
+        }
+        
+        res /= (double)s2.size();
+        return res;
+    }
+    
+    /* Score based on the path length similarity */
+    private double wordnetScore(String word1, List<POSTaggedToken> sentence)
+    {
+        double maxScore = 0.0;
+        
+        for (POSTaggedToken tt : sentence) {
+            if (tt.token.equals(word1)) {
+                return 1.0;
+            }
+        }
+        
+        for (POSTaggedToken tt : sentence) {
+            String otherWord = tt.token;
+            double score = WS4J.runPATH(word1, otherWord); /* path-length similarity in WordNet 3.0 */
+            
+            if (score > maxScore) {
+                maxScore = score;
+            }
+        }
+        
+        return maxScore;
+    }
+    
+    private double harmonicMean(double d1, double d2)
+    {
+        return (d1 + d2 > 0 ) ? ((2 * d1 * d2) / (d1 + d2)) : 0.0;
     }
     
     private Set<Double> numberTokens(List<POSTaggedToken> sentence)
@@ -372,19 +377,6 @@ public class FeatureCollector
         return n;
     }
     
-    /*
-     * Named Entity Features: overlap of capitalized words
-     */
-    private void capitalizedOverlap()
-    {
-        Set<String> capTokens1 = findCapitalizedWords(sp.s1);
-        Set<String> capTokens2 = findCapitalizedWords(sp.s2);
-        double presence = (!capTokens1.isEmpty() || !capTokens2.isEmpty()) ? 1.0 : 0.0;
-        
-        features[featureIndex++] = setOverlap(capTokens1, capTokens2);
-        features[featureIndex++] = presence;
-    }
-    
     private Set<String> findCapitalizedWords(List<POSTaggedToken> sentence)
     {
         Set<String> cap = new HashSet<>();
@@ -392,7 +384,7 @@ public class FeatureCollector
         for (int i = 0; i < sentence.size(); i++) {
             String token = sentence.get(i).token;
             
-            /* Doesn't confuse a capitalized word with a stock item, treated by another feature */
+            /* Avoids confusing a capitalized word with a stock item, treated by another feature */
             if (token.length() > 1 && Character.isUpperCase( token.charAt(0) ) &&
                     (i == 0 || !sentence.get(i-1).token.equals("."))) {
                 cap.add(token);
@@ -401,18 +393,52 @@ public class FeatureCollector
         
         return cap;
     }
-
+    
     /*
-     * Named Entity Features: overlap of stock index symbols
+     * As specified in the paper, numbers like 6.23 and 6.2333 are considered equal, so we
+     * need to implement a special comparison to see if a double is contained inside a certain set.
      */
-    private void stockOverlap()
+    private boolean modifiedContains(Set<Double> n1, Double d)
     {
-        Set<String> stockItems1 = findStockItems(sp.s1);
-        Set<String> stockItems2 = findStockItems(sp.s2);
-        double presence = (!stockItems1.isEmpty() || !stockItems2.isEmpty()) ? 1.0 : 0.0;
+        String number = d.toString();
         
-        features[featureIndex++] = setOverlap(stockItems1, stockItems2);
-        features[featureIndex++] = presence;
+        for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
+            Double d1 = it.next();
+            
+            if (d1 == d) {
+                return true;
+            }
+
+            String number1 = d1.toString();
+
+            if (number1.startsWith(number) || number.startsWith(number1) ) {
+                return true;
+            }
+
+        }
+        
+        return false;
+    }
+    
+    /*
+     * Returns true if the two sets have a non-empty intersection, false otherwise. As above,
+     * we need a customized method to implement our special comparison.
+     */
+    private boolean modifiedContainsAll(Set<Double> n1, Set<Double> n2)
+    {
+        if (n1.isEmpty() || n2.isEmpty()) {
+            return false;
+        }
+        
+        for (Iterator<Double> it = n1.iterator(); it.hasNext(); ) {
+            Double d = it.next();
+            
+            if (!modifiedContains(n2, d)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
    
     private Set<String> findStockItems(List<POSTaggedToken> sentence)
@@ -434,19 +460,11 @@ public class FeatureCollector
     }
     
     /*
-     * Vector Space Sentence Similarity
+     * Returns the LSA vector associated to an entire sentence, with or without weights
+     * applied to the single word vectors.
+     * Here word vectors are simply summed together in order to create sentence vectors; in my
+     * report, the existence and study of more sophisticated compositions is mentioned.
      */
-    private void vectorSpaceSimilarity()
-    {
-        double[] U1 = sentenceVector(sp.s1, false);
-        double[] U2 = sentenceVector(sp.s2, false);
-        double[] U1Weighted = sentenceVector(sp.s1, true);
-        double[] U2Weighted = sentenceVector(sp.s2, true);
-        
-        features[featureIndex++] = dotProduct(U1, U2) / (double)(U1.length * U2.length);
-        features[featureIndex++] = dotProduct(U1Weighted, U2Weighted) / (double)(U1Weighted.length * U2Weighted.length);
-    }
-    
     private double[] sentenceVector(List<POSTaggedToken> sentence, boolean weighted)
     {
         double[] V = new double[ Constants.getLSAVectorSize() ];
@@ -454,7 +472,7 @@ public class FeatureCollector
         for (POSTaggedToken tt : sentence) {
             double[] word = lsa.getWordVector(tt);
             
-            /* The information content is surely in cache, so no overhead added here */
+            /* The information content is always in cache at this point, so no overhead added */
             double icw = informationContent(tt);
             
             for (int i = 0; i < V.length; i++) {
@@ -480,7 +498,10 @@ public class FeatureCollector
         return sum;
     }
     
-    /* An overlap is a measure between 0 and 1, where 1 indicates two identical sets */
+    /*
+     * This is a measure of how many elements two sets share, going from 0 (no common element) to 1
+     * (identical sets).
+     */
     private <T> double setOverlap(Set<T> set1, Set<T> set2)
     {
         double overlap = (set1.size() + set2.size());

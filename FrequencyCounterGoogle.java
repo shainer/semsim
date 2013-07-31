@@ -1,3 +1,14 @@
+/*
+ * Class for reading frequency counts from the Google NGram Corpus.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -6,8 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
- * When we don't know the words we are dealing with, we use the Google NGram Corpus, a bit
- * preprocessed to avoid slowing down too much (see report).
+ * When we don't know the words we are dealing with, we use the Google NGram Corpus, included
+ * in the release.
+ * See report for a discussion on how I used and preprocessed the corpus.
  */
 public class FrequencyCounterGoogle implements FrequencyCounter
 {
@@ -58,7 +70,7 @@ public class FrequencyCounterGoogle implements FrequencyCounter
             
             /* Here we need linear search, since the files are not sorted lexicographically */
             while ((line = br.readLine()) != null) {
-                /* Split into token and tag */
+                /* Split entry into token and tag */
                 String[] fields = line.split("\t");
                 String[] w = fields[0].split("_");
                 
@@ -93,7 +105,7 @@ public class FrequencyCounterGoogle implements FrequencyCounter
         return new BigInteger("468491999592");
     }
     
-    /* The corpus uses a quite particular tagset */
+    /* The corpus uses a quite particular tagset, listed at http://books.google.com/ngrams/info */
     private String translateTag(String tag)
     {
         if (tag.equals("V")) {

@@ -1,4 +1,3 @@
-import cmu.arktweetnlp.io.JsonTweetReader;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.io.BufferedReader;
 import java.io.FileReader;

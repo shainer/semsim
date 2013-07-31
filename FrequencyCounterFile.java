@@ -1,3 +1,15 @@
+/*
+ * Frequency counts from an external text file.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *
+ */
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +37,7 @@ public class FrequencyCounterFile implements FrequencyCounter
             if (fields.length > 1) {
                 frequencyCounts.put(fields[0], new BigInteger(fields[1]));
             } else {
-                totalCount = new BigInteger(fields[0]); /* the first row is the total */
+                totalCount = new BigInteger(fields[0]); /* the first row is the total count */
             }
         }
     }
@@ -34,6 +46,7 @@ public class FrequencyCounterFile implements FrequencyCounter
     {
         BigInteger c = frequencyCounts.get(token);
         
+        /* This should not happen unless you use customized training files. */
         if (c == null) {
             return new BigInteger("0");
         }

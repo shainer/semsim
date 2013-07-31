@@ -1,3 +1,16 @@
+/*
+ * Managing LSA vectors for the Vector Similarity feature. The LSA matrix
+ * was courtesy of Emanuele Bastianelli.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -6,7 +19,9 @@ import java.util.Map;
 import java.util.HashMap;
 
 /*
- * Reads LSA vectors from our matrix.
+ * Vectors are stored in an external text file. The matrix is completely stored in RAM in the
+ * constructor, since vectors are not sorted by word and it's faster than doing consecutive lookups
+ * in an external file.
  */
 public class LSA
 {
@@ -28,8 +43,12 @@ public class LSA
     }
     
     /*
-     * Reads the entire vector in memory immediately. Since we parse as we read and BufferedReader takes
-     * care of internal buffering, this function takes less than 30 seconds on a common laptop.
+     * To avoid the overhead of multiple calls to split() or other string parsing functions, I perform
+     * the parsing while reading the file. The BufferedReader class takes care of internal buffering, and
+     * so this function takes less than 30 seconds on a common laptop.
+     * 
+     * The parsing is performed with a little DFA, so we expect every line to comply to a very
+     * restricted format. See lsa_matrix.txt .
      */
     void parseFile(BufferedReader br) throws IOException
     {
@@ -123,7 +142,7 @@ public class LSA
     }
     
     /*
-     * Another internal tagset to translate to our own
+     * Another internal tagset, translated to our own
      */
     private char translateTag(char tag)
     {        

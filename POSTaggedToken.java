@@ -1,9 +1,15 @@
-
-import cmu.arktweetnlp.Tagger;
-
 /*
- * Container class for a token with a Part-of-Speech tag assigned to it.
+ * Token with a Part-of-Speech tag and (optionally) a lemma.
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
  */
+
 public class POSTaggedToken
 {
     public String token;
@@ -20,16 +26,13 @@ public class POSTaggedToken
     {
         this.token = token;
         this.tag = tag;
-    }
-    
-    public POSTaggedToken(Tagger.TaggedToken tt)
-    {
-        this.token = tt.token;
-        this.tag = tt.tag;
+        this.lemma = "";
     }
     
     public POSTaggedToken()
-    {}
+    {
+        this("", "", "");
+    }
     
     @Override public boolean equals(Object o)
     {

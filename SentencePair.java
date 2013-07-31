@@ -1,8 +1,14 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Builds and stores an unlabeled sentence pair (input for our system).
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
  */
-
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -13,10 +19,6 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 import java.util.Iterator;
 
-/**
- *
- * @author shainer
- */
 public class SentencePair
 {
     public List<POSTaggedToken> s1;
@@ -24,6 +26,11 @@ public class SentencePair
     
     private StanfordCoreNLP nlp;
     
+    /*
+     * This builds the sentence from partial information. For the tweet question we already have tokens,
+     * POS tags and lemmas, while we use the Stanford CoreNLP parser for the question extracted from
+     * Q&A databases.
+     */
     public SentencePair(List<String> s1Tokens, List<String> s1Tags, List<String> s1Lemmas, String s2Text, StanfordCoreNLP nlp)
     {
         this.nlp = nlp;
@@ -31,7 +38,7 @@ public class SentencePair
         this.s2 = new LinkedList<>();
         
         for (int i = 0; i < s1Tokens.size(); i++) {
-            POSTaggedToken tt = new POSTaggedToken( s1Tokens.get(i), s1Tags.get(i) );
+            POSTaggedToken tt = new POSTaggedToken( s1Tokens.get(i), s1Tags.get(i), s1Lemmas.get(i) );
             this.s1.add(tt);
         }
        
@@ -89,7 +96,7 @@ public class SentencePair
                 
                 itSentence.set(tt);
             }
-        } 
+        }        
     }
     
     private String translateTag(String tag)

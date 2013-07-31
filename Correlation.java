@@ -1,11 +1,21 @@
+/*
+ * Pearson correlation from two sets of similarity scores. 
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
+
 import java.math.BigDecimal;
 
-/*
- * Computing Pearson correlation from two sets of similarity scores.
- * 
- * NOTE: boxing and unboxing don't work automatically for arrays as they do for primitive types. So
- * in order to avoid expensive copies that go from one type to the other, I simply redefined exactly the
- * same method twice.
+/* 
+ * NOTE: boxing and unboxing don't work automatically for arrays as they do for primitive types. Since
+ * the arrays usually have thousands of elements, I avoided expensive copies from one type to the other
+ * by redefining the same method twice.
  */
 public class Correlation
 {

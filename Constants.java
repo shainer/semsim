@@ -1,3 +1,15 @@
+/*
+ * Constants and default values used in the application. 
+ * 
+ * Copyright (C) 2013 Lisa Vitolo <lisavitolo90@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Creative Commons
+ * Attribution-NonCommercial-ShareAlike 3.0 license.
+ * You should have received a copy of the license with this product.
+ * Otherwise, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
+ */
+
 import libsvm.svm_parameter;
 
 public class Constants
@@ -10,7 +22,7 @@ public class Constants
     private static final String wordFrequenciesPath = "word-frequencies.txt";
     
     /*
-     * These paths and parameters are all configurable using a Properties file, so
+     * These paths and parameters are all configurable through a Properties file, so
      * we provide also setters and they are not declared final. These below are the
      * default values.
      */
@@ -25,7 +37,7 @@ public class Constants
     private static final double[] P_VALUES = {1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01};
     private static final double[] G_VALUES = {2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002};
     
-    /* Optimal parameters for the regressor */
+    /* Optimal parameters for the SV regressor */
     private static final double C = 1;
     private static final double P = 0.02;
     private static final double G = 2;
@@ -69,10 +81,7 @@ public class Constants
     {
         svm_parameter param = new svm_parameter();
         
-        /* 
-         * These parameters are taken from the Takelab suggestions.
-         * See report for an explanation of their meaning.
-         */
+        /* These parameters are taken from the Takelab implementation. */
         param.svm_type = svm_parameter.EPSILON_SVR;
         param.kernel_type = svm_parameter.RBF;
         param.cache_size = 10.0;
