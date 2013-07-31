@@ -52,7 +52,7 @@ public class FrequencyCounterGoogle implements FrequencyCounter
         BigInteger frequencyCount = null;
         
         try {
-            String filePath = "googlebooks/" + filename;
+            String filePath = Constants.getGoogleCorpusFolder() + filename;
             BufferedReader br = new BufferedReader( new FileReader(filePath) );
             String line;
             

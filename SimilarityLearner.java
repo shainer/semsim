@@ -18,7 +18,7 @@ public class SimilarityLearner
     public SimilarityLearner(StanfordCoreNLP nlp)
     {
         System.out.print(":: Initializing feature collector with LSA... ");
-        fc = new FeatureCollector("word-frequencies.txt");
+        fc = new FeatureCollector( Constants.getWordFrequenciesPath() );
         System.out.println("OK.");
         
         this.nlp = nlp;

@@ -10,7 +10,7 @@ import java.util.Properties;
 public class SemanticSimilarity
 {
     public static void main(String[] args)
-    {        
+    {
         int paramIndex;
         
         Properties prop = new Properties();
@@ -20,42 +20,39 @@ public class SemanticSimilarity
         
         /* If a properties file is passed, it must contains options for training the system. */
         if ((paramIndex = findParameter(args, "--parameters")) != -1) {
-            trainSystem(args, paramIndex, pipeline);
-        } else { /* otherwise, proceed with using the system */ 
-            String inputFile = null;
-            String outputFile = null;
-            
-            if (args.length > 0) {
-                inputFile = args[0];
-            }
-
-            if (args.length > 1) {
-                outputFile = args[1];
-            }
-
-            /* Parses a JSON tweet */
-            System.out.print(":: Parsing input tweet... ");
-            TweetParser tp = new TweetParser(inputFile, outputFile, pipeline);
-            tp.parse();
-            List<SentencePair> pairs = tp.getSentencePairs();
-            System.out.println("OK");
-
-            /* Load the pre-existing model from file */
-            SimilarityTest m = new SimilarityTest(pipeline);
-
-            System.out.print(":: Computing and writing similarities on output... ");
-            /* Gets the results and writes them on the JSON output file */
-            double[] similarities = m.getSimilarities(pairs);
-            tp.writeSimilarities(similarities);
-            System.out.println("OK");
+            parseProperties(args, paramIndex);
+        } else {
+            paramIndex = -2;
         }
+
+        String inputFile = null;
+        String outputFile = null;
+
+        if (args.length > (paramIndex + 2)) {
+            inputFile = args[paramIndex + 2];
+        }
+
+        if (args.length > (paramIndex + 3)) {
+            outputFile = args[paramIndex + 3];
+        }
+        
+        /* Parses a JSON tweet */
+        System.out.print(":: Parsing input tweet... ");
+        TweetParser tp = new TweetParser(inputFile, outputFile, pipeline);
+        tp.parse();
+        List<SentencePair> pairs = tp.getSentencePairs();
+        System.out.println("OK");
+
+        /* Load the pre-existing model from file */
+        SimilarityTest m = new SimilarityTest(pipeline);
+        System.out.print(":: Computing and writing similarities on output... ");
+        /* Gets the results and writes them on the JSON output file */
+        double[] similarities = m.getSimilarities(pairs);
+        tp.writeSimilarities(similarities);
+        System.out.println("OK");
     }
     
-    /*
-     * Reads the properties file and launches the correct step of the training.
-     * Refer to the README to know which steps are available and which parameter are required for each.
-     */
-    private static void trainSystem(String[] args, int paramIndex, StanfordCoreNLP nlp)
+    private static void parseProperties(String[] args, int paramIndex)
     {
         Properties prop = new Properties();
         String propertyFile;
@@ -65,7 +62,7 @@ public class SemanticSimilarity
             System.err.println("Missing properties file after --parameters");
             System.exit(-1);
         }
-                
+        
         propertyFile = args[paramIndex+1];
       
         try {
@@ -75,18 +72,44 @@ public class SemanticSimilarity
             System.exit(-1);
         }
         
-        String trainingFiles = prop.getProperty("trainfiles");
+        String google = prop.getProperty("google-corpus");
+        String lsa = prop.getProperty("lsa");
+        String sim = prop.getProperty("similarity-model");
         
-        if (trainingFiles == null) {
-            System.err.println("The property file has an invalid format. Please see the README for instructions.");
-            System.exit(-1);
+        if (google != null) {
+            File f = new File(google);
+            
+            if (!f.exists() || !f.isDirectory()) {
+                System.err.println("The google corpus path \"" + google + "\" doesn't exist.");
+                System.exit(-1);
+            }
+            
+            Constants.setGoogleCorpusFolder(google);
         }
-
-        SimilarityLearner sl = new SimilarityLearner(nlp);
-        List<TrainingSample> samples = sl.extractFeatures( trainingFiles.split(" ") );
-        sl.learnModel(samples);
+        
+        if (lsa != null) {
+            File f = new File(lsa);
+            
+            if (!f.exists()) {
+                System.err.println("The LSA matrix path \"" + lsa + "\" doesn't exist.");
+                System.exit(-1);
+            }
+            
+            Constants.setLsaMatrixPath(lsa, Integer.parseInt(prop.getProperty("lsa-size", "100")));
+        }
+        
+        if (sim != null) {
+            File f = new File(sim);
+            
+            if (!f.exists()) {
+                System.err.println("The similarity model path \"" + sim + "\" doesn't exist.");
+                System.exit(-1);
+            }
+            
+            Constants.setSimilarityModelPath(sim);
+        }
     }
-    
+   
     /*
      * Gets the index of a string in the command line array, or -1 if it
      * doesn't exist.

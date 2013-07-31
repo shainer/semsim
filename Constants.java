@@ -7,12 +7,17 @@ public class Constants
                                                "how", "in", "is", "it", "of", "on", "or", "that", "the", "this", "to",
                                                "was", "what", "when", "where", "who", "will", "with", "the", "'s", "did",
                                                "have", "has", "had", "were", "'ll"};
+    private static final String wordFrequenciesPath = "word-frequencies.txt";
     
-    private static final String similarityModelPath = "similarityModel.txt";
-
-    /* LSA constants */
-    private static final String lsaMatrixPath = "lsa_matrix.txt";
-    private static final int LSA_VECTOR_SIZE = 100;
+    /*
+     * These paths and parameters are all configurable using a Properties file, so
+     * we provide also setters and they are not declared final. These below are the
+     * default values.
+     */
+    private static String googleCorpusFolder = "googlebooks/";
+    private static String similarityModelPath = "similarityModel.txt";
+    private static String lsaMatrixPath = "lsa_matrix.txt";
+    private static int LSA_VECTOR_SIZE = 100;
     
     /* Constants for CrossValidation.java */
     private static final int CROSS_VALIDATION_FOLD = 10;
@@ -33,6 +38,16 @@ public class Constants
     public static String[] getStopWords()
     {
         return stopWords;
+    }
+    
+    public static String getGoogleCorpusFolder()
+    {
+        return googleCorpusFolder;
+    }
+    
+    public static String getWordFrequenciesPath()
+    {
+        return wordFrequenciesPath;
     }
     
     public static String getSimilarityModelPath()
@@ -99,5 +114,21 @@ public class Constants
     public static double getBestGamma()
     {
         return G;
+    }
+    
+    public static void setGoogleCorpusFolder(String f)
+    {
+        googleCorpusFolder = f;
+    }
+    
+    public static void setLsaMatrixPath(String matrixFile, int vectorSize)
+    {
+        lsaMatrixPath = matrixFile;
+        LSA_VECTOR_SIZE = vectorSize;
+    }
+    
+    public static void setSimilarityModelPath(String f)
+    {
+        similarityModelPath = f;
     }
 }
