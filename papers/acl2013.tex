@@ -52,8 +52,8 @@
 \maketitle 
 \begin{abstract}
 The Palmisano system is going to be a live Question Answering system operating on Twitter.
-Starting from the original question posed by the user, Palmisano searches similar questions,
-complete with their answers, from QA databases. Extracted questions need to be evaluated so
+Starting from the original question posed by the user, Palmisano looks for similar questions,
+complete with their answers, in Q&A databases. Extracted questions need to be evaluated so
 that the most similar to the original one is used to generate the final answer. This project
 developed a semantic similarity system based on the TakeLab \textit{simple} system, which shall
 be used to assign a score to extracted questions, measuring their semantic similarity to the original one.
@@ -124,16 +124,19 @@ Similarity scores range from 0 (totally different sentences) to 5
 
 Both the training and test set are shipped with a Gold Standard score
 for each sentence pair. However, semantic similarity is a concept
-that remains vague and open to discussions or contradictions. {[}CIT{]}
-recaps all the issues encountered while annotating.
+that remains vague and open to discussions or contradictions. \cite{Agirre:12}
+recaps some of the issues encountered while annotating.
 
 
 \subsection{Preprocessing steps}
 
-Before features are extracted, sentence pairs are preprocessed with
+Before feature extraction, sentence pairs are preprocessed with
 the following rules:
 \begin{itemize}
-\item tokenization, Part-Of-Speech tagging and lemmatization;
+\item tokenization, Part-Of-Speech tagging and lemmatization. For the user
+question, the necessary information is already provided by preceding stages of the Palmisano
+pipeline. For questions extracted from databases the Stanford Core NLP pipeline
+is invoked.
 \item hyphens and slashes are removed;
 \item angular brackets appearing at the beginning or
 at the end of tokens are removed;
@@ -151,13 +154,9 @@ of generality. Additionally, if two sentences have a lot of stopwords
 in common, this doesn't increase much their probability of being similar,
 so leaving them in place may actually confuse the system.
 \end{itemize}
-The first step is carried on in two ways: for the user question, by
-relying on the preceding stages of the Palmisano pipeline. For the
-questions extracted from the database the Stanford Core NLP pipeline
-is invoked.
 
-All the other steps are taken care of internally, without use of external
-libraries.
+Except for the Stanford pipeline, no other external library is used during
+this process.
 
 
 \subsection{Features}
@@ -195,14 +194,14 @@ but it was added by the authors as a later improvement.
 
 This overlap, or degree of coverage between the two sentences, deals
 with ``raw'' words or lemmas. Now we move to more sophisticated
-types of coverages, who try to take into account other semantic properties
-of the tokens in order to obtain a more realistic value.
+types of coverages, which try to take into account other semantic properties
+of the tokens in order to obtain a more realistic measure.
 
 
 \subsubsection*{WordNet-augmented word overlap}
 
 Here we try to take into account different words that have however
-a quite close meaning. Such ``closeness'' is measured from the path
+a quite close meaning. Such ``closeness'' is measured using the path
 length similarity of WordNet. Let's define the WordNet-augmented coverage:
 
 \[
@@ -264,8 +263,8 @@ wwo=harmonic(wwc(S_{1},S_{2}),\, wwc(S_{2},S_{1}))
 In computational linguistics, the distributional hypothesis states
 that words that tend to appear in the same contexts are likely to
 be similar; this hypothesis is usually confirmed by the trends in
-human annotations. In TakeLab, words and the contexts are expressed
-with a term-document matrix. Word vectors are then summed together
+human annotations. In TakeLab, words and their contexts are expressed
+by a term-document matrix. Word vectors are then summed together
 in order to compose sentence vectors. The first feature is a cosine
 similarity between the two sentence vectors. For the second feature,
 word vectors are weighted with the information content of the word
@@ -291,10 +290,30 @@ and similarly for the sum of all the information contents.
 
 \subsubsection*{Number overlaps}
 
-This describes three features dealing entirely with numeric tokens,
+This collects three features dealing entirely with numeric tokens,
 on the basis that the human annotators for the training set often
-gave low similarity scores to sentence pairs where the numbers differed
-a lot.
+gave low similarity scores to sentence pairs where the numbers differed.
+
+First we build $N_{1}$ and $N_{2}$, two sets containing all the numerical tokens
+respectively from the first and the second sentence. Then we compute the
+following features:
+
+\[
+\log(1+|N_{1}|+|N_{2}|)
+\]
+
+
+\[
+\frac{2|N_{1}\cap N_{2}|}{|N_{1}|+|N_{2}|}
+\]
+
+
+\[
+N_{1}\subseteq N_{2}\vee\, N_{2}\subseteq N_{1}
+\]
+
+where the last is a boolean value. As we specified in the code, TakeLab requires that
+numbers differing only for the number of decimal digits (e.g 6.2 and 6.23) be considered equal.
 
 
 \subsubsection*{Named Entity features}
@@ -660,8 +679,8 @@ load the machine learning models used by the NLP pipeline.
 Training and test files were provided by the Semeval 2012 Task 6,
 so that all systems could be evaluated on the same samples. Each sample
 file was actually split in two: one text file for the sentence pairs,
-called STS.input.<name>.txt, and another with the annotated similarity
-scores, named STS.gs.<name>.txt.
+called STS.input.\textit{name}.txt, and another with the annotated similarity
+scores, named STS.gs.\textit{name}.txt.
 
 In order to simplify command line arguments and I/O operations, the
 \texttt{\small{putOutput.py}} script merged the two of them into one
@@ -673,16 +692,14 @@ text file organized this way:
 
 
 This is also the only format recognized by my application. All the
-sample files you see in the subdirectories are already in this format,
-but \texttt{\small{putOutput.py}} is available in the src/scripts/
-folder should you need to convert new samples.
+sample files you see in the subdirectories are already in this format.
 
 
 \subsection{The Google NGram Corpus}
 
 The Google NGram corpus is a huge resource, collecting frequency counts
 for English tokens spanning across several decades. Unfortunately
-it is not really optimized for a huge sequences of queries, so I applied
+it is not really optimized for huge sequences of queries, so I applied
 some processing steps in order to reduce its volume to a manageable
 size, also in terms of occupied disk space:
 \begin{itemize}
@@ -938,12 +955,16 @@ the paper was written;
 \item I used different external data: LSA matrix, WordNet library, and Google
 NGram Corpus.
 \item personal errors.
+\item lack of details: whether punctuaction characters or numbers should be taken into account
+for some features, how to manage different tagsets into the same application, etc... were deemed
+too implementation-specific to be added to a mostly theorical paper. Even with some aid by the professors,
+I cannot be completely sure I always made the best decisions.
 \end{itemize}
 
 \section{Applying this system in Palmisano}
 
 From now on, I'm going to refer to the original TakeLab simple system.
-It is my personal opinion that it will not be suitable for being applied
+It is my personal opinion that it will not be very suitable for being applied
 to Tweets ``as it is'', and I'm going to explain why.
 
 First, some of the features and preprocessing functions were clearly
@@ -980,10 +1001,15 @@ subtracts some relevant information in the questions.
 On top of all, I believe that the system should be enriched with some
 features designed for dealing with questions before being inserted
 in the Palmisano pipeline. A possible idea is a feature comparing
-the motives behind a question (asking for a factual information vs.
-a personal opinion, asking for a reason, and so on). Furthermore,
-when more annotated tweets are available, the training and cross validation
-should be repeated on those. 
+the "W-words" of a question, for instance "where" versus "why", which means
+asking for a location versus asking for a reason. The tags "types" and
+"categories" added in the tweets to recognize different kinds of questions could
+play a role too, although they are technically outside the sentence itself:
+being able to differentiate immediately between a question asking for a fact
+and one collecting personal opinions could be a good jump forward our goal.
+
+Furthermore, when a sufficiently large number of tweets is available, both
+the training and cross validation should be repeated on those. 
 
 
 \section{Acknowledgements}
